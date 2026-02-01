@@ -16,23 +16,22 @@ export type ToolMetadata = {
 };
 
 export const toolsRegistry: ToolMetadata[] = [
-  // Tools will be added here
-  // Example:
-  // {
-  //   slug: 'json-to-csv',
-  //   title: {
-  //     he: 'המרת JSON ל-CSV',
-  //     en: 'JSON to CSV Converter',
-  //   },
-  //   description: {
-  //     he: 'המר קבצי JSON לפורמט CSV בקלות ובמהירות',
-  //     en: 'Convert JSON files to CSV format easily and quickly',
-  //   },
-  //   keywords: {
-  //     he: ['json', 'csv', 'המרה', 'קונברטר'],
-  //     en: ['json', 'csv', 'converter', 'transform'],
-  //   },
-  // },
+  {
+    slug: 'json-to-csv',
+    title: {
+      he: 'המרת JSON ל-CSV',
+      en: 'JSON to CSV Converter',
+    },
+    description: {
+      he: 'המר קבצי JSON לפורמט CSV בקלות ובמהירות. כלי חינם למפתחים ואנשי טכנולוגיה.',
+      en: 'Convert JSON files to CSV format easily and quickly. Free tool for developers and tech professionals.',
+    },
+    keywords: {
+      he: ['json', 'csv', 'המרה', 'קונברטר', 'json to csv'],
+      en: ['json', 'csv', 'converter', 'transform', 'json to csv'],
+    },
+    category: 'data',
+  },
 ];
 
 export function getToolBySlug(slug: string): ToolMetadata | undefined {

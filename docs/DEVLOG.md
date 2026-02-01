@@ -34,6 +34,85 @@ Notes: בדוק מובייל ו-SEO לפני merge.
 
 ## רשומות
 
+### 2026-02-01 - כלי ראשון: JSON to CSV Converter
+
+**תאריך:** 2026-02-01  
+**שם הכלי:** JSON to CSV Converter  
+**Slug:** json-to-csv  
+**סוג השינוי:** Feature  
+**תיאור השינוי:**  
+הוספת הכלי הראשון לפרויקט - JSON to CSV Converter. כלי המרה למפתחים ואנשי נתונים.
+
+**קבצים שנוצרו:**
+- app/[locale]/tools/json-to-csv/page.tsx
+- app/[locale]/tools/json-to-csv/logic.ts  
+- app/[locale]/tools/json-to-csv/seo.ts
+
+**עדכונים:**
+- core/registry/tools.registry.ts - הוסיף את json-to-csv לרישום
+- messages/he.json - הוסיף תרגומים בעברית
+- messages/en.json - הוסיף תרגומים באנגלית
+
+**תיאור דטאילי:**
+
+1. **logic.ts:**
+   - convertJsonToCsv() - פונקציה טהורה המומיר JSON array ל-CSV
+   - escapeCSVValue() - ריחוף ערכים לפי RFC 4180
+   - formatValue() - עיצוב ערכים שונים לCVS
+   - בדיקות שגיאות מלאות לקלט לא תקין
+
+2. **page.tsx:**
+   - שימוש בToolLayout, ToolInput, ToolOutput, ToolActions
+   - טיפול בשגיאות עם תצוגה ברורה
+   - כפתורים: Copy, Clear, Download
+   - FAQ section בעברית ובאנגלית
+   - ללא hardcoded strings - הכל דרך i18n
+
+3. **seo.ts:**
+   - generateMetadata() - מטאדטה ספציפית לכלי
+   - generateSchema() - Schema.org/SoftwareApplication
+   - hreflang לשתי השפות
+
+4. **i18n:**
+   - תרגומים מלאים בעברית ובאנגלית
+   - כל הטקסטים דרך t() function
+   - RTL תומך בעברית
+
+**עמידה בעקרונות:**
+- ✅ Frontend Only - אין שרת, לוגיקה טהורה בדפדפן
+- ✅ Mobile-First - כל הUI עם Tailwind mobile-first
+- ✅ כלי אחד = חיפוש אחד - json-to-csv בלבד
+- ✅ הפרדת אחריות - logic.ts, page.tsx, seo.ts מופרדים לחלוטין
+- ✅ SEO מלא - Title, Description, Schema, Canonical, hreflang
+- ✅ i18n מלא - עברית ואנגלית, RTL תומך
+- ✅ Tap targets ≥ 44px
+- ✅ font-size מינימלי 16px
+
+**דוגמה לקלט:**
+```json
+[
+  {"name": "John", "age": 30},
+  {"name": "Jane", "age": 25}
+]
+```
+
+**דוגמה לפלט:**
+```
+name,age
+John,30
+Jane,25
+```
+
+**Commit:** (ממתין)  
+
+**הערות שימוש:**
+- הכלי טיפל בערכים עם פסיקים וירידות שורה
+- Null/undefined מומרות לערך ריק
+- מערכים ואובייקטים מומרים לJSON string
+- אין כל תלות בספריות חיצוניות לתהליך ההמרה
+
+---
+
 ### 2026-02-01 - התשתית הראשונית
 
 **תאריך:** 2026-02-01  
