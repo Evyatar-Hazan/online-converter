@@ -117,7 +117,7 @@ Notes: בדוק מובייל ו-SEO לפני merge.
 - /core/registry/index.ts
 - /.env.example
 
-**Commit:** (ממתין לקומיט ראשון)  
+**Commit:** 9697637  
 
 **הערות שימוש:**
 - התשתית מוכנה להוספת כלים חדשים
