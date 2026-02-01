@@ -1,0 +1,11 @@
+{
+  "common": {
+    "siteName": "Converter",
+    "home": "Home",
+    "tools": "Tools"
+  },
+  "home": {
+    "title": "Fast and Accessible Conversion Tools",
+    "description": "Professional conversion tools for developers and tech professionals"
+  }
+}
