@@ -78,33 +78,38 @@ export function ConverterLayout({
       <div className="container">
         <Header showBack={true} />
         
-        <div className="card">
-          <h2 style={{ marginBottom: '0.5rem', color: 'var(--primary-color)' }}>{title}</h2>
+        <main className="card" aria-labelledby="tool-title">
+          <h2 id="tool-title" style={{ marginBottom: '0.5rem', color: 'var(--primary-color)' }}>{title}</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{description}</p>
           
           <div style={{ marginBottom: '1rem' }}>
-            <label className="section-title" style={{ display: 'block', marginBottom: '0.5rem' }}>{inputLabel}</label>
+            <label htmlFor="converter-input" className="section-title" style={{ display: 'block', marginBottom: '0.5rem' }}>{inputLabel}</label>
             <textarea
+              id="converter-input"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               placeholder={t('converter.inputPlaceholder', { label: inputLabel })}
+              aria-invalid={!!error}
             />
           </div>
 
           <div className="btn-container">
             <button className="btn btn-primary" onClick={handleConvert}>
-              <RefreshCw size={18} /> {t('converter.convert')}
+              <RefreshCw size={18} aria-hidden="true" /> {t('converter.convert')}
             </button>
             <button className="btn" onClick={handleClear} style={{ backgroundColor: '#64748b' }}>
-              <Trash2 size={18} /> {t('converter.clear')}
+              <Trash2 size={18} aria-hidden="true" /> {t('converter.clear')}
             </button>
           </div>
 
-          {error && <div className="error-msg" style={{ display: 'block' }}>{error}</div>}
+          <div aria-live="assertive" aria-atomic="true">
+            {error && <div className="error-msg" style={{ display: 'block' }}>{error}</div>}
+          </div>
 
           <div style={{ marginTop: '2rem' }}>
-            <label className="section-title" style={{ display: 'block', marginBottom: '0.5rem' }}>{outputLabel}</label>
+            <label htmlFor="converter-output" className="section-title" style={{ display: 'block', marginBottom: '0.5rem' }}>{outputLabel}</label>
             <textarea
+              id="converter-output"
               readOnly
               value={outputVal}
               placeholder={t('converter.outputPlaceholder', { label: outputLabel })}
@@ -113,13 +118,13 @@ export function ConverterLayout({
 
           <div className="btn-container">
             <button className="btn btn-success" onClick={handleDownload} disabled={!outputVal}>
-              <Download size={18} /> {t('converter.download')}
+              <Download size={18} aria-hidden="true" /> {t('converter.download')}
             </button>
             <button className="btn" onClick={handleCopy} disabled={!outputVal} style={{ backgroundColor: '#64748b' }}>
-              <Copy size={18} /> {t('converter.copy')}
+              <Copy size={18} aria-hidden="true" /> {t('converter.copy')}
             </button>
           </div>
-        </div>
+        </main>
       </div>
       <Footer />
     </div>

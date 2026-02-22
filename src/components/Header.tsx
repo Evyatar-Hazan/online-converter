@@ -25,13 +25,17 @@ export function Header({ showBack = false }: HeaderProps) {
     <header>
       <div style={{ display: 'flex', justifyContent: showBack ? 'space-between' : 'flex-end', alignItems: 'center', marginBottom: '1.5rem' }}>
         {showBack && (
-          <Link to="/" className="back-link" style={{ margin: 0 }}>
-            {i18n.language === 'he' ? <ArrowLeft size={16} style={{transform: 'rotate(180deg)'}} /> : <ArrowLeft size={16} />} 
+          <Link to="/" className="back-link" style={{ margin: 0 }} aria-label={t('header.back')}>
+            {i18n.language === 'he' ? <ArrowLeft size={16} aria-hidden="true" style={{transform: 'rotate(180deg)'}} /> : <ArrowLeft aria-hidden="true" size={16} />} 
             {t('header.back')}
           </Link>
         )}
-        <button className="btn" onClick={toggleLanguage} style={{ margin: 0, padding: '0.5rem 1rem', display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--card-bg)', color: 'var(--text-main)', border: '1px solid var(--border-color)' }}>
-          <Globe size={16} />
+        <button 
+          className="btn" 
+          onClick={toggleLanguage} 
+          aria-label={i18n.language === 'he' ? 'Switch to English' : 'החלף לשפה העברית'}
+          style={{ margin: 0, padding: '0.5rem 1rem', display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--card-bg)', color: 'var(--text-main)', border: '1px solid var(--border-color)' }}>
+          <Globe size={16} aria-hidden="true" />
           {i18n.language === 'he' ? 'English' : 'עברית'}
         </button>
       </div>

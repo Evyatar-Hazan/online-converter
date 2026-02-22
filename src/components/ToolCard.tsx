@@ -23,7 +23,9 @@ interface ToolCardProps {
 export function ToolCard({ iconType, title, description, features, linkUrl, openText }: ToolCardProps) {
   return (
     <div className="tool-card">
-      {iconMap[iconType]}
+      <div aria-hidden="true">
+        {iconMap[iconType]}
+      </div>
       <h2>{title}</h2>
       <p>{description}</p>
       <div className="tool-features">
