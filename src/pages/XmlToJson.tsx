@@ -1,14 +1,16 @@
 
 import { ConverterLayout } from '../components/ConverterLayout';
 import { xmlToJson } from '../utils/xmlToJson';
+import { useTranslation } from 'react-i18next';
 
 export default function XmlToJson() {
+  const { t } = useTranslation();
   return (
     <ConverterLayout
-      title="XML to JSON Converter"
-      description="Convert XML structures and attributes into clean JSON. Great for modernizing legacy APIs."
-      inputLabel="XML Input"
-      outputLabel="JSON Output"
+      title={t('pages.xmlToJson.title')}
+      description={t('pages.xmlToJson.desc')}
+      inputLabel={t('pages.xmlToJson.input')}
+      outputLabel={t('pages.xmlToJson.output')}
       storageKey="converter_xml_to_json_input"
       onConvert={xmlToJson}
       defaultOutputExtension="json"

@@ -1,0 +1,85 @@
+{
+  "header": {
+    "title": "Universal Data Converter",
+    "description": "Convert between JSON, CSV, and XML formats. All tools run 100% in your browser for privacy and speed.",
+    "back": "Back to Tools"
+  },
+  "home": {
+    "howItWorksTitle": "How It Works",
+    "howItWorksDesc": "All tools process your data locally in your browser. No uploads, no tracking, no limits. Choose a tool above to get started."
+  },
+  "tools": {
+    "jsonToCsv": {
+      "title": "JSON to CSV",
+      "desc": "Transform JSON objects/arrays into clean CSV files for spreadsheets and analysis.",
+      "f1": "Instant",
+      "f2": "Handles Arrays",
+      "f3": "Privacy First",
+      "open": "Open Tool \u2192"
+    },
+    "csvToJson": {
+      "title": "CSV to JSON",
+      "desc": "Parse CSV headers and rows into structured JSON for APIs and data workflows.",
+      "f1": "Instant",
+      "f2": "Handles Quotes",
+      "f3": "Privacy First",
+      "open": "Open Tool \u2192"
+    },
+    "jsonToXml": {
+      "title": "JSON to XML",
+      "desc": "Convert JSON objects/arrays into well-formed XML for integrations and documentation.",
+      "f1": "Instant",
+      "f2": "Escapes Special Chars",
+      "f3": "Privacy First",
+      "open": "Open Tool \u2192"
+    },
+    "xmlToJson": {
+      "title": "XML to JSON",
+      "desc": "Convert XML elements and attributes into structured JSON for APIs and data analysis.",
+      "f1": "Instant",
+      "f2": "Handles Attributes",
+      "f3": "Privacy First",
+      "open": "Open Tool \u2192"
+    }
+  },
+  "converter": {
+    "convert": "Convert",
+    "clear": "Clear",
+    "download": "Download",
+    "copy": "Copy",
+    "copied": "Copied to clipboard!",
+    "copyFail": "Failed to copy.",
+    "inputPlaceholder": "Paste your {{label}} here...",
+    "outputPlaceholder": "Your {{label}} will appear here...",
+    "failMsg": "Conversion failed. Please check your logic or input formatting."
+  },
+  "pages": {
+    "jsonToCsv": {
+      "title": "JSON to CSV Converter",
+      "desc": "Transform JSON APIs and payloads into clean CSV files. Handles nested arrays gracefully.",
+      "input": "JSON Input",
+      "output": "CSV Output"
+    },
+    "csvToJson": {
+      "title": "CSV to JSON Converter",
+      "desc": "Parse CSV data into structured JSON format. Supports complex quotes and commas.",
+      "input": "CSV Input",
+      "output": "JSON Output"
+    },
+    "jsonToXml": {
+      "title": "JSON to XML Converter",
+      "desc": "Convert JSON data into well-formed XML format with automatic tag generation.",
+      "input": "JSON Input",
+      "output": "XML Output"
+    },
+    "xmlToJson": {
+      "title": "XML to JSON Converter",
+      "desc": "Convert XML structures and attributes into clean JSON. Great for modernizing legacy APIs.",
+      "input": "XML Input",
+      "output": "JSON Output"
+    }
+  },
+  "footer": {
+    "rights": "Universal Data Converter. All rights reserved."
+  }
+}

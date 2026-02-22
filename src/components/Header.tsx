@@ -1,22 +1,43 @@
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 
 interface HeaderProps {
   showBack?: boolean;
 }
 
 export function Header({ showBack = false }: HeaderProps) {
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const nextLang = i18n.language === 'he' ? 'en' : 'he';
+    i18n.changeLanguage(nextLang);
+  };
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'he' ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   return (
     <header>
-      {showBack && (
-        <Link to="/" className="back-link">
-          <ArrowLeft size={16} /> Back to Tools
-        </Link>
-      )}
-      <h1>Universal Data Converter</h1>
+      <div style={{ display: 'flex', justifyContent: showBack ? 'space-between' : 'flex-end', alignItems: 'center', marginBottom: '1.5rem' }}>
+        {showBack && (
+          <Link to="/" className="back-link" style={{ margin: 0 }}>
+            {i18n.language === 'he' ? <ArrowLeft size={16} style={{transform: 'rotate(180deg)'}} /> : <ArrowLeft size={16} />} 
+            {t('header.back')}
+          </Link>
+        )}
+        <button className="btn" onClick={toggleLanguage} style={{ margin: 0, padding: '0.5rem 1rem', display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--card-bg)', color: 'var(--text-main)', border: '1px solid var(--border-color)' }}>
+          <Globe size={16} />
+          {i18n.language === 'he' ? 'English' : 'עברית'}
+        </button>
+      </div>
+      <h1>{t('header.title')}</h1>
       <p className="description">
-        Convert between JSON, CSV, and XML formats. All tools run 100% in your browser for privacy and speed.
+        {t('header.description')}
       </p>
     </header>
   );

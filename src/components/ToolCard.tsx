@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { FileJson, FileText, Code2, Database } from 'lucide-react';
 
+
 // Maps string identifiers to Lucide icons
 const iconMap = {
   FileText: <FileText size={40} className="tool-icon" />,
@@ -16,9 +17,10 @@ interface ToolCardProps {
   description: string;
   features: string[];
   linkUrl: string;
+  openText: string;
 }
 
-export function ToolCard({ iconType, title, description, features, linkUrl }: ToolCardProps) {
+export function ToolCard({ iconType, title, description, features, linkUrl, openText }: ToolCardProps) {
   return (
     <div className="tool-card">
       {iconMap[iconType]}
@@ -29,7 +31,9 @@ export function ToolCard({ iconType, title, description, features, linkUrl }: To
           <span key={idx} className="feature">✓ {feature}</span>
         ))}
       </div>
-      <Link to={linkUrl} className="btn">Open Tool &rarr;</Link>
+      <Link to={linkUrl} className="btn">
+        {openText}
+      </Link>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Download, Copy, RefreshCw, Trash2 } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useTranslation } from 'react-i18next';
 
 interface ConverterLayoutProps {
   title: string;
@@ -26,6 +27,7 @@ export function ConverterLayout({
   const [inputVal, setInputVal] = useLocalStorage<string>(storageKey, '');
   const [outputVal, setOutputVal] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const { t } = useTranslation();
 
   const handleConvert = () => {
     try {
@@ -37,7 +39,7 @@ export function ConverterLayout({
       const result = onConvert(inputVal);
       setOutputVal(result);
     } catch (err: any) {
-      setError(err.message || 'Conversion failed. Please check your logic or input formatting.');
+      setError(t('converter.failMsg'));
       setOutputVal('');
     }
   };
@@ -59,9 +61,9 @@ export function ConverterLayout({
     if (!outputVal) return;
     try {
       await navigator.clipboard.writeText(outputVal);
-      alert('Copied to clipboard!');
+      alert(t('converter.copied'));
     } catch (err) {
-      alert('Failed to copy.');
+      alert(t('converter.copyFail'));
     }
   };
 
@@ -85,16 +87,16 @@ export function ConverterLayout({
             <textarea
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
-              placeholder={`Paste your ${inputLabel.toLowerCase()} here...`}
+              placeholder={t('converter.inputPlaceholder', { label: inputLabel })}
             />
           </div>
 
           <div className="btn-container">
             <button className="btn btn-primary" onClick={handleConvert}>
-              <RefreshCw size={18} /> Convert
+              <RefreshCw size={18} /> {t('converter.convert')}
             </button>
             <button className="btn" onClick={handleClear} style={{ backgroundColor: '#64748b' }}>
-              <Trash2 size={18} /> Clear
+              <Trash2 size={18} /> {t('converter.clear')}
             </button>
           </div>
 
@@ -105,16 +107,16 @@ export function ConverterLayout({
             <textarea
               readOnly
               value={outputVal}
-              placeholder={`Your ${outputLabel.toLowerCase()} will appear here...`}
+              placeholder={t('converter.outputPlaceholder', { label: outputLabel })}
             />
           </div>
 
           <div className="btn-container">
             <button className="btn btn-success" onClick={handleDownload} disabled={!outputVal}>
-              <Download size={18} /> Download
+              <Download size={18} /> {t('converter.download')}
             </button>
             <button className="btn" onClick={handleCopy} disabled={!outputVal} style={{ backgroundColor: '#64748b' }}>
-              <Copy size={18} /> Copy
+              <Copy size={18} /> {t('converter.copy')}
             </button>
           </div>
         </div>

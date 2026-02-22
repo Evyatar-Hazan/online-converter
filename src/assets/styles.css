@@ -219,6 +219,9 @@ textarea {
     resize: vertical;
     outline: none;
     background-color: #fafafa;
+    direction: ltr;
+    /* Always keep code LTR */
+    text-align: left;
 }
 
 textarea:focus {

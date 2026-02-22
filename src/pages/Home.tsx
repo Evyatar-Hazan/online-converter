@@ -2,8 +2,11 @@
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { ToolCard } from '../components/ToolCard';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <div className="app-wrapper">
       <div className="container">
@@ -12,38 +15,41 @@ export default function Home() {
           <div className="tools-grid">
             <ToolCard
               iconType="FileText"
-              title="JSON to CSV"
-              description="Transform JSON objects/arrays into clean CSV files for spreadsheets and analysis."
-              features={['Instant', 'Handles Arrays', 'Privacy First']}
+              title={t('tools.jsonToCsv.title')}
+              description={t('tools.jsonToCsv.desc')}
+              features={[t('tools.jsonToCsv.f1'), t('tools.jsonToCsv.f2'), t('tools.jsonToCsv.f3')]}
               linkUrl="/json-to-csv"
+              openText={t('tools.jsonToCsv.open')}
             />
             <ToolCard
               iconType="Database"
-              title="CSV to JSON"
-              description="Parse CSV headers and rows into structured JSON for APIs and data workflows."
-              features={['Instant', 'Handles Quotes', 'Privacy First']}
+              title={t('tools.csvToJson.title')}
+              description={t('tools.csvToJson.desc')}
+              features={[t('tools.csvToJson.f1'), t('tools.csvToJson.f2'), t('tools.csvToJson.f3')]}
               linkUrl="/csv-to-json"
+              openText={t('tools.csvToJson.open')}
             />
             <ToolCard
               iconType="Code2"
-              title="JSON to XML"
-              description="Convert JSON objects/arrays into well-formed XML for integrations and documentation."
-              features={['Instant', 'Escapes Special Chars', 'Privacy First']}
+              title={t('tools.jsonToXml.title')}
+              description={t('tools.jsonToXml.desc')}
+              features={[t('tools.jsonToXml.f1'), t('tools.jsonToXml.f2'), t('tools.jsonToXml.f3')]}
               linkUrl="/json-to-xml"
+              openText={t('tools.jsonToXml.open')}
             />
             <ToolCard
               iconType="FileJson"
-              title="XML to JSON"
-              description="Convert XML elements and attributes into structured JSON for APIs and data analysis."
-              features={['Instant', 'Handles Attributes', 'Privacy First']}
+              title={t('tools.xmlToJson.title')}
+              description={t('tools.xmlToJson.desc')}
+              features={[t('tools.xmlToJson.f1'), t('tools.xmlToJson.f2'), t('tools.xmlToJson.f3')]}
               linkUrl="/xml-to-json"
+              openText={t('tools.xmlToJson.open')}
             />
           </div>
           <section style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <h2>How It Works</h2>
+            <h2>{t('home.howItWorksTitle')}</h2>
             <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '1rem auto' }}>
-              All tools process your data locally in your browser. No uploads, no tracking, no limits. Choose a
-              tool above to get started.
+              {t('home.howItWorksDesc')}
             </p>
           </section>
         </main>
