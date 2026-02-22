@@ -42,6 +42,22 @@
       "f2": "Handles Attributes",
       "f3": "Privacy First",
       "open": "Open Tool \u2192"
+    },
+    "jsonToYaml": {
+      "title": "JSON to YAML",
+      "desc": "Convert JSON objects into clean YAML for configs and devops workflows.",
+      "f1": "Instant",
+      "f2": "Clean Syntax",
+      "f3": "Privacy First",
+      "open": "Open Tool \u2192"
+    },
+    "yamlToJson": {
+      "title": "YAML to JSON",
+      "desc": "Convert YAML configs into structured JSON for APIs and processing.",
+      "f1": "Instant",
+      "f2": "Strict Parsing",
+      "f3": "Privacy First",
+      "open": "Open Tool \u2192"
     }
   },
   "converter": {
@@ -78,6 +94,18 @@
       "title": "XML to JSON Converter",
       "desc": "Convert XML structures and attributes into clean JSON. Great for modernizing legacy APIs.",
       "input": "XML Input",
+      "output": "JSON Output"
+    },
+    "jsonToYaml": {
+      "title": "JSON to YAML Converter",
+      "desc": "Transform JSON data into readable YAML format. Ideal for Kubernetes and CI/CD configs.",
+      "input": "JSON Input",
+      "output": "YAML Output"
+    },
+    "yamlToJson": {
+      "title": "YAML to JSON Converter",
+      "desc": "Convert YAML settings into structured JSON data. Supports multi-document YAML.",
+      "input": "YAML Input",
       "output": "JSON Output"
     }
   },

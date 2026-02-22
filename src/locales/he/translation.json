@@ -42,6 +42,22 @@
       "f2": "מטפל במאפיינים",
       "f3": "פרטיות מלאה",
       "open": "פתח כלי \u2190"
+    },
+    "jsonToYaml": {
+      "title": "JSON ל-YAML",
+      "desc": "המר אובייקטים של JSON לקובצי YAML נקיים עבור הגדרות ותהליכי פיתוח.",
+      "f1": "מיידי",
+      "f2": "תחביר נקי",
+      "f3": "פרטיות מלאה",
+      "open": "פתח כלי \u2190"
+    },
+    "yamlToJson": {
+      "title": "YAML ל-JSON",
+      "desc": "המר הגדרות YAML ל-JSON מובנה עבור APIs ועיבוד נתונים.",
+      "f1": "מיידי",
+      "f2": "פענוח קפדני",
+      "f3": "פרטיות מלאה",
+      "open": "פתח כלי \u2190"
     }
   },
   "converter": {
@@ -78,6 +94,18 @@
       "title": "ממיר XML ל-JSON",
       "desc": "המר מבני XML כולל תכונות פנימיות למבנה JSON נקי. אדיר למעבר ממידע ישן.",
       "input": "קלט XML",
+      "output": "פלט JSON"
+    },
+    "jsonToYaml": {
+      "title": "ממיר JSON ל-YAML",
+      "desc": "המר נתוני JSON לפורמט YAML קריא. אידיאלי עבור הגדרות Kubernetes ו-CI/CD.",
+      "input": "קלט JSON",
+      "output": "פלט YAML"
+    },
+    "yamlToJson": {
+      "title": "ממיר YAML ל-JSON",
+      "desc": "המר הגדרות YAML לנתוני JSON מובנים. תומך במסמכי YAML מרובים.",
+      "input": "קלט YAML",
       "output": "פלט JSON"
     }
   },

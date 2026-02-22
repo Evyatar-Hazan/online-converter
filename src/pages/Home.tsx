@@ -45,6 +45,22 @@ export default function Home() {
               linkUrl="/xml-to-json"
               openText={t('tools.xmlToJson.open')}
             />
+            <ToolCard
+              iconType="FileCog"
+              title={t('tools.jsonToYaml.title')}
+              description={t('tools.jsonToYaml.desc')}
+              features={[t('tools.jsonToYaml.f1'), t('tools.jsonToYaml.f2'), t('tools.jsonToYaml.f3')]}
+              linkUrl="/json-to-yaml"
+              openText={t('tools.jsonToYaml.open')}
+            />
+            <ToolCard
+              iconType="Settings2"
+              title={t('tools.yamlToJson.title')}
+              description={t('tools.yamlToJson.desc')}
+              features={[t('tools.yamlToJson.f1'), t('tools.yamlToJson.f2'), t('tools.yamlToJson.f3')]}
+              linkUrl="/yaml-to-json"
+              openText={t('tools.yamlToJson.open')}
+            />
           </div>
           <section style={{ textAlign: 'center', marginTop: '3rem' }}>
             <h2>{t('home.howItWorksTitle')}</h2>
