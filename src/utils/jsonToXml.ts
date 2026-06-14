@@ -1,8 +1,10 @@
-function isPrimitive(val: any): boolean {
+type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
+
+function isPrimitive(val: unknown): boolean {
     return val === null || typeof val !== 'object';
 }
 
-function escapeXml(value: any): string {
+function escapeXml(value: unknown): string {
     return String(value)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -11,7 +13,7 @@ function escapeXml(value: any): string {
         .replace(/'/g, '&apos;');
 }
 
-function formatValue(val: any, level: number): string {
+function formatValue(val: JsonValue, level: number): string {
     const indent = '  '.repeat(level);
     const nextLevel = level + 1;
     if (Array.isArray(val)) {
@@ -50,12 +52,12 @@ function formatValue(val: any, level: number): string {
     return `${indent}${escapeXml(val ?? '')}`;
 }
 
-export function jsonToXml(jsonData: string | Record<string, any>, rootName: string = 'root'): string {
+export function jsonToXml(jsonData: string | JsonValue, rootName: string = 'root'): string {
     const parsedRoot = typeof rootName === 'string' && rootName.trim() ? rootName.trim() : 'root';
-    let data: any;
+    let data: JsonValue;
     try {
         data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-    } catch (e) {
+    } catch {
         throw new Error('Invalid JSON format.');
     }
     if (data === undefined) {

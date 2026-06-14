@@ -38,7 +38,7 @@ export function ConverterLayout({
       }
       const result = onConvert(inputVal);
       setOutputVal(result);
-    } catch (err: any) {
+    } catch {
       setError(t('converter.failMsg'));
       setOutputVal('');
     }
@@ -62,7 +62,7 @@ export function ConverterLayout({
     try {
       await navigator.clipboard.writeText(outputVal);
       alert(t('converter.copied'));
-    } catch (err) {
+    } catch {
       alert(t('converter.copyFail'));
     }
   };

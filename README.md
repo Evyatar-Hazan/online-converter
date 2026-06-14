@@ -6,11 +6,13 @@ Languages available: [English](README.md) | [עברית (Hebrew)](README.he.md)
 
 ## ✨ Features
 
-- **Four Powerful Tools:**
+- **Six Powerful Tools:**
   - **JSON to CSV:** Flattens arrays and structures properties into clean comma-separated values.
   - **CSV to JSON:** Validates headers and rows to construct robust JSON representations.
   - **XML to JSON:** Deep traversal to convert attribute structures and nodes into clean nested JSON.
   - **JSON to XML:** Recursively maps arrays and primitives to valid XML syntax with auto tags.
+  - **JSON to YAML:** Converts JSON payloads into readable YAML.
+  - **YAML to JSON:** Parses YAML content into formatted JSON.
 - **Privacy First Approach:** 100% of the logic happens locally in your browser. No files are uploaded and no APIs are called.
 - **Dark Mode Support:** State-of-the-Art CSS variable implementation with dynamic theme toggling (Sun/Moon).
 - **Internationalization (i18n):** Full support for English (LTR) and Hebrew (RTL) including structural interface flip.
@@ -31,8 +33,8 @@ Languages available: [English](README.md) | [עברית (Hebrew)](README.he.md)
 To run the project locally on your machine, ensure you have [Node.js](https://nodejs.org/) installed, and then run the following commands:
 
 ```bash
-# 1. Clone the repository (or navigate into the Converter directory)
-cd Converter
+# 1. Clone the repository or navigate into it
+cd online-converter
 
 # 2. Install dependencies
 npm install
@@ -53,6 +55,15 @@ npm run build
 ```
 
 This will output statically verified assets into the `dist` directory, ready to be served on platforms like Vercel, Netlify, or Nginx.
+
+## ✅ Quality Checks
+
+```bash
+npm run lint
+npm audit
+```
+
+GitHub Actions runs build and lint checks on every push and pull request.
 
 ## 📄 License
 

@@ -1,11 +1,17 @@
-function domToJson(node: Node): any {
+type XmlJsonValue = string | XmlJsonObject | XmlJsonValue[];
+
+interface XmlJsonObject {
+    [key: string]: XmlJsonValue;
+}
+
+function domToJson(node: Node): XmlJsonValue {
     if (node.nodeType === 3) {
-        return node.nodeValue?.trim();
+        return node.nodeValue?.trim() ?? '';
     }
     if (node.nodeType === 4) {
-        return node.nodeValue;
+        return node.nodeValue ?? '';
     }
-    const obj: any = {};
+    const obj: XmlJsonObject = {};
     if (node instanceof Element) {
         const attrs = node.attributes;
         if (attrs && attrs.length > 0) {
@@ -29,7 +35,7 @@ function domToJson(node: Node): any {
         if (child.nodeType === 1) {
             const key = child.nodeName;
             const value = domToJson(child);
-            if (obj.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
                 if (!Array.isArray(obj[key])) {
                     obj[key] = [obj[key]];
                 }
@@ -49,7 +55,7 @@ export function xmlToJson(xmlString: string): string {
     let xml: Document;
     try {
         xml = new window.DOMParser().parseFromString(xmlString, 'application/xml');
-    } catch (e) {
+    } catch {
         throw new Error('Invalid XML format.');
     }
     if (xml.getElementsByTagName('parsererror').length > 0) {
