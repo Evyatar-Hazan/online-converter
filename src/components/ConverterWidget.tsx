@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, Clipboard, Download, Eraser, Play, Sparkles } from 'lucide-react';
+import { AlertTriangle, ArrowLeftRight, CheckCircle2, Clipboard, Download, Eraser, FileText, Play, Sparkles } from 'lucide-react';
 import { convert } from '../lib/converter-functions';
 import type { ConverterTool, Locale } from '../types';
 import { ui } from '../data/site';
@@ -15,9 +15,67 @@ declare global {
   }
 }
 
+const formatLabels: Record<Locale, Record<string, string>> = {
+  en: {
+    json: 'JSON',
+    csv: 'CSV',
+    xml: 'XML',
+    yaml: 'YAML',
+    text: 'Text',
+    base64: 'Base64',
+    url: 'URL',
+    html: 'HTML',
+    'escaped html': 'Escaped HTML',
+    slug: 'Slug',
+    stats: 'Stats',
+    lines: 'Lines',
+    'sorted lines': 'Sorted lines',
+    'unique lines': 'Unique lines',
+    timestamp: 'Timestamp',
+    date: 'Date',
+    hex: 'HEX',
+    rgb: 'RGB',
+    jwt: 'JWT'
+  },
+  he: {
+    json: 'JSON',
+    csv: 'CSV',
+    xml: 'XML',
+    yaml: 'YAML',
+    text: 'טקסט',
+    base64: 'Base64',
+    url: 'URL',
+    html: 'HTML',
+    'escaped html': 'HTML מקודד',
+    slug: 'Slug',
+    stats: 'סטטיסטיקה',
+    lines: 'שורות',
+    'sorted lines': 'שורות ממוינות',
+    'unique lines': 'שורות ייחודיות',
+    timestamp: 'חותמת זמן',
+    date: 'תאריך',
+    hex: 'HEX',
+    rgb: 'RGB',
+    jwt: 'JWT'
+  }
+};
+
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
   const sample = tool.examples[0]?.input ?? '';
+  const inputTypeLabel = formatLabels[locale][tool.inputType] ?? tool.inputType;
+  const outputTypeLabel = formatLabels[locale][tool.outputType] ?? tool.outputType;
+  const widgetText = {
+    ready: locale === 'he' ? 'מוכן להמרה' : 'Ready to convert',
+    converted: locale === 'he' ? 'הפלט מוכן' : 'Output ready',
+    emptyOutput: locale === 'he' ? 'הפלט יופיע כאן אחרי ההמרה.' : 'Your converted output will appear here.',
+    inputType: locale === 'he' ? 'סוג קלט' : 'Input type',
+    outputType: locale === 'he' ? 'סוג פלט' : 'Output type',
+    localOnly: locale === 'he' ? 'ההמרה מתבצעת בדפדפן שלך' : 'Runs in your browser',
+    manualHint: locale === 'he' ? 'כבה אוטומטי כדי לעבוד ידנית' : 'Turn off Auto for manual mode',
+    sampleName: locale === 'he' ? 'טען דוגמה' : 'Load sample',
+    clearInput: labels.clear
+  };
   const [input, setInput] = useState(sample);
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
@@ -30,6 +88,14 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     const lines = input ? input.split(/\r\n|\r|\n/).length : 0;
     return { characters: input.length, lines };
   }, [input]);
+
+  const outputStats = useMemo(() => {
+    const lines = output ? output.split(/\r\n|\r|\n/).length : 0;
+    return { characters: output.length, lines };
+  }, [output]);
+
+  const status = error ? 'error' : output ? 'success' : 'idle';
+  const statusLabel = error ? labels.conversionFailed : output ? widgetText.converted : widgetText.ready;
 
   const trackEvent = useCallback(
     (name: string, props: Record<string, string | number | boolean> = {}) => {
@@ -108,32 +174,47 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   return (
     <section className="converter-widget" aria-labelledby="converter-title">
       <div className="converter-toolbar">
-        <div>
+        <div className="converter-heading">
           <p className="eyebrow">{labels.instant}</p>
           <h2 id="converter-title">{tool.shortTitle[locale]}</h2>
+          <div className="converter-badges" aria-label={tool.title[locale]}>
+            <span>{widgetText.localOnly}</span>
+            <span>{widgetText.inputType}: {inputTypeLabel}</span>
+            <span>{widgetText.outputType}: {outputTypeLabel}</span>
+          </div>
         </div>
         <div className="toolbar-actions" role="toolbar" aria-label={tool.title[locale]}>
-          <button className="icon-button text-button" type="button" onClick={() => setAutoConvert((value) => !value)} aria-pressed={autoConvert}>
+          <button className="icon-button text-button" type="button" onClick={() => setAutoConvert((value) => !value)} aria-pressed={autoConvert} title={widgetText.manualHint}>
             <Sparkles size={16} aria-hidden="true" />
             {labels.autoConvert}
           </button>
-          <button className="icon-button" type="button" onClick={() => setInput(sample)} aria-label={labels.sample}>
+          <button className="icon-button" type="button" onClick={() => setInput(sample)} aria-label={widgetText.sampleName} title={widgetText.sampleName}>
             <Play size={16} aria-hidden="true" />
           </button>
-          <button className="icon-button" type="button" onClick={() => setInput('')} aria-label={labels.clear}>
+          <button className="icon-button" type="button" onClick={() => setInput('')} aria-label={widgetText.clearInput} title={widgetText.clearInput}>
             <Eraser size={16} aria-hidden="true" />
           </button>
           {tool.reverseSlug && (
-            <a className="icon-button" href={`/${locale}/${tool.reverseSlug}/`} aria-label={labels.swap}>
+            <a className="icon-button" href={`/${locale}/${tool.reverseSlug}/`} aria-label={labels.swap} title={labels.swap}>
               <ArrowLeftRight size={16} aria-hidden="true" />
             </a>
           )}
         </div>
       </div>
 
+      <div className={`converter-status converter-status-${status}`} aria-live="polite">
+        {status === 'error' ? <AlertTriangle size={18} aria-hidden="true" /> : <CheckCircle2 size={18} aria-hidden="true" />}
+        <span>{statusLabel}</span>
+      </div>
+
       <div className="editor-grid">
         <label className="editor-panel">
-          <span>{labels.input}</span>
+          <span className="panel-header">
+            <span>{labels.input}</span>
+            <small>
+              {inputStats.characters} {labels.characters} · {inputStats.lines} {labels.lines}
+            </small>
+          </span>
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
@@ -141,17 +222,22 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
             dir="ltr"
             aria-invalid={Boolean(error)}
           />
-          <small>
-            {inputStats.characters} {labels.characters} · {inputStats.lines} {labels.lines}
-          </small>
         </label>
 
         <label className="editor-panel">
-          <span>{labels.output}</span>
+          <span className="panel-header">
+            <span>{labels.output}</span>
+            <small>
+              {outputStats.characters} {labels.characters} · {outputStats.lines} {labels.lines}
+            </small>
+          </span>
           <textarea value={output} readOnly spellCheck={false} dir="ltr" />
-          <small>
-            {Object.entries(metadata).map(([key, value]) => `${key}: ${value}`).join(' · ') || `${output.length} ${labels.characters}`}
-          </small>
+          {!output && (
+            <div className="empty-output" aria-hidden="true">
+              <FileText size={22} />
+              <span>{widgetText.emptyOutput}</span>
+            </div>
+          )}
         </label>
       </div>
 
@@ -168,6 +254,15 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
           <Download size={18} aria-hidden="true" />
           {labels.download}
         </button>
+        {Object.keys(metadata).length > 0 && (
+          <div className="metadata-strip" aria-label="Metadata">
+            {Object.entries(metadata).map(([key, value]) => (
+              <span key={key}>
+                {key}: {value}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="status-region" aria-live="polite" aria-atomic="true">

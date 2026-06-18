@@ -460,17 +460,46 @@ h3 {
 
 .converter-widget {
   margin: 18px 0 34px;
-  padding: 18px;
+  overflow: hidden;
+  padding: 0;
 }
 
 .converter-toolbar {
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  padding: 18px;
 }
 
 .converter-toolbar h2 {
   margin: 0;
+}
+
+.converter-heading {
+  min-width: 0;
+}
+
+.converter-badges,
+.metadata-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.converter-badges {
+  margin-top: 12px;
+}
+
+.converter-badges span,
+.metadata-strip span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 5px 9px;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .toolbar-actions {
@@ -489,29 +518,80 @@ h3 {
   padding: 0 12px;
 }
 
+.converter-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 18px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.converter-status-success {
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+  color: var(--brand-strong);
+}
+
+.converter-status-error {
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  color: var(--danger);
+}
+
 .editor-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .editor-panel {
+  position: relative;
   display: grid;
-  gap: 8px;
+  grid-template-rows: auto minmax(330px, 1fr);
   min-width: 0;
+  border-inline-start: 1px solid var(--line);
 }
 
-.editor-panel span {
+.editor-panel:first-child {
+  border-inline-start: 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-soft) 54%, var(--surface));
+  padding: 10px 12px;
+}
+
+.panel-header > span {
   font-weight: 850;
+}
+
+.panel-header small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 textarea {
   width: 100%;
   min-height: 330px;
+  height: 100%;
   resize: vertical;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--surface-soft) 72%, var(--surface));
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 28%, transparent) 1px, transparent 1px),
+    color-mix(in srgb, var(--surface-soft) 68%, var(--surface));
+  background-size: 8ch 100%;
   color: var(--ink);
   padding: 14px;
   font-family: var(--mono);
@@ -520,22 +600,37 @@ textarea {
 }
 
 textarea[aria-invalid='true'] {
-  border-color: var(--danger);
+  box-shadow: inset 0 0 0 2px var(--danger);
 }
 
-.editor-panel small {
+.empty-output {
+  pointer-events: none;
+  position: absolute;
+  inset: 58px 14px auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
   color: var(--muted);
-  min-height: 1.3em;
+  padding: 12px;
+  font-weight: 750;
 }
 
 .converter-actions {
+  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 14px;
+  padding: 14px 18px;
+}
+
+.metadata-strip {
+  margin-inline-start: auto;
 }
 
 .status-region {
-  margin-top: 12px;
+  padding: 0 18px 18px;
 }
 
 .error-message,
@@ -682,6 +777,10 @@ summary {
     justify-content: space-between;
   }
 
+  .converter-toolbar .toolbar-actions {
+    justify-content: flex-start;
+  }
+
   .hero-section,
   .tool-hero {
     padding-top: 28px;
@@ -689,10 +788,35 @@ summary {
 
   .hero-copy,
   .tool-hero > div:first-child,
-  .converter-widget,
   .content-panel,
   .strategy-band {
     padding: 18px;
+  }
+
+  .converter-toolbar,
+  .converter-actions,
+  .converter-status,
+  .status-region {
+    padding-inline: 14px;
+  }
+
+  .editor-panel {
+    border-block-start: 1px solid var(--line);
+    border-inline-start: 0;
+  }
+
+  .editor-panel:first-child {
+    border-block-start: 0;
+  }
+
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .metadata-strip {
+    width: 100%;
+    margin-inline-start: 0;
   }
 
   .tools-grid,
