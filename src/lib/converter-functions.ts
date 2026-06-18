@@ -1,11 +1,11 @@
 import { parse, stringify } from 'yaml';
-import type { ConverterOptions, ConvertResult } from '../types';
+import type { ConvertPreview, ConverterOptions, ConvertResult } from '../types';
 
 type JsonObject = Record<string, unknown>;
 type ConverterFunction = (input: string, options: ConverterOptions) => ConvertResult;
 
-function result(output: string, metadata?: Record<string, string | number>, warnings?: string[]): ConvertResult {
-  return { output, metadata, warnings };
+function result(output: string, metadata?: Record<string, string | number>, warnings?: string[], preview?: ConvertPreview): ConvertResult {
+  return { output, metadata, warnings, preview };
 }
 
 function parseJson(input: string): unknown {
@@ -39,6 +39,48 @@ function countStats(input: string): Record<string, number> {
     characters: input.length,
     lines,
     words
+  };
+}
+
+function jsonPreview(value: unknown): ConvertPreview {
+  if (Array.isArray(value)) {
+    return {
+      type: 'json',
+      title: 'JSON array',
+      values: {
+        items: value.length,
+        firstItemType: value.length ? Array.isArray(value[0]) ? 'array' : typeof value[0] : 'empty'
+      }
+    };
+  }
+
+  if (value && typeof value === 'object') {
+    const keys = Object.keys(value as JsonObject);
+    return {
+      type: 'json',
+      title: 'JSON object',
+      values: {
+        keys: keys.length,
+        topLevelKeys: keys.slice(0, 6).join(', ') || 'none'
+      }
+    };
+  }
+
+  return {
+    type: 'json',
+    title: 'JSON value',
+    values: { valueType: value === null ? 'null' : typeof value }
+  };
+}
+
+function colorPreview(format: string, cssColor: string, values: Record<string, string | number>): ConvertPreview {
+  return {
+    type: 'color',
+    title: format,
+    values: {
+      css: cssColor,
+      ...values
+    }
   };
 }
 
@@ -341,7 +383,12 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       return record;
     });
 
-    return result(JSON.stringify(records, null, 2), { rows: records.length, columns: headers.length });
+    return result(JSON.stringify(records, null, 2), { rows: records.length, columns: headers.length }, undefined, {
+      type: 'table',
+      title: 'CSV preview',
+      values: { rows: records.length, columns: headers.length },
+      rows: records.slice(0, 5)
+    });
   },
 
   jsonToXml(input) {
@@ -398,8 +445,9 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
   jsonFormatter(input, options) {
     const indent = Math.min(8, Math.max(2, numberOption(options, 'indent', 2)));
-    const output = JSON.stringify(parseJson(input), null, indent);
-    return result(output, { ...countStats(output), indent });
+    const data = parseJson(input);
+    const output = JSON.stringify(data, null, indent);
+    return result(output, { ...countStats(output), indent }, undefined, jsonPreview(data));
   },
 
   jsonMinifier(input) {
@@ -483,7 +531,11 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Lines: ${stats.lines}`,
       `Estimated reading time: ${readingMinutes} min`
     ].join('\n');
-    return result(output, { ...stats, readingMinutes });
+    return result(output, { ...stats, readingMinutes }, undefined, {
+      type: 'json',
+      title: 'Text stats',
+      values: { ...stats, readingMinutes, charactersNoSpaces: input.replace(/\s/g, '').length }
+    });
   },
 
   sortLines(input, options) {
@@ -578,25 +630,28 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
   hexToRgb(input) {
     const [r, g, b] = parseHex(input);
-    return result([`rgb(${r}, ${g}, ${b})`, `rgba(${r}, ${g}, ${b}, 1)`, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b });
+    const css = `rgb(${r}, ${g}, ${b})`;
+    return result([css, `rgba(${r}, ${g}, ${b}, 1)`, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b }, undefined, colorPreview('RGB color', css, { r, g, b }));
   },
 
   rgbToHex(input) {
     const [r, g, b] = parseRgb(input);
     const output = `#${[r, g, b].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
-    return result(output, { r, g, b });
+    return result(output, { r, g, b }, undefined, colorPreview('HEX color', output, { r, g, b }));
   },
 
   rgbToHsl(input) {
     const rgb = parseRgb(input);
     const [h, s, l] = rgbToHslValues(rgb);
-    return result([`hsl(${h}, ${s}%, ${l}%)`, `H: ${h}`, `S: ${s}%`, `L: ${l}%`].join('\n'), { h, s, l });
+    const css = `hsl(${h}, ${s}%, ${l}%)`;
+    return result([css, `H: ${h}`, `S: ${s}%`, `L: ${l}%`].join('\n'), { h, s, l }, undefined, colorPreview('HSL color', css, { h, s, l }));
   },
 
   hslToRgb(input) {
     const hsl = parseHsl(input);
     const [r, g, b] = hslToRgbValues(hsl);
-    return result([`rgb(${r}, ${g}, ${b})`, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b });
+    const css = `rgb(${r}, ${g}, ${b})`;
+    return result([css, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b }, undefined, colorPreview('RGB color', css, { r, g, b }));
   },
 
   jwtDecoder(input) {
@@ -607,7 +662,17 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(
       JSON.stringify({ header, payload, signaturePresent: Boolean(parts[2]) }, null, 2),
       undefined,
-      ['This tool decodes JWT content only. It does not verify the signature.']
+      ['This tool decodes JWT content only. It does not verify the signature.'],
+      {
+        type: 'jwt',
+        title: 'JWT payload',
+        values: {
+          algorithm: typeof header === 'object' && header && 'alg' in header ? String((header as JsonObject).alg) : 'unknown',
+          tokenType: typeof header === 'object' && header && 'typ' in header ? String((header as JsonObject).typ) : 'unknown',
+          payloadKeys: typeof payload === 'object' && payload ? Object.keys(payload as JsonObject).join(', ') : 'none',
+          signaturePresent: Boolean(parts[2])
+        }
+      }
     );
   }
 };

@@ -65,8 +65,16 @@ export interface ConverterTool {
 
 export type ConverterOptions = Record<string, string | number | boolean>;
 
+export interface ConvertPreview {
+  type: 'color' | 'json' | 'table' | 'jwt';
+  title?: string;
+  values?: Record<string, string | number | boolean>;
+  rows?: Record<string, string | number | boolean>[];
+}
+
 export interface ConvertResult {
   output: string;
   warnings?: string[];
   metadata?: Record<string, string | number>;
+  preview?: ConvertPreview;
 }

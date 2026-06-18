@@ -34,6 +34,13 @@ test('converter page exposes useful options', async ({ page }) => {
   await expect(page.getByLabel('Output')).toHaveValue('cherry\nbanana\nApple');
 });
 
+test('converter page shows a quick preview', async ({ page }) => {
+  await page.goto('/en/rgb-to-hex/');
+  await page.getByLabel('Input').fill('rgb(79, 70, 229)');
+  await page.getByRole('button', { name: 'Convert' }).click();
+  await expect(page.getByLabel('Quick preview')).toContainText('#4f46e5');
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');

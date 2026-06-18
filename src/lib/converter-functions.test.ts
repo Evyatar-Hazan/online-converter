@@ -12,6 +12,8 @@ describe('converter functions', () => {
       { name: 'Avi', city: 'Jerusalem' },
       { name: 'Maya', city: 'Tel Aviv' }
     ]);
+    expect(json.preview?.type).toBe('table');
+    expect(json.preview?.rows).toHaveLength(2);
   });
 
   it('handles YAML and JSON conversion', () => {
@@ -46,7 +48,9 @@ describe('converter functions', () => {
   it('converts dates, colors and text helpers', () => {
     expect(convert('dateToTimestamp', '2026-06-18T12:00:00Z').output).toContain('Unix seconds');
     expect(convert('hexToRgb', '#4f46e5').output).toContain('rgb(79, 70, 229)');
-    expect(convert('rgbToHex', 'rgb(79, 70, 229)').output).toBe('#4f46e5');
+    const hex = convert('rgbToHex', 'rgb(79, 70, 229)');
+    expect(hex.output).toBe('#4f46e5');
+    expect(hex.preview?.type).toBe('color');
     expect(convert('rgbToHsl', 'rgb(79, 70, 229)').output).toContain('hsl(');
     expect(convert('hslToRgb', 'hsl(243, 76%, 59%)').output).toContain('rgb(');
     expect(convert('slugGenerator', 'Best JSON Tools!').output).toBe('best-json-tools');
@@ -55,7 +59,9 @@ describe('converter functions', () => {
   });
 
   it('applies converter options', () => {
-    expect(convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' }).output).toContain('\n    "name"');
+    const formatted = convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' });
+    expect(formatted.output).toContain('\n    "name"');
+    expect(formatted.preview?.values?.keys).toBe(1);
     expect(convert('sortLines', 'banana\nApple\ncherry', { direction: 'desc', caseSensitive: false }).output).toBe('cherry\nbanana\nApple');
     expect(convert('removeDuplicateLines', 'Apple\napple\n banana \nbanana', { caseSensitive: false, trimLines: true }).output).toBe('Apple\nbanana');
     expect(convert('trimWhitespace', '  one    two  ', { collapseSpaces: true }).output).toBe('one two');

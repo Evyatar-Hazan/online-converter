@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeftRight, CheckCircle2, Clipboard, Download, Eraser, FileText, Play, Sparkles } from 'lucide-react';
 import { convert } from '../lib/converter-functions';
-import type { ConverterOptions, ConverterTool, Locale } from '../types';
+import type { ConvertPreview, ConverterOptions, ConverterTool, Locale } from '../types';
 import { ui } from '../data/site';
 
 interface ConverterWidgetProps {
@@ -97,6 +97,10 @@ const outputExtensions: Record<string, string> = {
   jwt: 'json'
 };
 
+function previewEntries(preview: ConvertPreview) {
+  return Object.entries(preview.values ?? {}).filter(([, value]) => value !== undefined && value !== '');
+}
+
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
   const defaultOptionValues = useMemo<ConverterOptions>(() => {
@@ -116,6 +120,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     localOnly: locale === 'he' ? 'ההמרה מתבצעת בדפדפן שלך' : 'Runs in your browser',
     manualHint: locale === 'he' ? 'כבה אוטומטי כדי לעבוד ידנית' : 'Turn off Auto for manual mode',
     examples: locale === 'he' ? 'דוגמאות' : 'Examples',
+    preview: locale === 'he' ? 'תצוגה מהירה' : 'Quick preview',
     sampleName: locale === 'he' ? 'טען דוגמה' : 'Load sample',
     errorHint: locale === 'he' ? 'בדוק את מבנה הקלט, נסה דוגמה מוכנה או נקה תווים שהועתקו ממקור חיצוני.' : 'Check the input structure, try a sample, or remove characters copied from another source.',
     clearInput: labels.clear
@@ -125,6 +130,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const [error, setError] = useState('');
   const [warnings, setWarnings] = useState<string[]>([]);
   const [metadata, setMetadata] = useState<Record<string, string | number>>({});
+  const [preview, setPreview] = useState<ConvertPreview | null>(null);
   const [optionValues, setOptionValues] = useState<ConverterOptions>(defaultOptionValues);
   const [autoConvert, setAutoConvert] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -165,6 +171,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     setError('');
     setWarnings([]);
     setMetadata({});
+    setPreview(null);
 
     if (!input.trim()) {
       setOutput('');
@@ -176,6 +183,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       setOutput(result.output);
       setWarnings(result.warnings ?? []);
       setMetadata(result.metadata ?? {});
+      setPreview(result.preview ?? null);
       if (source === 'manual') {
         trackEvent('convert_tool', { inputCharacters: input.length, outputCharacters: result.output.length });
       }
@@ -183,6 +191,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       const message = caught instanceof Error ? caught.message : labels.conversionFailed;
       setError(message || labels.conversionFailed);
       setOutput('');
+      setPreview(null);
       if (source === 'manual') {
         trackEvent('convert_error', { inputCharacters: input.length });
       }
@@ -225,6 +234,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     setError('');
     setWarnings([]);
     setMetadata({});
+    setPreview(null);
     trackEvent('load_example', { exampleIndex: index });
   };
 
@@ -379,6 +389,56 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
           </div>
         )}
       </div>
+
+      {preview && (
+        <div className={`preview-panel preview-${preview.type}`} aria-label={widgetText.preview}>
+          <div className="preview-heading">
+            <span>{widgetText.preview}</span>
+            {preview.title && <strong>{preview.title}</strong>}
+          </div>
+
+          {preview.type === 'color' && typeof preview.values?.css === 'string' && (
+            <div className="color-preview">
+              <span className="color-swatch" style={{ background: preview.values.css }} aria-hidden="true" />
+              <code>{preview.values.css}</code>
+            </div>
+          )}
+
+          {previewEntries(preview).length > 0 && (
+            <dl className="preview-metadata">
+              {previewEntries(preview).map(([key, value]) => (
+                <div key={key}>
+                  <dt>{key}</dt>
+                  <dd>{String(value)}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          {preview.rows && preview.rows.length > 0 && (
+            <div className="preview-table-wrap">
+              <table className="preview-table">
+                <thead>
+                  <tr>
+                    {Object.keys(preview.rows[0]).map((key) => (
+                      <th key={key}>{key}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {preview.rows.map((row, index) => (
+                    <tr key={`${index}-${Object.values(row).join('-')}`}>
+                      {Object.keys(preview.rows?.[0] ?? {}).map((key) => (
+                        <td key={key}>{String(row[key] ?? '')}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="status-region" aria-live="polite" aria-atomic="true">
         {error && (
