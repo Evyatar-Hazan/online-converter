@@ -16,6 +16,15 @@ test('Hebrew home page supports RTL and search filtering', async ({ page }) => {
   await expect(page.locator('[data-tool-card]:visible')).toHaveCount(2);
 });
 
+test('Hebrew category page lists matching tools', async ({ page }) => {
+  await page.goto('/he/text/');
+  await expect(page.locator('h1')).toContainText('כלי טקסט');
+  await expect(page.getByText('מה אפשר לעשות כאן')).toBeVisible();
+  await expect(page.getByText('האם הכלים עובדים טוב עם עברית?')).toBeVisible();
+  await expect(page.locator('[data-tool-card]')).toHaveCount(5);
+  await expect(page.getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');

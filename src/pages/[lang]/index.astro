@@ -83,7 +83,7 @@ const jsonLd = [
       <h2>{labels.strategyText}</h2>
     </div>
     <ul>
-      {categories.map((category) => <li>{categoryLabels[category][locale]}</li>)}
+      {categories.map((category) => <li><a href={`/${locale}/${category}/`}>{categoryLabels[category][locale]}</a></li>)}
     </ul>
   </section>
 

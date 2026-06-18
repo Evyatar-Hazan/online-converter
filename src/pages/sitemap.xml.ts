@@ -1,9 +1,11 @@
 import { converters } from '../data/converters';
-import { locales, siteUrl } from '../data/site';
+import { categoryLabels, locales, siteUrl } from '../data/site';
 
 export function GET() {
+  const categories = Object.keys(categoryLabels);
   const urls = [
     ...locales.map((locale) => `/${locale}/`),
+    ...locales.flatMap((locale) => categories.map((category) => `/${locale}/${category}/`)),
     ...locales.flatMap((locale) => converters.map((tool) => `/${locale}/${tool.slug}/`))
   ];
 

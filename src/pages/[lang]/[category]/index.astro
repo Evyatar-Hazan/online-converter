@@ -1,0 +1,118 @@
+---
+import AdSlot from '../../../components/AdSlot.astro';
+import ToolCard from '../../../components/ToolCard.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { converters } from '../../../data/converters';
+import { categoryContent, categoryLabels, locales, siteName, siteUrl, ui } from '../../../data/site';
+import type { ConverterCategory, Locale } from '../../../types';
+
+export function getStaticPaths() {
+  const categories = Object.keys(categoryLabels) as ConverterCategory[];
+  return locales.flatMap((lang) => categories.map((category) => ({ params: { lang, category } })));
+}
+
+const locale = Astro.params.lang as Locale;
+const category = Astro.params.category as ConverterCategory;
+const labels = ui[locale];
+const content = categoryContent[category][locale];
+const tools = converters.filter((tool) => tool.category === category);
+const canonicalPath = `/${locale}/${category}/`;
+const title = `${content.title} | ${siteName[locale]}`;
+const description = content.description;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: content.title,
+    url: `${siteUrl}${canonicalPath}`,
+    description,
+    hasPart: tools.map((tool) => ({
+      '@type': 'SoftwareApplication',
+      name: tool.title[locale],
+      url: `${siteUrl}/${locale}/${tool.slug}/`,
+      applicationCategory: 'UtilitiesApplication'
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: labels.home, item: `${siteUrl}/${locale}/` },
+      { '@type': 'ListItem', position: 2, name: categoryLabels[category][locale], item: `${siteUrl}${canonicalPath}` }
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: content.faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer
+      }
+    }))
+  }
+];
+---
+
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  alternateSlug={category}
+  jsonLd={jsonLd}
+>
+  <nav class="breadcrumbs" aria-label="Breadcrumbs">
+    <a href={`/${locale}/`}>{labels.home}</a>
+    <span>/</span>
+    <span>{categoryLabels[category][locale]}</span>
+  </nav>
+
+  <section class="tool-hero">
+    <div>
+      <p class="eyebrow">{labels.categoriesTitle}</p>
+      <h1>{content.title}</h1>
+      <p>{content.intro}</p>
+      <div class="trust-row">
+        <span>{tools.length} {labels.tools}</span>
+        <span>{labels.privacy}</span>
+        <span>{labels.noUpload}</span>
+      </div>
+    </div>
+    <AdSlot locale={locale} placement="sidebar" />
+  </section>
+
+  <AdSlot locale={locale} placement="top" />
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'שימושים נפוצים' : 'Common uses'}</p>
+      <h2>{locale === 'he' ? 'מה אפשר לעשות כאן' : 'What you can do here'}</h2>
+      <ul class="check-list">
+        {content.useCases.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{labels.faqTitle}</p>
+      <h2>{labels.faqTitle}</h2>
+      {content.faq.map((item) => (
+        <details>
+          <summary>{item.question}</summary>
+          <p>{item.answer}</p>
+        </details>
+      ))}
+    </article>
+  </section>
+
+  <section class="section-shell">
+    <div class="section-heading">
+      <p class="eyebrow">{categoryLabels[category][locale]}</p>
+      <h2>{labels.allTools}</h2>
+    </div>
+    <div class="tools-grid">
+      {tools.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+    </div>
+  </section>
+</BaseLayout>
