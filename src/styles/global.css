@@ -661,9 +661,44 @@ textarea[aria-invalid='true'] {
   padding: 24px;
 }
 
+.content-panel-wide {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
 .content-panel ol {
   margin-bottom: 0;
   padding-inline-start: 1.35rem;
+}
+
+.example-card {
+  display: grid;
+  align-content: start;
+}
+
+.example-card pre {
+  direction: ltr;
+  overflow: auto;
+  max-height: 260px;
+  margin: 6px 0 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 22%, transparent) 1px, transparent 1px),
+    color-mix(in srgb, var(--surface-soft) 70%, var(--surface));
+  background-size: 8ch 100%;
+  padding: 14px;
+  color: var(--ink);
+  text-align: left;
+}
+
+.example-card code {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .check-list {

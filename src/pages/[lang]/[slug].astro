@@ -5,7 +5,50 @@ import ToolCard from '../../components/ToolCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { locales, siteName, siteUrl, ui } from '../../data/site';
-import type { Locale } from '../../types';
+import type { ConverterTool, Locale } from '../../types';
+
+function contentIntro(tool: ConverterTool, locale: Locale) {
+  const categoryText = {
+    data: {
+      en: 'Use this converter when data needs to move between spreadsheets, APIs, config files or reporting tools without changing the meaning of the original values.',
+      he: 'השתמש בממיר הזה כשצריך להעביר נתונים בין גיליונות, API, קבצי הגדרות או כלי דיווח בלי לשנות את משמעות הערכים המקוריים.'
+    },
+    text: {
+      en: 'This text tool is useful for cleaning lists, preparing content, editing copy and handling repeated formatting tasks quickly.',
+      he: 'כלי הטקסט הזה מתאים לניקוי רשימות, הכנת תוכן, עריכת טקסט וביצוע פעולות פורמט שחוזרות על עצמן במהירות.'
+    },
+    encoding: {
+      en: 'Use this utility when text has to be safely encoded, decoded or moved between URLs, forms, scripts and data payloads.',
+      he: 'השתמש בכלי הזה כאשר צריך לקודד, לפענח או להעביר טקסט בצורה בטוחה בין URL, טפסים, סקריפטים ומטעני נתונים.'
+    },
+    time: {
+      en: 'This date and time converter helps compare machine-readable timestamps with readable dates for logs, APIs and debugging.',
+      he: 'ממיר התאריכים והזמנים הזה עוזר להשוות בין timestamps שמיועדים למכונה לבין תאריכים קריאים ללוגים, API ודיבוג.'
+    },
+    developer: {
+      en: 'This developer utility is designed for quick inspection, formatting and cleanup while working with code, API responses or technical content.',
+      he: 'כלי הפיתוח הזה נועד לבדיקה מהירה, עיצוב וניקוי בזמן עבודה עם קוד, תגובות API או תוכן טכני.'
+    },
+    color: {
+      en: 'Use this color converter when moving between design tools, CSS values and frontend implementation details.',
+      he: 'השתמש בממיר הצבעים הזה כשצריך לעבור בין כלי עיצוב, ערכי CSS ופרטי יישום בפרונטאנד.'
+    }
+  };
+
+  return contentIntroText(tool, categoryText[tool.category][locale], locale);
+}
+
+function contentIntroText(tool: ConverterTool, base: string, locale: Locale) {
+  return locale === 'he'
+    ? `${base} ${tool.shortTitle.he} רץ מקומית בדפדפן, כך שאפשר לבדוק קלט אמיתי, להעתיק תוצאה או להוריד קובץ בלי להעלות מידע לשרת.`
+    : `${base} ${tool.shortTitle.en} runs locally in the browser, so you can test real input, copy the result or download a file without uploading data to a server.`;
+}
+
+function exampleOutputNote(tool: ConverterTool, locale: Locale) {
+  return locale === 'he'
+    ? `הדוגמה של ${tool.shortTitle.he} מראה את מבנה הקלט שהכלי מצפה לקבל. אפשר לטעון אותה בכפתור הדוגמה, לשנות ערכים ולראות מיד איך הפלט משתנה.`
+    : `The ${tool.shortTitle.en} example shows the input shape this tool expects. Load it with the sample button, change values and immediately see how the output changes.`;
+}
 
 export function getStaticPaths() {
   return locales.flatMap((lang) => converters.map((tool) => ({ params: { lang, slug: tool.slug } })));
@@ -21,6 +64,7 @@ if (!tool) {
 
 const labels = ui[locale];
 const related = tool.related.map((item) => converterBySlug.get(item)).filter(Boolean).slice(0, 3);
+const example = tool.examples[0];
 const title = `${tool.title[locale]} | ${siteName[locale]}`;
 const description = tool.metaDescription[locale];
 const canonicalPath = `/${locale}/${tool.slug}/`;
@@ -82,6 +126,25 @@ const jsonLd = [
   <AdSlot locale={locale} placement="top" />
 
   <ConverterWidget client:load tool={tool} locale={locale} />
+
+  <section class="content-grid">
+    <article class="content-panel content-panel-wide">
+      <p class="eyebrow">{locale === 'he' ? 'שימוש מעשי' : 'Practical use'}</p>
+      <h2>{locale === 'he' ? `מתי להשתמש ב־${tool.shortTitle[locale]}` : `When to use ${tool.shortTitle[locale]}`}</h2>
+      <p>{contentIntro(tool, locale)}</p>
+      <ul class="check-list">
+        {tool.features[locale].map((feature) => <li>{feature}</li>)}
+      </ul>
+    </article>
+    {example && (
+      <article class="content-panel example-card">
+        <p class="eyebrow">{locale === 'he' ? 'דוגמה' : 'Example'}</p>
+        <h2>{example.label[locale]}</h2>
+        <p>{exampleOutputNote(tool, locale)}</p>
+        <pre><code>{example.input}</code></pre>
+      </article>
+    )}
+  </section>
 
   <section class="content-grid">
     <article class="content-panel">
