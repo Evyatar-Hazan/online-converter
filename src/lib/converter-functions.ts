@@ -123,7 +123,7 @@ function jsonToXmlValue(value: unknown, level: number): string {
   return `${indent}${escapeXml(value ?? '')}`;
 }
 
-function csvRows(input: string): string[][] {
+function csvRows(input: string, delimiter = ','): string[][] {
   const normalized = input.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
   if (!normalized) return [];
 
@@ -143,7 +143,7 @@ function csvRows(input: string): string[][] {
       } else {
         inQuotes = !inQuotes;
       }
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === delimiter && !inQuotes) {
       currentRow.push(current);
       current = '';
     } else if (char === '\n' && !inQuotes) {
@@ -169,8 +169,19 @@ function encodeBase64(input: string): string {
   return btoa(String.fromCharCode(...new TextEncoder().encode(input)));
 }
 
-function decodeBase64(input: string): string {
+function toUrlSafeBase64(input: string, omitPadding: boolean): string {
+  const output = input.replace(/\+/g, '-').replace(/\//g, '_');
+  return omitPadding ? output.replace(/=+$/g, '') : output;
+}
+
+function normalizeBase64(input: string, urlSafe: boolean): string {
   const normalized = input.trim().replace(/\s+/g, '');
+  const standard = urlSafe ? normalized.replace(/-/g, '+').replace(/_/g, '/') : normalized;
+  return standard.padEnd(Math.ceil(standard.length / 4) * 4, '=');
+}
+
+function decodeBase64(input: string, urlSafe = false): string {
+  const normalized = normalizeBase64(input, urlSafe);
   if (!normalized) {
     throw new Error('Invalid Base64: paste an encoded value before decoding.');
   }
@@ -327,16 +338,16 @@ function hslToRgbValues([h, s, l]: [number, number, number]): [number, number, n
 }
 
 function decodeJwtPart(part: string): unknown {
-  const padded = part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '=');
   try {
-    return JSON.parse(decodeBase64(padded));
+    return JSON.parse(decodeBase64(part, true));
   } catch {
     throw new Error('Invalid JWT: header or payload is not valid Base64URL JSON.');
   }
 }
 
 export const converterFunctions: Record<string, ConverterFunction> = {
-  jsonToCsv(input) {
+  jsonToCsv(input, options) {
+    const delimiter = selectOption(options, 'delimiter', ',');
     const data = parseJson(input);
     const items = Array.isArray(data) ? data : [data];
     const headers = new Set<string>();
@@ -349,7 +360,7 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
     const headerArray = [...headers];
     const rows = [
-      headerArray.join(','),
+      headerArray.join(delimiter),
       ...items.map((item) =>
         headerArray
           .map((header) => {
@@ -357,17 +368,19 @@ export const converterFunctions: Record<string, ConverterFunction> = {
             const value = (item as JsonObject)[header];
             if (value === undefined || value === null) return '';
             const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
-            return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+            return text.includes('"') || text.includes('\n') || text.includes(delimiter) ? `"${text.replace(/"/g, '""')}"` : text;
           })
-          .join(',')
+          .join(delimiter)
       )
     ];
 
-    return result(rows.join('\n'), { rows: Math.max(items.length, 0), columns: headerArray.length });
+    return result(rows.join('\n'), { rows: Math.max(items.length, 0), columns: headerArray.length, delimiter: delimiter === '\t' ? 'tab' : delimiter });
   },
 
-  csvToJson(input) {
-    const rows = csvRows(input);
+  csvToJson(input, options) {
+    const delimiter = selectOption(options, 'delimiter', ',');
+    const trimValues = booleanOption(options, 'trimValues', true);
+    const rows = csvRows(input, delimiter);
     if (!rows.length) return result('[]', { rows: 0, columns: 0 });
 
     const headers = rows[0].map((header) => header.trim());
@@ -378,12 +391,13 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const records = rows.slice(1).filter((row) => row.some((cell) => cell.trim() !== '')).map((row) => {
       const record: Record<string, string> = {};
       headers.forEach((header, index) => {
-        record[header] = row[index] ?? '';
+        const value = row[index] ?? '';
+        record[header] = trimValues ? value.trim() : value;
       });
       return record;
     });
 
-    return result(JSON.stringify(records, null, 2), { rows: records.length, columns: headers.length }, undefined, {
+    return result(JSON.stringify(records, null, 2), { rows: records.length, columns: headers.length, delimiter: delimiter === '\t' ? 'tab' : delimiter }, undefined, {
       type: 'table',
       title: 'CSV preview',
       values: { rows: records.length, columns: headers.length },
@@ -455,13 +469,16 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { characters: output.length });
   },
 
-  base64Encode(input) {
-    const output = encodeBase64(input);
-    return result(output, { characters: output.length });
+  base64Encode(input, options) {
+    const urlSafe = booleanOption(options, 'urlSafe', false);
+    const omitPadding = booleanOption(options, 'omitPadding', false);
+    const output = urlSafe ? toUrlSafeBase64(encodeBase64(input), omitPadding) : encodeBase64(input);
+    return result(output, { characters: output.length, urlSafe: String(urlSafe), padding: omitPadding ? 'omitted' : 'included' });
   },
 
-  base64Decode(input) {
-    const output = decodeBase64(input);
+  base64Decode(input, options) {
+    const urlSafe = booleanOption(options, 'urlSafe', false);
+    const output = decodeBase64(input, urlSafe);
     return result(output, countStats(output));
   },
 
@@ -481,14 +498,17 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(output));
   },
 
-  urlEncode(input) {
-    return result(encodeURIComponent(input), { characters: input.length });
+  urlEncode(input, options) {
+    const spaceAsPlus = booleanOption(options, 'spaceAsPlus', false);
+    const output = spaceAsPlus ? encodeURIComponent(input).replace(/%20/g, '+') : encodeURIComponent(input);
+    return result(output, { characters: input.length, spaceAsPlus: String(spaceAsPlus) });
   },
 
-  urlDecode(input) {
+  urlDecode(input, options) {
     let output = '';
+    const source = booleanOption(options, 'plusAsSpace', true) ? input.replace(/\+/g, ' ') : input;
     try {
-      output = decodeURIComponent(input);
+      output = decodeURIComponent(source);
     } catch {
       throw new Error('Invalid URL encoding: percent escapes must use two hexadecimal characters, like %20.');
     }
@@ -634,9 +654,13 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result([css, `rgba(${r}, ${g}, ${b}, 1)`, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b }, undefined, colorPreview('RGB color', css, { r, g, b }));
   },
 
-  rgbToHex(input) {
+  rgbToHex(input, options) {
     const [r, g, b] = parseRgb(input);
-    const output = `#${[r, g, b].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+    const hexCase = selectOption(options, 'hexCase', 'lower');
+    const includeHash = booleanOption(options, 'includeHash', true);
+    const value = [r, g, b].map((item) => item.toString(16).padStart(2, '0')).join('');
+    const cased = hexCase === 'upper' ? value.toUpperCase() : value.toLowerCase();
+    const output = `${includeHash ? '#' : ''}${cased}`;
     return result(output, { r, g, b }, undefined, colorPreview('HEX color', output, { r, g, b }));
   },
 

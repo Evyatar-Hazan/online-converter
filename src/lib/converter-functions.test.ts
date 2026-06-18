@@ -62,6 +62,13 @@ describe('converter functions', () => {
     const formatted = convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' });
     expect(formatted.output).toContain('\n    "name"');
     expect(formatted.preview?.values?.keys).toBe(1);
+    expect(convert('jsonToCsv', '[{"name":"Avi","city":"Jerusalem"}]', { delimiter: ';' }).output).toContain('name;city');
+    expect(JSON.parse(convert('csvToJson', 'name; city\nAvi; Jerusalem', { delimiter: ';', trimValues: true }).output)).toEqual([{ name: 'Avi', city: 'Jerusalem' }]);
+    expect(convert('base64Encode', '???>', { urlSafe: true, omitPadding: true }).output).not.toMatch(/[+/=]/);
+    expect(convert('base64Decode', 'Pz8_Pg', { urlSafe: true }).output).toBe('???>');
+    expect(convert('urlEncode', 'hello world', { spaceAsPlus: true }).output).toBe('hello+world');
+    expect(convert('urlDecode', 'hello+world', { plusAsSpace: true }).output).toBe('hello world');
+    expect(convert('rgbToHex', 'rgb(79, 70, 229)', { hexCase: 'upper', includeHash: false }).output).toBe('4F46E5');
     expect(convert('sortLines', 'banana\nApple\ncherry', { direction: 'desc', caseSensitive: false }).output).toBe('cherry\nbanana\nApple');
     expect(convert('removeDuplicateLines', 'Apple\napple\n banana \nbanana', { caseSensitive: false, trimLines: true }).output).toBe('Apple\nbanana');
     expect(convert('trimWhitespace', '  one    two  ', { collapseSpaces: true }).output).toBe('one two');

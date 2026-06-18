@@ -52,9 +52,18 @@ test('converter page can load input and options from a share link', async ({ pag
   await expect(page.getByLabel('Output')).toHaveValue('cherry\nbanana\nApple');
 });
 
+test('converter page applies new format options', async ({ page }) => {
+  await page.goto('/en/rgb-to-hex/');
+  await page.getByLabel('Input').fill('rgb(79, 70, 229)');
+  await page.getByLabel('HEX case').selectOption('upper');
+  await page.getByLabel('Include #').uncheck();
+  await page.getByRole('button', { name: 'Convert' }).click();
+  await expect(page.getByLabel('Output')).toHaveValue('4F46E5');
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');
   await expect(page.getByLabel('Input')).toBeVisible();
-  await expect(page.getByLabel('Output')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /Output/ })).toBeVisible();
 });

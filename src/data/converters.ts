@@ -36,6 +36,91 @@ const jsonIndentOptions = [
   }
 ];
 
+const csvOutputOptions = [
+  {
+    id: 'delimiter',
+    type: 'select' as const,
+    defaultValue: ',',
+    label: { en: 'Delimiter', he: 'מפריד' },
+    choices: [
+      { value: ',', label: { en: 'Comma', he: 'פסיק' } },
+      { value: ';', label: { en: 'Semicolon', he: 'נקודה-פסיק' } },
+      { value: '\t', label: { en: 'Tab', he: 'טאב' } }
+    ]
+  }
+];
+
+const csvInputOptions = [
+  ...csvOutputOptions,
+  {
+    id: 'trimValues',
+    type: 'toggle' as const,
+    defaultValue: true,
+    label: { en: 'Trim values', he: 'נקה ערכים' }
+  }
+];
+
+const base64EncodeOptions = [
+  {
+    id: 'urlSafe',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'URL-safe output', he: 'פלט בטוח ל־URL' }
+  },
+  {
+    id: 'omitPadding',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'Omit padding', he: 'בלי סימני padding' }
+  }
+];
+
+const base64DecodeOptions = [
+  {
+    id: 'urlSafe',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'URL-safe input', he: 'קלט בטוח ל־URL' }
+  }
+];
+
+const urlEncodeOptions = [
+  {
+    id: 'spaceAsPlus',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'Spaces as +', he: 'רווחים כ־+' }
+  }
+];
+
+const urlDecodeOptions = [
+  {
+    id: 'plusAsSpace',
+    type: 'toggle' as const,
+    defaultValue: true,
+    label: { en: '+ as space', he: '+ כרווח' }
+  }
+];
+
+const hexOutputOptions = [
+  {
+    id: 'hexCase',
+    type: 'select' as const,
+    defaultValue: 'lower',
+    label: { en: 'HEX case', he: 'אותיות HEX' },
+    choices: [
+      { value: 'lower', label: { en: 'Lowercase', he: 'אותיות קטנות' } },
+      { value: 'upper', label: { en: 'Uppercase', he: 'אותיות גדולות' } }
+    ]
+  },
+  {
+    id: 'includeHash',
+    type: 'toggle' as const,
+    defaultValue: true,
+    label: { en: 'Include #', he: 'כולל #' }
+  }
+];
+
 const lineSortOptions = [
   {
     id: 'direction',
@@ -148,6 +233,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Users table', he: 'טבלת משתמשים' }, input: '[{"name":"Avi","city":"Jerusalem"},{"name":"Maya","city":"Tel Aviv"}]' },
       { label: { en: 'Nested values', he: 'ערכים מקוננים' }, input: '[{"name":"Avi","tags":["admin","editor"]},{"name":"Maya","tags":["viewer"]}]' }
     ],
+    options: csvOutputOptions,
     faq: [faq.private, faq.free],
     related: ['csv-to-json', 'json-to-yaml', 'json-formatter']
   },
@@ -176,6 +262,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'People CSV', he: 'CSV אנשים' }, input: 'name,city\nAvi,Jerusalem\nMaya,Tel Aviv' },
       { label: { en: 'Quoted commas', he: 'פסיקים במרכאות' }, input: 'name,note\nAvi,"Jerusalem, Israel"\nMaya,"Tel Aviv, Israel"' }
     ],
+    options: csvInputOptions,
     faq: [faq.private, faq.free],
     related: ['json-to-csv', 'json-formatter', 'yaml-to-json']
   },
@@ -310,6 +397,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Unicode text', he: 'טקסט Unicode' }, input: 'Hello שלום' },
       { label: { en: 'URL text', he: 'טקסט לקישור' }, input: 'email=test@example.com&lang=he' }
     ],
+    options: base64EncodeOptions,
     faq: [faq.private, faq.free],
     related: ['base64-decode', 'url-encode', 'html-escape']
   },
@@ -329,6 +417,7 @@ export const converters: ConverterTool[] = [
     features: { en: ['Unicode safe', 'Validation', 'Instant'], he: ['תומך Unicode', 'אימות', 'מידי'] },
     guide: { en: ['Paste Base64.', 'Decode to text.', 'Copy the decoded result.'], he: ['הדבק Base64.', 'פענח לטקסט.', 'העתק את התוצאה.'] },
     examples: [{ label: { en: 'Encoded greeting', he: 'ברכה מקודדת' }, input: 'SGVsbG8g16nXnNeV150=' }],
+    options: base64DecodeOptions,
     faq: [faq.private, faq.free],
     related: ['base64-encode', 'url-decode', 'html-unescape']
   },
@@ -392,6 +481,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Search query', he: 'שאילתת חיפוש' }, input: 'hello world שלום' },
       { label: { en: 'URL params', he: 'פרמטרים ל־URL' }, input: 'name=Dana&city=Tel Aviv' }
     ],
+    options: urlEncodeOptions,
     faq: [faq.private, faq.free],
     related: ['url-decode', 'base64-encode']
   },
@@ -410,6 +500,7 @@ export const converters: ConverterTool[] = [
     features: { en: ['Percent decoding', 'Readable output', 'Instant'], he: ['פענוח אחוזים', 'פלט קריא', 'מידי'] },
     guide: { en: ['Paste an encoded URL string.', 'Decode it.', 'Copy the readable result.'], he: ['הדבק מחרוזת URL מקודדת.', 'פענח אותה.', 'העתק את התוצאה הקריאה.'] },
     examples: [{ label: { en: 'Encoded query', he: 'שאילתה מקודדת' }, input: 'hello%20world%20%D7%A9%D7%9C%D7%95%D7%9D' }],
+    options: urlDecodeOptions,
     faq: [faq.private, faq.free],
     related: ['url-encode', 'base64-decode']
   },
@@ -703,6 +794,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'RGB color', he: 'צבע RGB' }, input: 'rgb(79, 70, 229)' },
       { label: { en: 'Plain RGB', he: 'RGB פשוט' }, input: '14, 234, 170' }
     ],
+    options: hexOutputOptions,
     faq: [faq.private, faq.free],
     related: ['hex-to-rgb']
   },
