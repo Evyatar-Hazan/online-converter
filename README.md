@@ -56,6 +56,18 @@ npm run build
 
 This will output statically verified assets into the `dist` directory, ready to be served on platforms like Vercel, Netlify, or Nginx.
 
+## ☁️ Production Deployment
+
+Production is handled by Cloudflare Pages Git integration, not by a GitHub Actions deploy job.
+
+- Site: `https://online-converter.evyatarhazan.com/`
+- Cloudflare Pages project: `online-converter`
+- Production branch: `main`
+- Build command: `npm run build`
+- Output directory: `dist`
+
+Every push to `main` triggers Cloudflare Pages to build and publish the latest production deployment.
+
 ## ✅ Quality Checks
 
 ```bash
@@ -63,7 +75,7 @@ npm run lint
 npm audit
 ```
 
-GitHub Actions runs build and lint checks on every push and pull request.
+GitHub Actions runs CI checks on every push and pull request: dependency install, production build, and lint. Deployments remain managed by Cloudflare Pages.
 
 ## 📄 License
 

@@ -55,6 +55,18 @@ npm run build
 
 פעולה זו תיצור תקיית `dist` קלילה שאותה ניתן להעלות לאכסונים כגון: Vercel, Netlify או שרתי Nginx.
 
+## ☁️ פריסה לפרודקשיין
+
+הפריסה לפרודקשיין מנוהלת על ידי Cloudflare Pages Git integration, ולא על ידי GitHub Actions deploy job.
+
+- אתר: `https://online-converter.evyatarhazan.com/`
+- פרויקט Cloudflare Pages: `online-converter`
+- ענף פרודקשיין: `main`
+- פקודת build: `npm run build`
+- תיקיית פלט: `dist`
+
+כל push ל-`main` גורם ל-Cloudflare Pages להריץ build ולפרסם deployment חדש לפרודקשיין.
+
 ## ✅ בדיקות איכות
 
 ```bash
@@ -62,7 +74,7 @@ npm run lint
 npm audit
 ```
 
-GitHub Actions מריץ בדיקות build ו-lint על כל push ו-pull request.
+GitHub Actions מריץ בדיקות CI על כל push ו-pull request: התקנת תלויות, build לפרודקשיין ו-lint. הפריסה עצמה נשארת מנוהלת דרך Cloudflare Pages.
 
 ## 📄 רישיון
 
