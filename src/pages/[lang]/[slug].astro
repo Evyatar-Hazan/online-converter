@@ -50,6 +50,136 @@ function exampleOutputNote(tool: ConverterTool, locale: Locale) {
     : `The ${tool.shortTitle.en} example shows the input shape this tool expects. Load it with the sample button, change values and immediately see how the output changes.`;
 }
 
+function formatName(value: string) {
+  const names: Record<string, string> = {
+    json: 'JSON',
+    csv: 'CSV',
+    xml: 'XML',
+    yaml: 'YAML',
+    html: 'HTML',
+    'escaped html': 'escaped HTML',
+    base64: 'Base64',
+    url: 'URL',
+    jwt: 'JWT',
+    hex: 'HEX',
+    rgb: 'RGB'
+  };
+
+  return names[value] ?? value.replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function generatedFaq(tool: ConverterTool) {
+  const input = formatName(tool.inputType);
+  const output = formatName(tool.outputType);
+  return [
+    {
+      question: {
+        en: `What input does ${tool.shortTitle.en} expect?`,
+        he: `איזה קלט מתאים ל־${tool.shortTitle.he}?`
+      },
+      answer: {
+        en: `${tool.shortTitle.en} expects ${input} input and returns ${output} output. Start with the sample if you are unsure about the expected structure.`,
+        he: `${tool.shortTitle.he} מקבל קלט מסוג ${tool.inputType} ומחזיר פלט מסוג ${tool.outputType}. אם לא בטוחים לגבי המבנה, כדאי להתחיל מהדוגמה המובנית.`
+      }
+    },
+    {
+      question: {
+        en: `Why did ${tool.shortTitle.en} show an error?`,
+        he: `למה ${tool.shortTitle.he} מציג שגיאה?`
+      },
+      answer: {
+        en: `Errors usually mean the input is empty, incomplete or not valid ${input}. Check brackets, quotes, separators and special characters before converting again.`,
+        he: `שגיאות בדרך כלל אומרות שהקלט ריק, חסר או לא תקין עבור ${tool.inputType}. בדוק סוגריים, מרכאות, מפרידים ותווים מיוחדים לפני המרה נוספת.`
+      }
+    }
+  ];
+}
+
+function conversionTips(tool: ConverterTool, locale: Locale) {
+  const base = locale === 'he'
+    ? ['נסה קודם את הדוגמה המובנית כדי להבין את מבנה הקלט.', 'בדוק שהקלט מלא לפני העתקה או הורדה של הפלט.', 'אם מתקבלת שגיאה, צמצם את הקלט לחלק קטן ובדוק אותו שוב.']
+    : ['Try the built-in sample first to understand the expected input shape.', 'Check that the input is complete before copying or downloading the output.', 'If an error appears, reduce the input to a smaller section and test again.'];
+
+  const categoryTip = {
+    data: {
+      en: 'For structured data, make sure nested objects, quotes and separators are valid before conversion.',
+      he: 'בנתונים מובנים, ודא שאובייקטים מקוננים, מרכאות ומפרידים כתובים בצורה תקינה לפני ההמרה.'
+    },
+    text: {
+      en: 'For text tools, watch for hidden spaces, empty lines and mixed line endings.',
+      he: 'בכלי טקסט, שים לב לרווחים נסתרים, שורות ריקות וסיומות שורה מעורבות.'
+    },
+    encoding: {
+      en: 'For encoding tools, keep the original text until you confirm the decoded or encoded result.',
+      he: 'בכלי קידוד, שמור את הטקסט המקורי עד שאתה מוודא שהתוצאה המקודדת או המפוענחת נכונה.'
+    },
+    time: {
+      en: 'For date tools, check whether the value is seconds, milliseconds, UTC or local time.',
+      he: 'בכלי תאריך, בדוק אם הערך הוא שניות, מילישניות, UTC או זמן מקומי.'
+    },
+    developer: {
+      en: 'For developer tools, validate the result before using it in production code or API requests.',
+      he: 'בכלי פיתוח, אמת את התוצאה לפני שימוש בקוד production או בבקשות API.'
+    },
+    color: {
+      en: 'For color tools, confirm that the final value matches the CSS or design system format you need.',
+      he: 'בכלי צבעים, ודא שהערך הסופי מתאים לפורמט ה־CSS או מערכת העיצוב שאתה צריך.'
+    }
+  };
+
+  return [categoryTip[tool.category][locale], ...base];
+}
+
+function commonIssues(tool: ConverterTool, locale: Locale) {
+  const issues = {
+    jsonToCsv: {
+      en: ['JSON must be valid before it can become CSV.', 'Deeply nested objects may appear as JSON text inside a CSV cell.', 'CSV column order is based on discovered object keys.'],
+      he: ['JSON חייב להיות תקין לפני שאפשר להפוך אותו ל־CSV.', 'אובייקטים מקוננים עמוק עשויים להופיע כטקסט JSON בתוך תא CSV.', 'סדר עמודות CSV מבוסס על המפתחות שנמצאו באובייקטים.']
+    },
+    csvToJson: {
+      en: ['The first CSV row must contain headers.', 'Unmatched quotes can break CSV parsing.', 'Rows with missing cells get empty values.'],
+      he: ['השורה הראשונה ב־CSV חייבת להכיל כותרות.', 'מרכאות לא סגורות עלולות לשבור את פענוח ה־CSV.', 'שורות עם תאים חסרים יקבלו ערכים ריקים.']
+    },
+    jwtDecoder: {
+      en: ['JWT decoding is not signature verification.', 'Malformed Base64 sections will fail.', 'Never paste sensitive production tokens into shared screens.'],
+      he: ['פענוח JWT אינו אימות חתימה.', 'מקטעי Base64 לא תקינים ייכשלו.', 'אל תדביק טוקנים רגישים ממערכות production במסכים משותפים.']
+    }
+  };
+
+  if (tool.converterId in issues) {
+    return issues[tool.converterId as keyof typeof issues][locale];
+  }
+
+  const defaults = {
+    data: {
+      en: ['Invalid structure is the most common cause of conversion errors.', 'Copying from rich text editors can add hidden characters.', 'Large inputs are easier to debug in smaller chunks.'],
+      he: ['מבנה לא תקין הוא הגורם הנפוץ ביותר לשגיאות המרה.', 'העתקה מעורכי טקסט עשירים יכולה להוסיף תווים נסתרים.', 'קלט גדול קל יותר לדיבוג כשמחלקים אותו לחלקים קטנים.']
+    },
+    text: {
+      en: ['Extra spaces can change the final text result.', 'Empty lines may be preserved depending on the tool.', 'Mixed Hebrew and English text can affect visual direction, not the actual text.'],
+      he: ['רווחים עודפים יכולים לשנות את התוצאה הסופית.', 'שורות ריקות עשויות להישמר בהתאם לכלי.', 'טקסט עברי ואנגלי מעורב יכול להשפיע על התצוגה, לא בהכרח על הטקסט עצמו.']
+    },
+    encoding: {
+      en: ['Partial encoded strings may fail to decode.', 'Special characters should be tested with a small sample first.', 'Double encoding can produce unexpected output.'],
+      he: ['מחרוזות מקודדות חלקית עלולות להיכשל בפענוח.', 'כדאי לבדוק תווים מיוחדים עם דוגמה קטנה קודם.', 'קידוד כפול יכול לייצר פלט לא צפוי.']
+    },
+    time: {
+      en: ['Seconds and milliseconds can produce very different dates.', 'Timezone display may differ between UTC and local output.', 'Invalid date strings cannot be converted reliably.'],
+      he: ['שניות ומילישניות יכולות להחזיר תאריכים שונים מאוד.', 'תצוגת אזור זמן יכולה להשתנות בין UTC לפלט מקומי.', 'מחרוזות תאריך לא תקינות לא ניתנות להמרה אמינה.']
+    },
+    developer: {
+      en: ['Syntax errors usually come from missing brackets, quotes or separators.', 'Formatted output should still be validated before use.', 'Sensitive code or tokens should not be shared in screenshots.'],
+      he: ['שגיאות תחביר נובעות לרוב מסוגריים, מרכאות או מפרידים חסרים.', 'גם פלט מעוצב כדאי לאמת לפני שימוש.', 'קוד רגיש או טוקנים לא כדאי לשתף בצילומי מסך.']
+    },
+    color: {
+      en: ['Color values outside the valid range cannot convert cleanly.', 'Short HEX and full HEX are both common but must be valid.', 'Copied RGB values should include three numeric channels.'],
+      he: ['ערכי צבע מחוץ לטווח התקין לא יומרו בצורה נקייה.', 'HEX קצר ו־HEX מלא נפוצים, אבל חייבים להיות תקינים.', 'ערכי RGB מועתקים צריכים לכלול שלושה ערוצים מספריים.']
+    }
+  };
+
+  return defaults[tool.category][locale];
+}
+
 export function getStaticPaths() {
   return locales.flatMap((lang) => converters.map((tool) => ({ params: { lang, slug: tool.slug } })));
 }
@@ -65,6 +195,9 @@ if (!tool) {
 const labels = ui[locale];
 const related = tool.related.map((item) => converterBySlug.get(item)).filter(Boolean).slice(0, 3);
 const example = tool.examples[0];
+const contextualFaq = [...generatedFaq(tool), ...tool.faq];
+const tips = conversionTips(tool, locale);
+const issues = commonIssues(tool, locale);
 const title = `${tool.title[locale]} | ${siteName[locale]}`;
 const description = tool.metaDescription[locale];
 const canonicalPath = `/${locale}/${tool.slug}/`;
@@ -82,7 +215,7 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: tool.faq.map((item) => ({
+    mainEntity: contextualFaq.map((item) => ({
       '@type': 'Question',
       name: item.question[locale],
       acceptedAnswer: {
@@ -157,12 +290,29 @@ const jsonLd = [
     <article class="content-panel">
       <p class="eyebrow">{labels.faqTitle}</p>
       <h2>{labels.faqTitle}</h2>
-      {tool.faq.map((item) => (
+      {contextualFaq.map((item) => (
         <details>
           <summary>{item.question[locale]}</summary>
           <p>{item.answer[locale]}</p>
         </details>
       ))}
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'טיפים לפני המרה' : 'Before converting'}</p>
+      <h2>{locale === 'he' ? 'איך לקבל תוצאה נקייה יותר' : 'How to get a cleaner result'}</h2>
+      <ul class="check-list">
+        {tips.map((tip) => <li>{tip}</li>)}
+      </ul>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'בעיות נפוצות' : 'Common issues'}</p>
+      <h2>{locale === 'he' ? 'מה לבדוק אם משהו לא עובד' : 'What to check if something fails'}</h2>
+      <ul class="issue-list">
+        {issues.map((issue) => <li>{issue}</li>)}
+      </ul>
     </article>
   </section>
 

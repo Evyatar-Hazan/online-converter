@@ -709,6 +709,14 @@ textarea[aria-invalid='true'] {
   list-style: none;
 }
 
+.issue-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .check-list li {
   position: relative;
   border: 1px solid var(--line);
@@ -716,6 +724,15 @@ textarea[aria-invalid='true'] {
   background: var(--surface-soft);
   padding: 10px 12px;
   color: var(--ink);
+  font-weight: 750;
+}
+
+.issue-list li {
+  border-inline-start: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  padding: 10px 12px;
+  color: var(--muted);
   font-weight: 750;
 }
 
