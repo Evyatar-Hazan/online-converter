@@ -54,7 +54,10 @@ export const converters: ConverterTool[] = [
       en: ['Paste a JSON object or array.', 'Click Convert or keep Auto enabled.', 'Copy the CSV or download it as a file.'],
       he: ['הדבק אובייקט או מערך JSON.', 'לחץ המרה או השאר מצב אוטומטי פעיל.', 'העתק את ה־CSV או הורד אותו כקובץ.']
     },
-    examples: [{ label: { en: 'Users table', he: 'טבלת משתמשים' }, input: '[{"name":"Avi","city":"Jerusalem"},{"name":"Maya","city":"Tel Aviv"}]' }],
+    examples: [
+      { label: { en: 'Users table', he: 'טבלת משתמשים' }, input: '[{"name":"Avi","city":"Jerusalem"},{"name":"Maya","city":"Tel Aviv"}]' },
+      { label: { en: 'Nested values', he: 'ערכים מקוננים' }, input: '[{"name":"Avi","tags":["admin","editor"]},{"name":"Maya","tags":["viewer"]}]' }
+    ],
     faq: [faq.private, faq.free],
     related: ['csv-to-json', 'json-to-yaml', 'json-formatter']
   },
@@ -79,7 +82,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['csv to json', 'convert csv json'], he: ['CSV ל JSON', 'ממיר CSV ל JSON'] },
     features: { en: ['Header mapping', 'Quoted values', 'Pretty JSON'], he: ['מיפוי כותרות', 'ערכים במרכאות', 'JSON קריא'] },
     guide: { en: ['Paste CSV with a header row.', 'Convert to JSON.', 'Use the result in APIs or scripts.'], he: ['הדבק CSV עם שורת כותרות.', 'המר ל־JSON.', 'השתמש בתוצאה ב־API או סקריפטים.'] },
-    examples: [{ label: { en: 'People CSV', he: 'CSV אנשים' }, input: 'name,city\nAvi,Jerusalem\nMaya,Tel Aviv' }],
+    examples: [
+      { label: { en: 'People CSV', he: 'CSV אנשים' }, input: 'name,city\nAvi,Jerusalem\nMaya,Tel Aviv' },
+      { label: { en: 'Quoted commas', he: 'פסיקים במרכאות' }, input: 'name,note\nAvi,"Jerusalem, Israel"\nMaya,"Tel Aviv, Israel"' }
+    ],
     faq: [faq.private, faq.free],
     related: ['json-to-csv', 'json-formatter', 'yaml-to-json']
   },
@@ -170,7 +176,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['json formatter', 'json validator'], he: ['עיצוב JSON', 'מאמת JSON'] },
     features: { en: ['Pretty print', 'Validation', 'Clean output'], he: ['הדפסה יפה', 'אימות', 'פלט נקי'] },
     guide: { en: ['Paste JSON.', 'Convert to format it.', 'Fix any validation error shown by the tool.'], he: ['הדבק JSON.', 'לחץ המרה כדי לעצב.', 'תקן שגיאות אימות אם מופיעות.'] },
-    examples: [{ label: { en: 'Compact JSON', he: 'JSON דחוס' }, input: '{"name":"Dana","items":[1,2,3]}' }],
+    examples: [
+      { label: { en: 'Compact JSON', he: 'JSON דחוס' }, input: '{"name":"Dana","items":[1,2,3]}' },
+      { label: { en: 'API response', he: 'תגובת API' }, input: '{"ok":true,"data":{"count":2,"items":["he","en"]}}' }
+    ],
     faq: [faq.private, faq.free],
     related: ['json-minifier', 'json-to-csv', 'yaml-to-json']
   },
@@ -206,7 +215,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['base64 encode', 'base64 encoder'], he: ['קידוד Base64', 'מקודד Base64'] },
     features: { en: ['Unicode safe', 'Copy result', 'No upload'], he: ['תומך Unicode', 'העתקת תוצאה', 'בלי העלאה'] },
     guide: { en: ['Paste text.', 'Encode to Base64.', 'Copy the encoded result.'], he: ['הדבק טקסט.', 'קודד ל־Base64.', 'העתק את התוצאה המקודדת.'] },
-    examples: [{ label: { en: 'Unicode text', he: 'טקסט Unicode' }, input: 'Hello שלום' }],
+    examples: [
+      { label: { en: 'Unicode text', he: 'טקסט Unicode' }, input: 'Hello שלום' },
+      { label: { en: 'URL text', he: 'טקסט לקישור' }, input: 'email=test@example.com&lang=he' }
+    ],
     faq: [faq.private, faq.free],
     related: ['base64-decode', 'url-encode', 'html-escape']
   },
@@ -243,7 +255,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['text to binary', 'binary converter'], he: ['טקסט לבינארי', 'ממיר בינארי'] },
     features: { en: ['8-bit groups', 'Unicode safe', 'Copy binary'], he: ['קבוצות 8 ביט', 'תומך Unicode', 'העתקת בינארי'] },
     guide: { en: ['Paste text.', 'Convert to binary.', 'Copy the byte groups.'], he: ['הדבק טקסט.', 'המר לבינארי.', 'העתק את קבוצות הביטים.'] },
-    examples: [{ label: { en: 'Greeting', he: 'ברכה' }, input: 'Hi שלום' }],
+    examples: [
+      { label: { en: 'Greeting', he: 'ברכה' }, input: 'Hi שלום' },
+      { label: { en: 'Emoji text', he: 'טקסט עם אימוג׳י' }, input: 'Convert 🚀' }
+    ],
     faq: [faq.private, faq.free],
     related: ['binary-to-text', 'base64-encode', 'url-encode']
   },
@@ -261,7 +276,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['binary to text', 'decode binary'], he: ['בינארי לטקסט', 'פענוח בינארי'] },
     features: { en: ['8-bit validation', 'Unicode output', 'Instant decode'], he: ['אימות 8 ביט', 'פלט Unicode', 'פענוח מידי'] },
     guide: { en: ['Paste binary byte groups.', 'Decode to text.', 'Copy the readable output.'], he: ['הדבק קבוצות בינאריות.', 'פענח לטקסט.', 'העתק את הפלט הקריא.'] },
-    examples: [{ label: { en: 'Binary greeting', he: 'ברכה בינארית' }, input: '01001000 01101001' }],
+    examples: [
+      { label: { en: 'Binary greeting', he: 'ברכה בינארית' }, input: '01001000 01101001' },
+      { label: { en: 'Binary word', he: 'מילה בינארית' }, input: '01001000 01100101 01101100 01101100 01101111' }
+    ],
     faq: [faq.private, faq.free],
     related: ['text-to-binary', 'base64-decode', 'url-decode']
   },
@@ -279,7 +297,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['url encode', 'percent encode'], he: ['קידוד URL', 'URL encode'] },
     features: { en: ['Percent encoding', 'Query safe', 'Unicode'], he: ['קידוד אחוזים', 'בטוח לפרמטרים', 'Unicode'] },
     guide: { en: ['Paste text or a URL segment.', 'Encode it.', 'Use the output in links or query strings.'], he: ['הדבק טקסט או חלק מ־URL.', 'קודד אותו.', 'השתמש בפלט בקישורים או פרמטרים.'] },
-    examples: [{ label: { en: 'Search query', he: 'שאילתת חיפוש' }, input: 'hello world שלום' }],
+    examples: [
+      { label: { en: 'Search query', he: 'שאילתת חיפוש' }, input: 'hello world שלום' },
+      { label: { en: 'URL params', he: 'פרמטרים ל־URL' }, input: 'name=Dana&city=Tel Aviv' }
+    ],
     faq: [faq.private, faq.free],
     related: ['url-decode', 'base64-encode']
   },
@@ -368,7 +389,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['slug generator', 'url slug'], he: ['יצירת slug', 'סלאג SEO'] },
     features: { en: ['URL friendly', 'Lowercase', 'Clean separators'], he: ['ידידותי ל־URL', 'אותיות קטנות', 'מפרידים נקיים'] },
     guide: { en: ['Paste a title.', 'Generate a slug.', 'Use it in URLs or filenames.'], he: ['הדבק כותרת.', 'צור slug.', 'השתמש בו ב־URL או שמות קבצים.'] },
-    examples: [{ label: { en: 'Article title', he: 'כותרת מאמר' }, input: 'Best JSON Tools for Developers' }],
+    examples: [
+      { label: { en: 'Article title', he: 'כותרת מאמר' }, input: 'Best JSON Tools for Developers' },
+      { label: { en: 'Hebrew title', he: 'כותרת בעברית' }, input: 'ממירים שימושיים למפתחים' }
+    ],
     faq: [faq.private, faq.free],
     related: ['text-case-converter', 'url-encode']
   },
@@ -402,7 +426,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['sort lines', 'alphabetize list'], he: ['מיון שורות', 'סידור רשימה'] },
     features: { en: ['Alphabetical sort', 'Keeps lines', 'Instant'], he: ['מיון אלפביתי', 'שומר שורות', 'מידי'] },
     guide: { en: ['Paste a list.', 'Sort lines.', 'Copy the ordered list.'], he: ['הדבק רשימה.', 'מיין שורות.', 'העתק את הרשימה המסודרת.'] },
-    examples: [{ label: { en: 'Names', he: 'שמות' }, input: 'Banana\nApple\nCherry' }],
+    examples: [
+      { label: { en: 'Names', he: 'שמות' }, input: 'Banana\nApple\nCherry' },
+      { label: { en: 'Hebrew list', he: 'רשימה בעברית' }, input: 'תל אביב\nירושלים\nחיפה' }
+    ],
     faq: [faq.private, faq.free],
     related: ['remove-duplicate-lines', 'word-counter']
   },
@@ -436,7 +463,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['trim whitespace', 'remove spaces'], he: ['ניקוי רווחים', 'הסרת רווחים'] },
     features: { en: ['Line trimming', 'Keeps line breaks', 'Fast cleanup'], he: ['ניקוי לפי שורה', 'שומר שורות', 'ניקוי מהיר'] },
     guide: { en: ['Paste text.', 'Trim whitespace.', 'Copy the cleaned result.'], he: ['הדבק טקסט.', 'נקה רווחים.', 'העתק את התוצאה הנקייה.'] },
-    examples: [{ label: { en: 'Messy lines', he: 'שורות לא נקיות' }, input: '  first line  \n   second line   ' }],
+    examples: [
+      { label: { en: 'Messy lines', he: 'שורות לא נקיות' }, input: '  first line  \n   second line   ' },
+      { label: { en: 'Padded values', he: 'ערכים עם רווחים' }, input: '  alpha  \n  beta  \n  gamma  ' }
+    ],
     faq: [faq.private, faq.free],
     related: ['remove-empty-lines', 'remove-duplicate-lines', 'sort-lines']
   },
@@ -453,7 +483,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['remove empty lines', 'delete blank lines'], he: ['הסרת שורות ריקות', 'מחיקת שורות ריקות'] },
     features: { en: ['Blank line removal', 'Keeps content order', 'List cleanup'], he: ['הסרת ריקות', 'שומר סדר', 'ניקוי רשימות'] },
     guide: { en: ['Paste multiline text.', 'Remove empty lines.', 'Copy the compact result.'], he: ['הדבק טקסט רב־שורות.', 'הסר שורות ריקות.', 'העתק את התוצאה המצומצמת.'] },
-    examples: [{ label: { en: 'List with gaps', he: 'רשימה עם רווחים' }, input: 'apple\n\nbanana\n   \ncherry' }],
+    examples: [
+      { label: { en: 'List with gaps', he: 'רשימה עם רווחים' }, input: 'apple\n\nbanana\n   \ncherry' },
+      { label: { en: 'CSV lines', he: 'שורות CSV' }, input: 'name,city\n\nDana,Haifa\n\nAvi,Jerusalem' }
+    ],
     faq: [faq.private, faq.free],
     related: ['trim-whitespace', 'remove-duplicate-lines', 'sort-lines']
   },
@@ -471,7 +504,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['decimal to hex', 'number to hex'], he: ['Decimal ל HEX', 'עשרוני להקסדצימלי'] },
     features: { en: ['Whole numbers', 'Uppercase HEX', '0x prefix'], he: ['מספרים שלמים', 'HEX באותיות גדולות', 'קידומת 0x'] },
     guide: { en: ['Paste a whole decimal number.', 'Convert to HEX.', 'Copy the hexadecimal value.'], he: ['הדבק מספר עשרוני שלם.', 'המר ל־HEX.', 'העתק את הערך ההקסדצימלי.'] },
-    examples: [{ label: { en: 'Decimal number', he: 'מספר עשרוני' }, input: '255' }],
+    examples: [
+      { label: { en: 'Decimal number', he: 'מספר עשרוני' }, input: '255' },
+      { label: { en: 'Large number', he: 'מספר גדול' }, input: '65535' }
+    ],
     faq: [faq.private, faq.free],
     related: ['hex-to-decimal', 'hex-to-rgb', 'rgb-to-hex']
   },
@@ -489,7 +525,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['hex to decimal', 'hex number converter'], he: ['HEX ל Decimal', 'הקסדצימלי לעשרוני'] },
     features: { en: ['0x optional', 'Whole numbers', 'Instant result'], he: ['0x אופציונלי', 'מספרים שלמים', 'תוצאה מידית'] },
     guide: { en: ['Paste a HEX number.', 'Convert to decimal.', 'Copy the decimal value.'], he: ['הדבק מספר HEX.', 'המר ל־Decimal.', 'העתק את הערך העשרוני.'] },
-    examples: [{ label: { en: 'HEX number', he: 'מספר HEX' }, input: '0xFF' }],
+    examples: [
+      { label: { en: 'HEX number', he: 'מספר HEX' }, input: '0xFF' },
+      { label: { en: 'Large HEX', he: 'HEX גדול' }, input: 'FFFF' }
+    ],
     faq: [faq.private, faq.free],
     related: ['decimal-to-hex', 'hex-to-rgb', 'rgb-to-hex']
   },
@@ -543,7 +582,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['hex to rgb', 'color converter'], he: ['HEX ל RGB', 'ממיר צבעים'] },
     features: { en: ['RGB output', 'CSS format', 'Color preview'], he: ['פלט RGB', 'פורמט CSS', 'תצוגת צבע'] },
     guide: { en: ['Paste a HEX color.', 'Convert to RGB.', 'Use the CSS value in your project.'], he: ['הדבק צבע HEX.', 'המר ל־RGB.', 'השתמש בערך CSS בפרויקט.'] },
-    examples: [{ label: { en: 'Brand color', he: 'צבע מותג' }, input: '#4f46e5' }],
+    examples: [
+      { label: { en: 'Brand color', he: 'צבע מותג' }, input: '#4f46e5' },
+      { label: { en: 'Short HEX', he: 'HEX קצר' }, input: '#0ea' }
+    ],
     faq: [faq.private, faq.free],
     related: ['rgb-to-hex']
   },
@@ -561,7 +603,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['rgb to hex', 'color converter'], he: ['RGB ל HEX', 'ממיר צבעים'] },
     features: { en: ['HEX output', 'CSS ready', 'Fast'], he: ['פלט HEX', 'מוכן ל־CSS', 'מהיר'] },
     guide: { en: ['Paste RGB values.', 'Convert to HEX.', 'Copy the color code.'], he: ['הדבק ערכי RGB.', 'המר ל־HEX.', 'העתק את קוד הצבע.'] },
-    examples: [{ label: { en: 'RGB color', he: 'צבע RGB' }, input: 'rgb(79, 70, 229)' }],
+    examples: [
+      { label: { en: 'RGB color', he: 'צבע RGB' }, input: 'rgb(79, 70, 229)' },
+      { label: { en: 'Plain RGB', he: 'RGB פשוט' }, input: '14, 234, 170' }
+    ],
     faq: [faq.private, faq.free],
     related: ['hex-to-rgb']
   },
@@ -579,7 +624,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['rgb to hsl', 'hsl color converter'], he: ['RGB ל HSL', 'ממיר צבע HSL'] },
     features: { en: ['CSS HSL output', 'Hue degrees', 'Saturation and lightness'], he: ['פלט HSL ל־CSS', 'Hue במעלות', 'רוויה ובהירות'] },
     guide: { en: ['Paste RGB values.', 'Convert to HSL.', 'Copy the CSS-ready value.'], he: ['הדבק ערכי RGB.', 'המר ל־HSL.', 'העתק ערך מוכן ל־CSS.'] },
-    examples: [{ label: { en: 'RGB brand color', he: 'צבע RGB' }, input: 'rgb(79, 70, 229)' }],
+    examples: [
+      { label: { en: 'RGB brand color', he: 'צבע RGB' }, input: 'rgb(79, 70, 229)' },
+      { label: { en: 'Green tone', he: 'גוון ירוק' }, input: '14, 234, 170' }
+    ],
     faq: [faq.private, faq.free],
     related: ['hsl-to-rgb', 'rgb-to-hex', 'hex-to-rgb']
   },
@@ -597,7 +645,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['hsl to rgb', 'convert hsl rgb'], he: ['HSL ל RGB', 'ממיר HSL'] },
     features: { en: ['CSS RGB output', 'Hue support', 'Fast conversion'], he: ['פלט RGB ל־CSS', 'תמיכה ב־Hue', 'המרה מהירה'] },
     guide: { en: ['Paste HSL values.', 'Convert to RGB.', 'Copy the color value.'], he: ['הדבק ערכי HSL.', 'המר ל־RGB.', 'העתק את ערך הצבע.'] },
-    examples: [{ label: { en: 'HSL color', he: 'צבע HSL' }, input: 'hsl(243, 76%, 59%)' }],
+    examples: [
+      { label: { en: 'HSL color', he: 'צבע HSL' }, input: 'hsl(243, 76%, 59%)' },
+      { label: { en: 'Warm tone', he: 'גוון חם' }, input: 'hsl(32, 92%, 54%)' }
+    ],
     faq: [faq.private, faq.free],
     related: ['rgb-to-hsl', 'rgb-to-hex', 'hex-to-rgb']
   },

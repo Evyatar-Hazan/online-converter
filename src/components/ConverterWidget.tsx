@@ -70,9 +70,38 @@ const formatLabels: Record<Locale, Record<string, string>> = {
   }
 };
 
+const outputExtensions: Record<string, string> = {
+  json: 'json',
+  csv: 'csv',
+  xml: 'xml',
+  yaml: 'yaml',
+  text: 'txt',
+  binary: 'txt',
+  base64: 'txt',
+  decimal: 'txt',
+  url: 'txt',
+  html: 'html',
+  'escaped html': 'html',
+  slug: 'txt',
+  stats: 'txt',
+  lines: 'txt',
+  'sorted lines': 'txt',
+  'unique lines': 'txt',
+  'trimmed text': 'txt',
+  'compact lines': 'txt',
+  timestamp: 'txt',
+  date: 'txt',
+  hex: 'txt',
+  rgb: 'css',
+  hsl: 'css',
+  jwt: 'json'
+};
+
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
-  const sample = tool.examples[0]?.input ?? '';
+  const [selectedExampleIndex, setSelectedExampleIndex] = useState(0);
+  const activeExample = tool.examples[selectedExampleIndex] ?? tool.examples[0];
+  const sample = activeExample?.input ?? '';
   const inputTypeLabel = formatLabels[locale][tool.inputType] ?? tool.inputType;
   const outputTypeLabel = formatLabels[locale][tool.outputType] ?? tool.outputType;
   const widgetText = {
@@ -83,10 +112,11 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     outputType: locale === 'he' ? 'סוג פלט' : 'Output type',
     localOnly: locale === 'he' ? 'ההמרה מתבצעת בדפדפן שלך' : 'Runs in your browser',
     manualHint: locale === 'he' ? 'כבה אוטומטי כדי לעבוד ידנית' : 'Turn off Auto for manual mode',
+    examples: locale === 'he' ? 'דוגמאות' : 'Examples',
     sampleName: locale === 'he' ? 'טען דוגמה' : 'Load sample',
     clearInput: labels.clear
   };
-  const [input, setInput] = useState(sample);
+  const [input, setInput] = useState(tool.examples[0]?.input ?? '');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -106,6 +136,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
 
   const status = error ? 'error' : output ? 'success' : 'idle';
   const statusLabel = error ? labels.conversionFailed : output ? widgetText.converted : widgetText.ready;
+  const downloadExtension = outputExtensions[tool.outputType] ?? 'txt';
 
   const trackEvent = useCallback(
     (name: string, props: Record<string, string | number | boolean> = {}) => {
@@ -173,12 +204,23 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `${tool.slug}.${tool.outputType.replace(/\s+/g, '-')}`;
+    anchor.download = `${tool.slug}.${downloadExtension}`;
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
     trackEvent('download_output', { outputCharacters: output.length });
+  };
+
+  const loadExample = (index: number) => {
+    const example = tool.examples[index];
+    if (!example) return;
+    setSelectedExampleIndex(index);
+    setInput(example.input);
+    setError('');
+    setWarnings([]);
+    setMetadata({});
+    trackEvent('load_example', { exampleIndex: index });
   };
 
   return (
@@ -211,6 +253,25 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
           )}
         </div>
       </div>
+
+      {tool.examples.length > 0 && (
+        <div className="example-strip" aria-label={widgetText.examples}>
+          <span>{widgetText.examples}</span>
+          <div className="example-actions">
+            {tool.examples.map((example, index) => (
+              <button
+                className={index === selectedExampleIndex ? 'example-chip active' : 'example-chip'}
+                type="button"
+                key={`${example.label.en}-${index}`}
+                onClick={() => loadExample(index)}
+                aria-pressed={index === selectedExampleIndex}
+              >
+                {example.label[locale]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className={`converter-status converter-status-${status}`} aria-live="polite">
         {status === 'error' ? <AlertTriangle size={18} aria-hidden="true" /> : <CheckCircle2 size={18} aria-hidden="true" />}
