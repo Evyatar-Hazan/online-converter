@@ -1,81 +1,82 @@
-# ממיר נתונים אוניברסלי (React TypeScript)
+# אונליין קונברטר
 
-אפליקציה מתקדמת, מהירה, הפועלת באופן מלא ולוקאלי בדפדפן - נכתבה מחדש בעזרת React, TypeScript ו-Vite. האפליקציה מבצעת עיבוד נתונים בצורה מאובטחת מבלי לשלוח כל מידע לשרת (Backend).
+מרכז ממירים דו־לשוני וממוקד SEO, בנוי עם Astro ו־React islands. האתר מייצר דפים סטטיים בעברית ובאנגלית, וכל ממיר אינטראקטיבי רץ מקומית בדפדפן לטובת מהירות ופרטיות.
 
-שפות זמינות: [English](README.md) | [עברית](README.he.md)
+## יכולות
 
-## ✨ יכולות מרכזיות
+- 24 ממירים בקטגוריות נתונים, טקסט, קידוד, תאריכים, צבעים וכלי פיתוח.
+- דפי SEO סטטיים לכל כלי ולכל קטגוריה בעברית ובאנגלית.
+- המרה מקומית בדפדפן: הקלט לא נשלח לשרת.
+- canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap ו־robots.txt.
+- תמיכה אופציונלית באנליטיקה פרטיותית דרך Cloudflare Web Analytics או Plausible.
+- טעינת Google AdSense, אזורי מודעות ידניים ו־`ads.txt` שנוצר מההגדרות.
+- בדיקות יחידה עם Vitest ובדיקות דפדפן עם Playwright.
 
-- **שישה כלים עוצמתיים:**
-  - **JSON ל-CSV:** משטח מערכים של JSON ובונה מהם עמודות קריאות.
-  - **CSV ל-JSON:** מנתח בצורה חכמה שורות וכותרות ומייצר מהן אובייקטים ב-JSON.
-  - **JSON ל-XML:** מיפוי רקורסיבי של אובייקטים לתגיות XML תקניות.
-  - **XML ל-JSON:** המרה חכמה של עצי DOM ומיפוי של מאפיינים פנימיים ל-JSON נקי.
-  - **JSON ל-YAML:** המרת JSON לקובץ YAML קריא ונקי.
-  - **YAML ל-JSON:** פענוח YAML והמרה ל-JSON מפורמט.
-- **פרטיות בראש ובראשונה:** 100% מההמרה מתבצעת בדפדפן הלקוח בצורה לוקאלית. אף קובץ לא עולה לרשת ואף API חיצוני לא פועל ברקע.
-- **מצב לילה (Dark Mode):** התממשקות מתקדמת עם משתני CSS המציעה החלפה דינמית וחלקה של צבעים על ידי כפתור (שמש/ירח).
-- **תמיכה בשפות וכיווניות (i18n & RTL):** תמיכה מלאה בהחלפת שפה בין עברית לאנגלית - תוך התחשבות מלאה בכיווני הטקסט והמבנה הלוגי (RTL / LTR).
-- **נגישות (a11y):** עמידה בסטנדרטים של תקני נגישות WCAG. כולל תיוגים סמנטיים (`aria-lives`, `aria-label`) וניווט רציף דרך המקלדת באמצעות `:focus-visible`.
-- **שמירת יציבות:** הזנות הטקסט של המשתמש נשמרים מקומית על ידי הוק מתקדם (`useLocalStorage`) כך שלא תאבד מידע בעת ריענון.
+## טכנולוגיות
 
-## 🛠️ טכנולוגיות בשימוש
+- Astro ליצירת אתר סטטי
+- React לווידג׳ט ההמרה האינטראקטיבי
+- TypeScript
+- פענוח YAML באמצעות `yaml`
+- Playwright ו־Vitest
 
-- **[React 18+](https://react.dev/):** ספריית בניית רכיבי ממשק מודרניים.
-- **[TypeScript](https://www.typescriptlang.org/):** שמירה על טיפוסיות חזקה ואפס תקלות זמן-ריצה.
-- **[Vite](https://vitejs.dev/):** סביבת בניית פרויקטים סופר-מהירה (מחליפה את Webpack).
-- **[React Router DOM](https://reactrouter.com/):** מערכת ניתוב מתקדמת בסביבת צד-לקוח.
-- **[i18next](https://www.i18next.com/):** מערכת מקצועית לניהול תרגומים.
-- **[Lucide React](https://lucide.dev/):** חבילת האייקונים היפה והעקבית ביותר כיום.
-
-## 🚀 התקנה והרצה מקומית
-
-כדי להריץ את הפרויקט אצלך במחשב, ודא שהתקנת מראש את [Node.js](https://nodejs.org/), ולאחר מכן הרץ ב-Terminal (שורת הפקודה) את הפעולות הבאות:
+## פיתוח מקומי
 
 ```bash
-# 1. היכנס לתיקיית הפרויקט
-cd online-converter
-
-# 2. התקן את שלל חבילות התלות והספריות
 npm install
-
-# 3. הפעל את שרת הפיתוח המקומי
 npm run dev
 ```
 
-פתח דפדפן וגלוש אל הכתובת `http://localhost:5173`.
-
-## 📦 בנייה עבור סביבת Production
-
-כדי לכווץ (Compile) ולבנות את המערכת לפני העלאה לשרת:
+Preview מקומי:
 
 ```bash
 npm run build
+npm run preview
 ```
 
-פעולה זו תיצור תקיית `dist` קלילה שאותה ניתן להעלות לאכסונים כגון: Vercel, Netlify או שרתי Nginx.
+## Analytics
 
-## ☁️ פריסה לפרודקשיין
+Analytics כבוי כברירת מחדל ונטען רק אם מוגדרים משתני סביבה.
 
-הפריסה לפרודקשיין מנוהלת על ידי Cloudflare Pages Git integration, ולא על ידי GitHub Actions deploy job.
+```bash
+PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=your_cloudflare_token
+PUBLIC_PLAUSIBLE_DOMAIN=online-converter.evyatarhazan.com
+```
+
+Cloudflare Web Analytics מודד צפיות עמוד. Plausible מקבל גם אירועי שימוש בממירים כמו `convert_tool`, `convert_error`, `copy_output` ו־`download_output`.
+
+## Google AdSense
+
+AdSense כבוי כברירת מחדל ונטען רק אם מוגדר Client ID אמיתי.
+
+```bash
+PUBLIC_GOOGLE_ADSENSE_CLIENT=ca-pub-6696643120887220
+PUBLIC_GOOGLE_ADSENSE_SLOT_TOP=1234567890
+PUBLIC_GOOGLE_ADSENSE_SLOT_INLINE=1234567890
+PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=1234567890
+PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=1234567890
+```
+
+כאשר `PUBLIC_GOOGLE_ADSENSE_CLIENT` מוגדר, סקריפט AdSense נטען ב־layout ו־`/ads.txt` נוצר מתוך אותו Client ID. אזורי מודעות ידניים יוצגו רק כאשר מוגדרים גם Client ID וגם Slot ID מתאים. Google תציג מודעות אמיתיות רק אחרי שהדומיין יאושר ב־AdSense.
+
+## פריסה לפרודקשן
+
+הפרודקשן מנוהל דרך Cloudflare Pages Git integration.
 
 - אתר: `https://online-converter.evyatarhazan.com/`
 - פרויקט Cloudflare Pages: `online-converter`
-- ענף פרודקשיין: `main`
+- ענף פרודקשן: `main`
 - פקודת build: `npm run build`
-- תיקיית פלט: `dist`
+- תיקיית output: `dist`
 
-כל push ל-`main` גורם ל-Cloudflare Pages להריץ build ולפרסם deployment חדש לפרודקשיין.
+כל push ל־`main` מפעיל פריסה חדשה ב־Cloudflare Pages.
 
-## ✅ בדיקות איכות
+## בדיקות איכות
 
 ```bash
+npm run build
 npm run lint
-npm audit
+npm run test
+npm run test:e2e
+npm audit --omit=dev
 ```
-
-GitHub Actions מריץ בדיקות CI על כל push ו-pull request: התקנת תלויות, build לפרודקשיין ו-lint. הפריסה עצמה נשארת מנוהלת דרך Cloudflare Pages.
-
-## 📄 רישיון
-
-קוד פתוח, משתמש ברישיון MIT. כל הזכויות שמורות לממיר נתונים אוניברסלי.

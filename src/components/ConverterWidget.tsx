@@ -9,6 +9,12 @@ interface ConverterWidgetProps {
   locale: Locale;
 }
 
+declare global {
+  interface Window {
+    plausible?: (eventName: string, options?: { props?: Record<string, string | number | boolean> }) => void;
+  }
+}
+
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
   const sample = tool.examples[0]?.input ?? '';
@@ -25,7 +31,25 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     return { characters: input.length, lines };
   }, [input]);
 
-  const runConversion = useCallback(() => {
+  const trackEvent = useCallback(
+    (name: string, props: Record<string, string | number | boolean> = {}) => {
+      const detail = {
+        name,
+        props: {
+          tool: tool.slug,
+          converter: tool.converterId,
+          locale,
+          ...props
+        }
+      };
+
+      window.dispatchEvent(new CustomEvent('online-converter:event', { detail }));
+      window.plausible?.(name, { props: detail.props });
+    },
+    [locale, tool.converterId, tool.slug]
+  );
+
+  const runConversion = useCallback((source: 'auto' | 'manual' = 'auto') => {
     setError('');
     setWarnings([]);
     setMetadata({});
@@ -40,12 +64,18 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       setOutput(result.output);
       setWarnings(result.warnings ?? []);
       setMetadata(result.metadata ?? {});
+      if (source === 'manual') {
+        trackEvent('convert_tool', { inputCharacters: input.length, outputCharacters: result.output.length });
+      }
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : labels.conversionFailed;
       setError(message || labels.conversionFailed);
       setOutput('');
+      if (source === 'manual') {
+        trackEvent('convert_error', { inputCharacters: input.length });
+      }
     }
-  }, [input, labels.conversionFailed, tool.converterId]);
+  }, [input, labels.conversionFailed, tool.converterId, trackEvent]);
 
   useEffect(() => {
     if (!autoConvert) return;
@@ -56,6 +86,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const copyOutput = async () => {
     if (!output) return;
     await navigator.clipboard.writeText(output);
+    trackEvent('copy_output', { outputCharacters: output.length });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1200);
   };
@@ -71,6 +102,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
+    trackEvent('download_output', { outputCharacters: output.length });
   };
 
   return (
@@ -124,7 +156,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       </div>
 
       <div className="converter-actions">
-        <button className="primary-action" type="button" onClick={runConversion}>
+        <button className="primary-action" type="button" onClick={() => runConversion('manual')}>
           <Play size={18} aria-hidden="true" />
           {labels.convert}
         </button>

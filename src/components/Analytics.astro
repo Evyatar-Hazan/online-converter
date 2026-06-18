@@ -1,0 +1,32 @@
+---
+const cloudflareToken = import.meta.env.PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN;
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+---
+
+{cloudflareToken && (
+  <script
+    is:inline
+    defer
+    src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon={JSON.stringify({ token: cloudflareToken })}
+  />
+)}
+
+{plausibleDomain && (
+  <>
+    <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>
+    <script is:inline>
+      window.plausible =
+        window.plausible ||
+        function () {
+          (window.plausible.q = window.plausible.q || []).push(arguments);
+        };
+
+      window.addEventListener('online-converter:event', (event) => {
+        const detail = event.detail || {};
+        if (!detail.name) return;
+        window.plausible(detail.name, { props: detail.props || {} });
+      });
+    </script>
+  </>
+)}

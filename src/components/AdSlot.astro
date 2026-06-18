@@ -10,9 +10,34 @@ interface Props {
 const { locale, placement } = Astro.props;
 const labels = ui[locale];
 const adText = locale === 'he' ? 'שטח פרסום' : 'Ad space';
+const adClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT;
+const adSlots = {
+  top: import.meta.env.PUBLIC_GOOGLE_ADSENSE_SLOT_TOP,
+  inline: import.meta.env.PUBLIC_GOOGLE_ADSENSE_SLOT_INLINE,
+  sidebar: import.meta.env.PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR,
+  bottom: import.meta.env.PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM
+};
+const adSlot = adSlots[placement];
+const showRealAd = Boolean(adClient && adSlot);
 ---
 
 <aside class={`ad-slot ad-slot-${placement}`} aria-label={labels.adLabel}>
   <span>{labels.adLabel}</span>
-  <div>{adText}</div>
+  {showRealAd ? (
+    <>
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client={adClient}
+        data-ad-slot={adSlot}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+      <script is:inline>
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </>
+  ) : (
+    <div>{adText}</div>
+  )}
 </aside>

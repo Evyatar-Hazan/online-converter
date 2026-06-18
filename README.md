@@ -1,64 +1,67 @@
-# React TypeScript Universal Data Converter
+# Online Converter
 
-A modern, fast, completely browser-based data conversion application built using React, TypeScript, and Vite. This application handles data transformations securely without sending any payload to a server.
+A bilingual SEO-first converter hub built with Astro and React islands. The site generates static pages for English and Hebrew, while each converter runs locally in the browser for speed and privacy.
 
-Languages available: [English](README.md) | [עברית (Hebrew)](README.he.md)
+## Features
 
-## ✨ Features
+- 24 converter tools across data formats, text, encoding, dates, colors and developer utilities.
+- Static SEO pages for every tool and category in English and Hebrew.
+- Browser-only conversion: pasted input is not uploaded to a server.
+- Canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap and robots.txt.
+- Optional privacy-friendly analytics through Cloudflare Web Analytics or Plausible.
+- Google AdSense script, manual ad slots and generated `ads.txt` support.
+- Vitest unit tests and Playwright browser tests.
 
-- **Six Powerful Tools:**
-  - **JSON to CSV:** Flattens arrays and structures properties into clean comma-separated values.
-  - **CSV to JSON:** Validates headers and rows to construct robust JSON representations.
-  - **XML to JSON:** Deep traversal to convert attribute structures and nodes into clean nested JSON.
-  - **JSON to XML:** Recursively maps arrays and primitives to valid XML syntax with auto tags.
-  - **JSON to YAML:** Converts JSON payloads into readable YAML.
-  - **YAML to JSON:** Parses YAML content into formatted JSON.
-- **Privacy First Approach:** 100% of the logic happens locally in your browser. No files are uploaded and no APIs are called.
-- **Dark Mode Support:** State-of-the-Art CSS variable implementation with dynamic theme toggling (Sun/Moon).
-- **Internationalization (i18n):** Full support for English (LTR) and Hebrew (RTL) including structural interface flip.
-- **Accessibility (a11y):** Built following WCAG semantics, dynamic ARIA tags, and high-contrast `:focus-visible` styling for optimal screen reader and keyboard navigation limits.
-- **Data Persistence:** User input and interface settings are automatically saved via custom `useLocalStorage` hooks.
+## Tech Stack
 
-## 🛠️ Technology Stack
+- Astro static site generation
+- React for the interactive converter widget
+- TypeScript
+- YAML parser via `yaml`
+- Playwright and Vitest
 
-- **[React 18+](https://react.dev/):** UI library for declarative views.
-- **[TypeScript](https://www.typescriptlang.org/):** Strictly typed JavaScript codebase.
-- **[Vite](https://vitejs.dev/):** Next Generation Frontend Tooling ensuring immediate Hot Module Reload (HMR) and optimized builds.
-- **[React Router DOM](https://reactrouter.com/):** Client-side declarative routing system.
-- **[i18next](https://www.i18next.com/):** Robust internationalization framework.
-- **[Lucide React](https://lucide.dev/):** Beautiful and consistent iconography.
-
-## 🚀 Getting Started
-
-To run the project locally on your machine, ensure you have [Node.js](https://nodejs.org/) installed, and then run the following commands:
+## Development
 
 ```bash
-# 1. Clone the repository or navigate into it
-cd online-converter
-
-# 2. Install dependencies
 npm install
-
-# 3. Start the development server
 npm run dev
 ```
 
-Open your browser and navigate to `http://localhost:5173`.
-
-## 📦 Building for Production
-
-To create an optimized bundle for deployment:
+Local preview:
 
 ```bash
-# Compile and build using Vite
 npm run build
+npm run preview
 ```
 
-This will output statically verified assets into the `dist` directory, ready to be served on platforms like Vercel, Netlify, or Nginx.
+## Analytics
 
-## ☁️ Production Deployment
+Analytics is optional and disabled unless environment variables are provided.
 
-Production is handled by Cloudflare Pages Git integration, not by a GitHub Actions deploy job.
+```bash
+PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=your_cloudflare_token
+PUBLIC_PLAUSIBLE_DOMAIN=online-converter.evyatarhazan.com
+```
+
+Cloudflare Web Analytics tracks page views. Plausible also receives converter events such as `convert_tool`, `convert_error`, `copy_output` and `download_output`.
+
+## Google AdSense
+
+AdSense is optional and disabled unless a real AdSense client ID is provided.
+
+```bash
+PUBLIC_GOOGLE_ADSENSE_CLIENT=ca-pub-6696643120887220
+PUBLIC_GOOGLE_ADSENSE_SLOT_TOP=1234567890
+PUBLIC_GOOGLE_ADSENSE_SLOT_INLINE=1234567890
+PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=1234567890
+PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=1234567890
+```
+
+When `PUBLIC_GOOGLE_ADSENSE_CLIENT` is set, the AdSense script loads in the site layout and `/ads.txt` is generated from that client ID. Manual ad placements render only when both the client ID and the matching slot ID are configured. Google will serve real ads only after the domain is approved in AdSense.
+
+## Production Deployment
+
+Production is handled by Cloudflare Pages Git integration.
 
 - Site: `https://online-converter.evyatarhazan.com/`
 - Cloudflare Pages project: `online-converter`
@@ -66,17 +69,14 @@ Production is handled by Cloudflare Pages Git integration, not by a GitHub Actio
 - Build command: `npm run build`
 - Output directory: `dist`
 
-Every push to `main` triggers Cloudflare Pages to build and publish the latest production deployment.
+Every push to `main` triggers a Cloudflare Pages deployment.
 
-## ✅ Quality Checks
+## Quality Checks
 
 ```bash
+npm run build
 npm run lint
-npm audit
+npm run test
+npm run test:e2e
+npm audit --omit=dev
 ```
-
-GitHub Actions runs CI checks on every push and pull request: dependency install, production build, and lint. Deployments remain managed by Cloudflare Pages.
-
-## 📄 License
-
-This project is open-source and available under the terms of the MIT License. Universal Data Converter. All rights reserved.

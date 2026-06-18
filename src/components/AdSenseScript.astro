@@ -1,0 +1,12 @@
+---
+const adClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT;
+---
+
+{adClient && (
+  <script
+    is:inline
+    async
+    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`}
+    crossorigin="anonymous"
+  />
+)}

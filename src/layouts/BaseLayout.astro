@@ -1,5 +1,7 @@
 ---
 import ThemeScript from '../components/ThemeScript.astro';
+import Analytics from '../components/Analytics.astro';
+import AdSenseScript from '../components/AdSenseScript.astro';
 import { locales, siteName, siteUrl, ui } from '../data/site';
 import type { Locale } from '../types';
 import '../styles/global.css';
@@ -39,6 +41,8 @@ const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <ThemeScript />
+    <Analytics />
+    <AdSenseScript />
     {jsonLd.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
   </head>
   <body>
