@@ -1,0 +1,78 @@
+---
+import ThemeScript from '../components/ThemeScript.astro';
+import { locales, siteName, siteUrl, ui } from '../data/site';
+import type { Locale } from '../types';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  canonicalPath: string;
+  alternateSlug?: string;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { locale, title, description, canonicalPath, alternateSlug = '', jsonLd = [] } = Astro.props;
+const labels = ui[locale];
+const otherLocale = locale === 'he' ? 'en' : 'he';
+const alternatePath = alternateSlug ? `/${otherLocale}/${alternateSlug}/` : `/${otherLocale}/`;
+const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+---
+
+<!doctype html>
+<html lang={locale} dir={labels.direction}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href={canonicalUrl} />
+    {locales.map((lang) => <link rel="alternate" hreflang={lang} href={`${siteUrl}/${lang}/${alternateSlug ? `${alternateSlug}/` : ''}`} />)}
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/en/${alternateSlug ? `${alternateSlug}/` : ''}`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName[locale]} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <ThemeScript />
+    {jsonLd.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{labels.tools}</a>
+    <header class="site-header">
+      <nav class="nav-shell" aria-label="Main navigation">
+        <a class="brand" href={`/${locale}/`} aria-label={siteName[locale]}>
+          <span class="brand-mark">OC</span>
+          <span>{siteName[locale]}</span>
+        </a>
+        <div class="nav-actions">
+          <a href={alternatePath} class="nav-link">{labels.langLabel}</a>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
+            <span aria-hidden="true">◐</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>{labels.footer}</p>
+      <nav aria-label="Footer">
+        <a href={`/${locale}/`}>{labels.home}</a>
+        <a href="/sitemap.xml">{labels.sitemap}</a>
+      </nav>
+    </footer>
+    <script is:inline>
+      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('oc-theme', next);
+      });
+    </script>
+  </body>
+</html>

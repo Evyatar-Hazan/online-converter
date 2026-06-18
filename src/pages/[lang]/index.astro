@@ -1,0 +1,114 @@
+---
+import ToolCard from '../../components/ToolCard.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { categoryLabels, locales, siteName, ui } from '../../data/site';
+import { converters } from '../../data/converters';
+import type { ConverterCategory, Locale } from '../../types';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const locale = Astro.params.lang as Locale;
+const labels = ui[locale];
+const categories = [...new Set(converters.map((tool) => tool.category))] as ConverterCategory[];
+const title = locale === 'he' ? 'אונליין קונברטר - ממירים מהירים בעברית ובאנגלית' : 'Online Converter - Fast bilingual converter tools';
+const description =
+  locale === 'he'
+    ? 'מרכז ממירים מהיר בעברית ובאנגלית עבור JSON, CSV, YAML, Base64, טקסט, צבעים, תאריכים וכלי פיתוח.'
+    : 'A fast bilingual converter hub for JSON, CSV, YAML, Base64, text, colors, dates and developer tools.';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName[locale],
+    url: `https://online-converter.evyatarhazan.com/${locale}/`,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `https://online-converter.evyatarhazan.com/${locale}/?q={search_term_string}`,
+      'query-input': 'required name=search_term_string'
+    }
+  }
+];
+---
+
+<BaseLayout locale={locale} title={title} description={description} canonicalPath={`/${locale}/`} jsonLd={jsonLd}>
+  <section class="hero-section">
+    <div class="hero-copy">
+      <p class="eyebrow">{labels.heroEyebrow}</p>
+      <h1>{labels.heroTitle}</h1>
+      <p>{labels.heroText}</p>
+      <div class="hero-actions">
+        <a class="primary-action" href="#tools">{labels.heroCta}</a>
+        <span>{converters.length} {labels.tools}</span>
+      </div>
+    </div>
+    <div class="hero-panel" aria-label={labels.privacy}>
+      <div>
+        <span>{labels.privacy}</span>
+        <strong>100%</strong>
+      </div>
+      <div>
+        <span>{labels.noUpload}</span>
+        <strong>0</strong>
+      </div>
+      <div>
+        <span>{labels.instant}</span>
+        <strong>&lt;1s</strong>
+      </div>
+    </div>
+  </section>
+
+  <AdSlot locale={locale} placement="top" />
+
+  <section class="section-shell" id="tools">
+    <div class="section-heading">
+      <p class="eyebrow">{labels.allTools}</p>
+      <h2>{labels.search}</h2>
+      <input class="tool-search" type="search" placeholder={labels.searchPlaceholder} data-tool-search aria-label={labels.search} />
+    </div>
+    <div class="category-tabs" aria-label={labels.categoriesTitle}>
+      <button type="button" data-filter="all" class="active">{labels.allTools}</button>
+      {categories.map((category) => <button type="button" data-filter={category}>{categoryLabels[category][locale]}</button>)}
+    </div>
+    <div class="tools-grid">
+      {converters.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+    </div>
+  </section>
+
+  <section class="strategy-band">
+    <div>
+      <p class="eyebrow">{labels.strategyTitle}</p>
+      <h2>{labels.strategyText}</h2>
+    </div>
+    <ul>
+      {categories.map((category) => <li>{categoryLabels[category][locale]}</li>)}
+    </ul>
+  </section>
+
+  <script>
+    const search = document.querySelector<HTMLInputElement>('[data-tool-search]');
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-tool-card]')];
+    const filters = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    let activeFilter = 'all';
+
+    function applyFilters() {
+      const query = search?.value.trim().toLowerCase() ?? '';
+      cards.forEach((card) => {
+        const matchesText = !query || card.dataset.title?.includes(query);
+        const matchesCategory = activeFilter === 'all' || card.dataset.category === activeFilter;
+        card.hidden = !(matchesText && matchesCategory);
+      });
+    }
+
+    search?.addEventListener('input', applyFilters);
+    filters.forEach((filter) => {
+      filter.addEventListener('click', () => {
+        activeFilter = filter.dataset.filter ?? 'all';
+        filters.forEach((item) => item.classList.toggle('active', item === filter));
+        applyFilters();
+      });
+    });
+  </script>
+</BaseLayout>

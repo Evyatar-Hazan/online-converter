@@ -1,0 +1,7 @@
+<script is:inline>
+  (() => {
+    const stored = localStorage.getItem('oc-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = stored || (prefersDark ? 'dark' : 'light');
+  })();
+</script>

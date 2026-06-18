@@ -1,0 +1,119 @@
+---
+import { ConverterWidget } from '../../components/ConverterWidget';
+import AdSlot from '../../components/AdSlot.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { converterBySlug, converters } from '../../data/converters';
+import { locales, siteName, siteUrl, ui } from '../../data/site';
+import type { Locale } from '../../types';
+
+export function getStaticPaths() {
+  return locales.flatMap((lang) => converters.map((tool) => ({ params: { lang, slug: tool.slug } })));
+}
+
+const locale = Astro.params.lang as Locale;
+const slug = Astro.params.slug as string;
+const tool = converterBySlug.get(slug);
+
+if (!tool) {
+  throw new Error(`Unknown converter slug: ${slug}`);
+}
+
+const labels = ui[locale];
+const related = tool.related.map((item) => converterBySlug.get(item)).filter(Boolean).slice(0, 3);
+const title = `${tool.title[locale]} | ${siteName[locale]}`;
+const description = tool.metaDescription[locale];
+const canonicalPath = `/${locale}/${tool.slug}/`;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: tool.title[locale],
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Web browser',
+    url: `${siteUrl}${canonicalPath}`,
+    description,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: tool.faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question[locale],
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer[locale]
+      }
+    }))
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: labels.home, item: `${siteUrl}/${locale}/` },
+      { '@type': 'ListItem', position: 2, name: tool.shortTitle[locale], item: `${siteUrl}${canonicalPath}` }
+    ]
+  }
+];
+---
+
+<BaseLayout locale={locale} title={title} description={description} canonicalPath={canonicalPath} alternateSlug={tool.slug} jsonLd={jsonLd}>
+  <nav class="breadcrumbs" aria-label="Breadcrumbs">
+    <a href={`/${locale}/`}>{labels.home}</a>
+    <span>/</span>
+    <span>{tool.shortTitle[locale]}</span>
+  </nav>
+
+  <section class="tool-hero">
+    <div>
+      <p class="eyebrow">{tool.keywords[locale][0]}</p>
+      <h1>{tool.title[locale]}</h1>
+      <p>{tool.description[locale]}</p>
+      <div class="trust-row">
+        <span>{labels.privacy}</span>
+        <span>{labels.noUpload}</span>
+        <span>{labels.instant}</span>
+      </div>
+    </div>
+    <AdSlot locale={locale} placement="sidebar" />
+  </section>
+
+  <AdSlot locale={locale} placement="top" />
+
+  <ConverterWidget client:load tool={tool} locale={locale} />
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{labels.guideTitle}</p>
+      <h2>{labels.guideTitle}</h2>
+      <ol>
+        {tool.guide[locale].map((step) => <li>{step}</li>)}
+      </ol>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{labels.faqTitle}</p>
+      <h2>{labels.faqTitle}</h2>
+      {tool.faq.map((item) => (
+        <details>
+          <summary>{item.question[locale]}</summary>
+          <p>{item.answer[locale]}</p>
+        </details>
+      ))}
+    </article>
+  </section>
+
+  <AdSlot locale={locale} placement="inline" />
+
+  <section class="section-shell">
+    <div class="section-heading">
+      <p class="eyebrow">{labels.relatedTitle}</p>
+      <h2>{labels.relatedTitle}</h2>
+    </div>
+    <div class="tools-grid compact">
+      {related.map((item) => item && <ToolCard tool={item} locale={locale} />)}
+    </div>
+  </section>
+
+  <AdSlot locale={locale} placement="bottom" />
+</BaseLayout>

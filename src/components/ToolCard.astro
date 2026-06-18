@@ -1,0 +1,30 @@
+---
+import { categoryLabels, ui } from '../data/site';
+import type { ConverterTool, Locale } from '../types';
+
+interface Props {
+  tool: ConverterTool;
+  locale: Locale;
+}
+
+const { tool, locale } = Astro.props;
+const labels = ui[locale];
+---
+
+<article class="tool-card" data-tool-card data-title={`${tool.title[locale]} ${tool.keywords[locale].join(' ')}`.toLowerCase()} data-category={tool.category}>
+  <div class="tool-card-top">
+    <span class="tool-category">{categoryLabels[tool.category][locale]}</span>
+    <div class="tool-badges">
+      {tool.popular && <span>{labels.popular}</span>}
+      {tool.new && <span>{labels.new}</span>}
+    </div>
+  </div>
+  <h3>{tool.shortTitle[locale]}</h3>
+  <p>{tool.description[locale]}</p>
+  <ul>
+    {tool.features[locale].map((feature) => <li>{feature}</li>)}
+  </ul>
+  <a class="card-link" href={`/${locale}/${tool.slug}/`}>
+    {labels.open}
+  </a>
+</article>
