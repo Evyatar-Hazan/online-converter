@@ -42,6 +42,16 @@ test('converter page shows a quick preview', async ({ page }) => {
   await expect(page.getByLabel('Quick preview')).toContainText('#4f46e5');
 });
 
+test('converter page can load input and options from a share link', async ({ page }) => {
+  const options = encodeURIComponent(JSON.stringify({ direction: 'desc', caseSensitive: false }));
+  await page.goto(`/en/sort-lines/?input=banana%0AApple%0Acherry&options=${options}`);
+  await expect(page.getByLabel('Input')).toHaveValue('banana\nApple\ncherry');
+  await expect(page.getByLabel('Sort order')).toHaveValue('desc');
+  await expect(page.getByLabel('Case sensitive')).not.toBeChecked();
+  await page.getByRole('button', { name: 'Convert' }).click();
+  await expect(page.getByLabel('Output')).toHaveValue('cherry\nbanana\nApple');
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');

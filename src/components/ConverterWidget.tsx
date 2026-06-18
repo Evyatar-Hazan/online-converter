@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, ArrowLeftRight, CheckCircle2, Clipboard, Download, Eraser, FileText, Play, Sparkles } from 'lucide-react';
+import { AlertTriangle, ArrowLeftRight, CheckCircle2, Clipboard, Download, Eraser, FileText, Link, Play, Sparkles } from 'lucide-react';
 import { convert } from '../lib/converter-functions';
 import type { ConvertPreview, ConverterOptions, ConverterTool, Locale } from '../types';
 import { ui } from '../data/site';
@@ -101,12 +101,32 @@ function previewEntries(preview: ConvertPreview) {
   return Object.entries(preview.values ?? {}).filter(([, value]) => value !== undefined && value !== '');
 }
 
+function readLinkedInput(fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  return new URLSearchParams(window.location.search).get('input') ?? fallback;
+}
+
+function readLinkedOptions(defaults: ConverterOptions): ConverterOptions {
+  if (typeof window === 'undefined') return defaults;
+  const linkedOptions = new URLSearchParams(window.location.search).get('options');
+  if (!linkedOptions) return defaults;
+
+  try {
+    const parsed = JSON.parse(linkedOptions) as ConverterOptions;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? { ...defaults, ...parsed } : defaults;
+  } catch {
+    return defaults;
+  }
+}
+
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
   const defaultOptionValues = useMemo<ConverterOptions>(() => {
     return Object.fromEntries((tool.options ?? []).map((option) => [option.id, option.defaultValue]));
   }, [tool.options]);
-  const [selectedExampleIndex, setSelectedExampleIndex] = useState(0);
+  const initialInput = useMemo(() => readLinkedInput(tool.examples[0]?.input ?? ''), [tool.examples]);
+  const initialOptionValues = useMemo(() => readLinkedOptions(defaultOptionValues), [defaultOptionValues]);
+  const [selectedExampleIndex, setSelectedExampleIndex] = useState(initialInput === (tool.examples[0]?.input ?? '') ? 0 : -1);
   const activeExample = tool.examples[selectedExampleIndex] ?? tool.examples[0];
   const sample = activeExample?.input ?? '';
   const inputTypeLabel = formatLabels[locale][tool.inputType] ?? tool.inputType;
@@ -122,18 +142,21 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     examples: locale === 'he' ? 'דוגמאות' : 'Examples',
     preview: locale === 'he' ? 'תצוגה מהירה' : 'Quick preview',
     sampleName: locale === 'he' ? 'טען דוגמה' : 'Load sample',
+    share: locale === 'he' ? 'העתק קישור שיתוף' : 'Copy share link',
+    shared: locale === 'he' ? 'קישור הועתק' : 'Link copied',
     errorHint: locale === 'he' ? 'בדוק את מבנה הקלט, נסה דוגמה מוכנה או נקה תווים שהועתקו ממקור חיצוני.' : 'Check the input structure, try a sample, or remove characters copied from another source.',
     clearInput: labels.clear
   };
-  const [input, setInput] = useState(tool.examples[0]?.input ?? '');
+  const [input, setInput] = useState(initialInput);
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [warnings, setWarnings] = useState<string[]>([]);
   const [metadata, setMetadata] = useState<Record<string, string | number>>({});
   const [preview, setPreview] = useState<ConvertPreview | null>(null);
-  const [optionValues, setOptionValues] = useState<ConverterOptions>(defaultOptionValues);
+  const [optionValues, setOptionValues] = useState<ConverterOptions>(initialOptionValues);
   const [autoConvert, setAutoConvert] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const inputStats = useMemo(() => {
     const lines = input ? input.split(/\r\n|\r|\n/).length : 0;
@@ -210,6 +233,21 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     trackEvent('copy_output', { outputCharacters: output.length });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1200);
+  };
+
+  const copyShareLink = async () => {
+    const url = new URL(window.location.href);
+    url.search = '';
+    if (input.trim()) {
+      url.searchParams.set('input', input);
+    }
+    if (Object.keys(optionValues).length > 0) {
+      url.searchParams.set('options', JSON.stringify(optionValues));
+    }
+    await navigator.clipboard.writeText(url.toString());
+    trackEvent('copy_share_link', { inputCharacters: input.length, hasOptions: Object.keys(optionValues).length > 0 });
+    setShareCopied(true);
+    window.setTimeout(() => setShareCopied(false), 1400);
   };
 
   const downloadOutput = () => {
@@ -378,6 +416,10 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
         <button className="secondary-action" type="button" onClick={downloadOutput} disabled={!output}>
           <Download size={18} aria-hidden="true" />
           {labels.download}
+        </button>
+        <button className="secondary-action" type="button" onClick={copyShareLink} disabled={!input.trim() && Object.keys(optionValues).length === 0}>
+          <Link size={18} aria-hidden="true" />
+          {shareCopied ? widgetText.shared : widgetText.share}
         </button>
         {Object.keys(metadata).length > 0 && (
           <div className="metadata-strip" aria-label="Metadata">
