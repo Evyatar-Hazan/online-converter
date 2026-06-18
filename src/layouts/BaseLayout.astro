@@ -65,7 +65,13 @@ const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
       <slot />
     </main>
     <footer class="site-footer">
-      <p>{labels.footer}</p>
+      <div class="footer-copy">
+        <p>{labels.footer}</p>
+        <p>
+          {labels.credit}{' '}
+          <a href="https://evyatarhazan.com/" target="_blank" rel="noopener noreferrer">Evyatar Hazan</a>
+        </p>
+      </div>
       <nav aria-label="Footer">
         <a href={`/${locale}/`}>{labels.home}</a>
         <a href="/sitemap.xml">{labels.sitemap}</a>

@@ -280,7 +280,8 @@ export const ui = {
     strategyTitle: 'More useful converter categories',
     strategyText:
       'Find practical tools for text, files, developer utilities, dates, colors, calculators, encoding and everyday formatting work.',
-    footer: 'Online Converter. Fast bilingual tools for privacy-first conversion.'
+    footer: 'Online Converter. Fast bilingual tools for privacy-first conversion.',
+    credit: 'Developed by'
   },
   he: {
     direction: 'rtl',
@@ -325,6 +326,7 @@ export const ui = {
     strategyTitle: 'עוד קטגוריות שימושיות',
     strategyText:
       'מצא כלים שימושיים לטקסט, קבצים, פיתוח, תאריכים, צבעים, מחשבונים, קידוד ועיצוב נתונים יומיומי.',
-    footer: 'אונליין קונברטר. כלים דו־לשוניים מהירים להמרה פרטית.'
+    footer: 'אונליין קונברטר. כלים דו־לשוניים מהירים להמרה פרטית.',
+    credit: 'פותח על ידי'
   }
 } as const;

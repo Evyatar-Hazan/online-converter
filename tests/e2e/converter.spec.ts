@@ -14,6 +14,7 @@ test('Hebrew home page supports RTL and search filtering', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await page.getByLabel('חיפוש ממירים').fill('Base64');
   await expect(page.locator('[data-tool-card]:visible')).toHaveCount(2);
+  await expect(page.getByRole('link', { name: 'Evyatar Hazan' })).toHaveAttribute('href', 'https://evyatarhazan.com/');
 });
 
 test('Hebrew category page lists matching tools', async ({ page }) => {

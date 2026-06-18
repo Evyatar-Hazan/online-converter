@@ -986,6 +986,16 @@ summary {
   margin: 0;
 }
 
+.footer-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.footer-copy a {
+  color: var(--brand-strong);
+  font-weight: 850;
+}
+
 .site-footer nav {
   display: flex;
   flex-wrap: wrap;
