@@ -30,16 +30,34 @@ describe('converter functions', () => {
     expect(decoded.output).toBe('Hello שלום');
   });
 
+  it('converts text and binary byte groups', () => {
+    const binary = convert('textToBinary', 'Hi');
+    expect(binary.output).toBe('01001000 01101001');
+
+    const text = convert('binaryToText', binary.output);
+    expect(text.output).toBe('Hi');
+  });
+
+  it('converts decimal and hexadecimal whole numbers', () => {
+    expect(convert('decimalToHex', '255').output).toBe('0xFF');
+    expect(convert('hexToDecimal', '0xFF').output).toBe('255');
+  });
+
   it('converts dates, colors and text helpers', () => {
     expect(convert('dateToTimestamp', '2026-06-18T12:00:00Z').output).toContain('Unix seconds');
     expect(convert('hexToRgb', '#4f46e5').output).toContain('rgb(79, 70, 229)');
     expect(convert('rgbToHex', 'rgb(79, 70, 229)').output).toBe('#4f46e5');
+    expect(convert('rgbToHsl', 'rgb(79, 70, 229)').output).toContain('hsl(');
+    expect(convert('hslToRgb', 'hsl(243, 76%, 59%)').output).toContain('rgb(');
     expect(convert('slugGenerator', 'Best JSON Tools!').output).toBe('best-json-tools');
+    expect(convert('trimWhitespace', '  one  \n two ').output).toBe('one\ntwo');
+    expect(convert('removeEmptyLines', 'one\n\n two ').output).toBe('one\n two ');
   });
 
   it('throws useful errors for invalid input', () => {
     expect(() => convert('jsonFormatter', '{bad')).toThrow();
     expect(() => convert('csvToJson', '"broken')).toThrow(/unmatched quote/i);
     expect(() => convert('hexToRgb', '#zzzzzz')).toThrow();
+    expect(() => convert('binaryToText', '101')).toThrow(/8-bit/i);
   });
 });

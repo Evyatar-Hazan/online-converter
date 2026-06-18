@@ -59,10 +59,18 @@ function formatName(value: string) {
     html: 'HTML',
     'escaped html': 'escaped HTML',
     base64: 'Base64',
+    binary: 'binary',
+    decimal: 'decimal',
     url: 'URL',
     jwt: 'JWT',
     hex: 'HEX',
-    rgb: 'RGB'
+    rgb: 'RGB',
+    hsl: 'HSL',
+    'trimmed text': 'trimmed text',
+    'compact lines': 'compact lines',
+    lines: 'lines',
+    'sorted lines': 'sorted lines',
+    'unique lines': 'unique lines'
   };
 
   return names[value] ?? value.replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -79,7 +87,7 @@ function generatedFaq(tool: ConverterTool) {
       },
       answer: {
         en: `${tool.shortTitle.en} expects ${input} input and returns ${output} output. Start with the sample if you are unsure about the expected structure.`,
-        he: `${tool.shortTitle.he} מקבל קלט מסוג ${tool.inputType} ומחזיר פלט מסוג ${tool.outputType}. אם לא בטוחים לגבי המבנה, כדאי להתחיל מהדוגמה המובנית.`
+        he: `${tool.shortTitle.he} מקבל קלט מסוג ${input} ומחזיר פלט מסוג ${output}. אם לא בטוחים לגבי המבנה, כדאי להתחיל מהדוגמה המובנית.`
       }
     },
     {
@@ -89,7 +97,7 @@ function generatedFaq(tool: ConverterTool) {
       },
       answer: {
         en: `Errors usually mean the input is empty, incomplete or not valid ${input}. Check brackets, quotes, separators and special characters before converting again.`,
-        he: `שגיאות בדרך כלל אומרות שהקלט ריק, חסר או לא תקין עבור ${tool.inputType}. בדוק סוגריים, מרכאות, מפרידים ותווים מיוחדים לפני המרה נוספת.`
+        he: `שגיאות בדרך כלל אומרות שהקלט ריק, חסר או לא תקין עבור ${input}. בדוק סוגריים, מרכאות, מפרידים ותווים מיוחדים לפני המרה נוספת.`
       }
     }
   ];

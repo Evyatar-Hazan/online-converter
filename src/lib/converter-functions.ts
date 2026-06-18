@@ -175,6 +175,83 @@ function parseHex(input: string): [number, number, number] {
   ];
 }
 
+function parseIntegerInput(input: string, base: 10 | 16): bigint {
+  const normalized = input.trim().replace(/^0x/i, '');
+  const pattern = base === 16 ? /^[0-9a-f]+$/i : /^[+-]?\d+$/;
+  if (!pattern.test(normalized)) {
+    throw new Error(base === 16 ? 'HEX input must contain hexadecimal digits.' : 'Decimal input must be a whole number.');
+  }
+  return base === 16 ? BigInt(`0x${normalized}`) : BigInt(normalized);
+}
+
+function rgbToHslValues([r, g, b]: [number, number, number]): [number, number, number] {
+  const red = r / 255;
+  const green = g / 255;
+  const blue = b / 255;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const lightness = (max + min) / 2;
+
+  if (max === min) {
+    return [0, 0, Math.round(lightness * 100)];
+  }
+
+  const delta = max - min;
+  const saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+  let hue = 0;
+
+  if (max === red) {
+    hue = (green - blue) / delta + (green < blue ? 6 : 0);
+  } else if (max === green) {
+    hue = (blue - red) / delta + 2;
+  } else {
+    hue = (red - green) / delta + 4;
+  }
+
+  return [Math.round(hue * 60), Math.round(saturation * 100), Math.round(lightness * 100)];
+}
+
+function parseHsl(input: string): [number, number, number] {
+  const matches = input.match(/-?\d+(\.\d+)?/g);
+  if (!matches || matches.length < 3) {
+    throw new Error('HSL input must include hue, saturation and lightness.');
+  }
+
+  const [h, s, l] = matches.slice(0, 3).map((value) => Number(value));
+  if ([h, s, l].some((value) => Number.isNaN(value)) || s < 0 || s > 100 || l < 0 || l > 100) {
+    throw new Error('HSL saturation and lightness must be between 0 and 100.');
+  }
+
+  return [((h % 360) + 360) % 360, s, l];
+}
+
+function hslToRgbValues([h, s, l]: [number, number, number]): [number, number, number] {
+  const saturation = s / 100;
+  const lightness = l / 100;
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const x = chroma * (1 - Math.abs(((h / 60) % 2) - 1));
+  const match = lightness - chroma / 2;
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+
+  if (h < 60) {
+    [red, green, blue] = [chroma, x, 0];
+  } else if (h < 120) {
+    [red, green, blue] = [x, chroma, 0];
+  } else if (h < 180) {
+    [red, green, blue] = [0, chroma, x];
+  } else if (h < 240) {
+    [red, green, blue] = [0, x, chroma];
+  } else if (h < 300) {
+    [red, green, blue] = [x, 0, chroma];
+  } else {
+    [red, green, blue] = [chroma, 0, x];
+  }
+
+  return [red, green, blue].map((value) => Math.round((value + match) * 255)) as [number, number, number];
+}
+
 function decodeJwtPart(part: string): unknown {
   const padded = part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '=');
   return JSON.parse(decodeBase64(padded));
@@ -303,6 +380,22 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(output));
   },
 
+  textToBinary(input) {
+    const bytes = [...new TextEncoder().encode(input)];
+    const output = bytes.map((byte) => byte.toString(2).padStart(8, '0')).join(' ');
+    return result(output, { bytes: bytes.length, groups: bytes.length });
+  },
+
+  binaryToText(input) {
+    const groups = input.trim().split(/\s+/).filter(Boolean);
+    if (!groups.length || groups.some((group) => !/^[01]{8}$/.test(group))) {
+      throw new Error('Binary input must use 8-bit groups separated by spaces or line breaks.');
+    }
+    const bytes = Uint8Array.from(groups.map((group) => parseInt(group, 2)));
+    const output = new TextDecoder().decode(bytes);
+    return result(output, countStats(output));
+  },
+
   urlEncode(input) {
     return result(encodeURIComponent(input), { characters: input.length });
   },
@@ -366,6 +459,29 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(lines.join('\n'), { lines: lines.length, removed: input.split(/\r\n|\r|\n/).length - lines.length });
   },
 
+  trimWhitespace(input) {
+    const output = input.split(/\r\n|\r|\n/).map((line) => line.trim()).join('\n').trim();
+    return result(output, countStats(output));
+  },
+
+  removeEmptyLines(input) {
+    const originalLines = input.split(/\r\n|\r|\n/);
+    const lines = originalLines.filter((line) => line.trim() !== '');
+    return result(lines.join('\n'), { lines: lines.length, removed: originalLines.length - lines.length });
+  },
+
+  decimalToHex(input) {
+    const value = parseIntegerInput(input, 10);
+    const output = `0x${value.toString(16).toUpperCase()}`;
+    return result(output, { digits: output.length - 2 });
+  },
+
+  hexToDecimal(input) {
+    const value = parseIntegerInput(input, 16);
+    const output = value.toString(10);
+    return result(output, { digits: output.length });
+  },
+
   timestampToDate(input) {
     const raw = Number(input.trim());
     if (Number.isNaN(raw)) throw new Error('Timestamp must be a number.');
@@ -396,6 +512,18 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const [r, g, b] = parseRgb(input);
     const output = `#${[r, g, b].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
     return result(output, { r, g, b });
+  },
+
+  rgbToHsl(input) {
+    const rgb = parseRgb(input);
+    const [h, s, l] = rgbToHslValues(rgb);
+    return result([`hsl(${h}, ${s}%, ${l}%)`, `H: ${h}`, `S: ${s}%`, `L: ${l}%`].join('\n'), { h, s, l });
+  },
+
+  hslToRgb(input) {
+    const hsl = parseHsl(input);
+    const [r, g, b] = hslToRgbValues(hsl);
+    return result([`rgb(${r}, ${g}, ${b})`, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b });
   },
 
   jwtDecoder(input) {

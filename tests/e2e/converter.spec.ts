@@ -21,7 +21,7 @@ test('Hebrew category page lists matching tools', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('כלי טקסט');
   await expect(page.getByText('מה אפשר לעשות כאן')).toBeVisible();
   await expect(page.getByText('האם הכלים עובדים טוב עם עברית?')).toBeVisible();
-  await expect(page.locator('[data-tool-card]')).toHaveCount(5);
+  await expect(page.locator('[data-tool-card]')).toHaveCount(7);
   await expect(page.getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
 });
 

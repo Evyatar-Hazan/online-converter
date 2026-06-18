@@ -22,7 +22,9 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     xml: 'XML',
     yaml: 'YAML',
     text: 'Text',
+    binary: 'Binary',
     base64: 'Base64',
+    decimal: 'Decimal',
     url: 'URL',
     html: 'HTML',
     'escaped html': 'Escaped HTML',
@@ -31,10 +33,13 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     lines: 'Lines',
     'sorted lines': 'Sorted lines',
     'unique lines': 'Unique lines',
+    'trimmed text': 'Trimmed text',
+    'compact lines': 'Compact lines',
     timestamp: 'Timestamp',
     date: 'Date',
     hex: 'HEX',
     rgb: 'RGB',
+    hsl: 'HSL',
     jwt: 'JWT'
   },
   he: {
@@ -43,7 +48,9 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     xml: 'XML',
     yaml: 'YAML',
     text: 'טקסט',
+    binary: 'בינארי',
     base64: 'Base64',
+    decimal: 'Decimal',
     url: 'URL',
     html: 'HTML',
     'escaped html': 'HTML מקודד',
@@ -52,10 +59,13 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     lines: 'שורות',
     'sorted lines': 'שורות ממוינות',
     'unique lines': 'שורות ייחודיות',
+    'trimmed text': 'טקסט נקי',
+    'compact lines': 'שורות מצומצמות',
     timestamp: 'חותמת זמן',
     date: 'תאריך',
     hex: 'HEX',
     rgb: 'RGB',
+    hsl: 'HSL',
     jwt: 'JWT'
   }
 };
