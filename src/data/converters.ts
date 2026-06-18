@@ -502,7 +502,49 @@ export const converters: ConverterTool[] = [
     examples: [{ label: { en: 'Encoded query', he: 'שאילתה מקודדת' }, input: 'hello%20world%20%D7%A9%D7%9C%D7%95%D7%9D' }],
     options: urlDecodeOptions,
     faq: [faq.private, faq.free],
-    related: ['url-encode', 'base64-decode']
+    related: ['url-encode', 'query-string-to-json', 'base64-decode']
+  },
+  {
+    slug: 'query-string-to-json',
+    converterId: 'queryStringToJson',
+    reverseSlug: 'json-to-query-string',
+    category: 'developer',
+    inputType: 'query string',
+    outputType: 'json',
+    title: { en: 'Query String to JSON Converter', he: 'ממיר Query String ל־JSON' },
+    shortTitle: { en: 'Query String to JSON', he: 'Query String ל־JSON' },
+    description: { en: 'Parse URL query parameters into readable JSON for debugging links, API calls and tracking URLs.', he: 'פענח פרמטרים של URL ל־JSON קריא עבור דיבוג קישורים, קריאות API וכתובות מעקב.' },
+    metaDescription: { en: 'Convert query strings to JSON online. Parse URL parameters locally with support for repeated keys and encoded values.', he: 'המרת Query String ל־JSON אונליין. פענוח פרמטרים מקומית עם תמיכה במפתחות חוזרים וערכים מקודדים.' },
+    keywords: { en: ['query string to json', 'url parameters to json'], he: ['Query String ל JSON', 'פרמטרים ל JSON'] },
+    features: { en: ['Full URL support', 'Repeated keys', 'Pretty JSON'], he: ['תמיכה ב־URL מלא', 'מפתחות חוזרים', 'JSON קריא'] },
+    guide: { en: ['Paste a query string or full URL.', 'Convert to JSON.', 'Inspect parameters and repeated values.'], he: ['הדבק query string או URL מלא.', 'המר ל־JSON.', 'בדוק פרמטרים וערכים חוזרים.'] },
+    examples: [
+      { label: { en: 'Search URL', he: 'כתובת חיפוש' }, input: 'https://example.com/search?q=online+converter&lang=he&page=2' },
+      { label: { en: 'Repeated keys', he: 'מפתחות חוזרים' }, input: 'tag=json&tag=csv&sort=popular' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['json-to-query-string', 'url-decode', 'url-encode']
+  },
+  {
+    slug: 'json-to-query-string',
+    converterId: 'jsonToQueryString',
+    reverseSlug: 'query-string-to-json',
+    category: 'developer',
+    inputType: 'json',
+    outputType: 'query string',
+    title: { en: 'JSON to Query String Converter', he: 'ממיר JSON ל־Query String' },
+    shortTitle: { en: 'JSON to Query String', he: 'JSON ל־Query String' },
+    description: { en: 'Build URL query strings from JSON objects for links, API requests and test URLs.', he: 'בנה query strings מאובייקטי JSON עבור קישורים, בקשות API וכתובות בדיקה.' },
+    metaDescription: { en: 'Convert JSON to query string online. Create URL parameters from objects and arrays directly in your browser.', he: 'המרת JSON ל־Query String אונליין. יצירת פרמטרים ל־URL מאובייקטים ומערכים ישירות בדפדפן.' },
+    keywords: { en: ['json to query string', 'json to url params'], he: ['JSON ל Query String', 'JSON לפרמטרים'] },
+    features: { en: ['Object keys', 'Array values', 'URL encoded'], he: ['מפתחות אובייקט', 'ערכי מערך', 'מקודד ל־URL'] },
+    guide: { en: ['Paste a flat JSON object.', 'Convert to query string.', 'Copy the result into a URL or API request.'], he: ['הדבק אובייקט JSON שטוח.', 'המר ל־query string.', 'העתק את התוצאה ל־URL או בקשת API.'] },
+    examples: [
+      { label: { en: 'Search params', he: 'פרמטרי חיפוש' }, input: '{"q":"online converter","lang":"he","page":2}' },
+      { label: { en: 'Array params', he: 'פרמטרי מערך' }, input: '{"tag":["json","csv"],"sort":"popular"}' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['query-string-to-json', 'url-encode', 'json-formatter']
   },
   {
     slug: 'html-escape',
@@ -774,7 +816,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Short HEX', he: 'HEX קצר' }, input: '#0ea' }
     ],
     faq: [faq.private, faq.free],
-    related: ['rgb-to-hex']
+    related: ['rgb-to-hex', 'hex-to-hsl', 'rgb-to-cmyk']
   },
   {
     slug: 'rgb-to-hex',
@@ -796,7 +838,7 @@ export const converters: ConverterTool[] = [
     ],
     options: hexOutputOptions,
     faq: [faq.private, faq.free],
-    related: ['hex-to-rgb']
+    related: ['hex-to-rgb', 'rgb-to-hsl', 'rgb-to-cmyk']
   },
   {
     slug: 'rgb-to-hsl',
@@ -817,7 +859,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Green tone', he: 'גוון ירוק' }, input: '14, 234, 170' }
     ],
     faq: [faq.private, faq.free],
-    related: ['hsl-to-rgb', 'rgb-to-hex', 'hex-to-rgb']
+    related: ['hsl-to-rgb', 'rgb-to-hex', 'hex-to-hsl']
   },
   {
     slug: 'hsl-to-rgb',
@@ -838,7 +880,92 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Warm tone', he: 'גוון חם' }, input: 'hsl(32, 92%, 54%)' }
     ],
     faq: [faq.private, faq.free],
-    related: ['rgb-to-hsl', 'rgb-to-hex', 'hex-to-rgb']
+    related: ['rgb-to-hsl', 'hsl-to-hex', 'hex-to-rgb']
+  },
+  {
+    slug: 'hex-to-hsl',
+    converterId: 'hexToHsl',
+    reverseSlug: 'hsl-to-hex',
+    category: 'color',
+    inputType: 'hex',
+    outputType: 'hsl',
+    title: { en: 'HEX to HSL Converter', he: 'ממיר HEX ל־HSL' },
+    shortTitle: { en: 'HEX to HSL', he: 'HEX ל־HSL' },
+    description: { en: 'Convert HEX colors into HSL values for CSS, themes and design systems.', he: 'המר צבעי HEX לערכי HSL עבור CSS, ערכות נושא ומערכות עיצוב.' },
+    metaDescription: { en: 'Convert HEX to HSL online with CSS-ready output and instant color preview.', he: 'המרת HEX ל־HSL אונליין עם פלט מוכן ל־CSS ותצוגת צבע מידית.' },
+    keywords: { en: ['hex to hsl', 'convert hex hsl'], he: ['HEX ל HSL', 'ממיר HEX HSL'] },
+    features: { en: ['CSS HSL output', 'Short HEX support', 'Color preview'], he: ['פלט HSL ל־CSS', 'תמיכה ב־HEX קצר', 'תצוגת צבע'] },
+    guide: { en: ['Paste a HEX color.', 'Convert to HSL.', 'Copy the HSL value into CSS.'], he: ['הדבק צבע HEX.', 'המר ל־HSL.', 'העתק את ערך ה־HSL ל־CSS.'] },
+    examples: [
+      { label: { en: 'Indigo HEX', he: 'HEX אינדיגו' }, input: '#4f46e5' },
+      { label: { en: 'Short HEX', he: 'HEX קצר' }, input: '#0ea' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['hsl-to-hex', 'hex-to-rgb', 'rgb-to-hsl']
+  },
+  {
+    slug: 'hsl-to-hex',
+    converterId: 'hslToHex',
+    reverseSlug: 'hex-to-hsl',
+    category: 'color',
+    inputType: 'hsl',
+    outputType: 'hex',
+    title: { en: 'HSL to HEX Converter', he: 'ממיר HSL ל־HEX' },
+    shortTitle: { en: 'HSL to HEX', he: 'HSL ל־HEX' },
+    description: { en: 'Convert HSL color values into HEX codes for CSS and design handoff.', he: 'המר ערכי HSL לקודי HEX עבור CSS והעברה מעיצוב לפיתוח.' },
+    metaDescription: { en: 'Convert HSL to HEX online with optional uppercase output and instant browser conversion.', he: 'המרת HSL ל־HEX אונליין עם אפשרות לאותיות גדולות והמרה מידית בדפדפן.' },
+    keywords: { en: ['hsl to hex', 'convert hsl hex'], he: ['HSL ל HEX', 'ממיר HSL HEX'] },
+    features: { en: ['HEX output', 'CSS ready', 'Color preview'], he: ['פלט HEX', 'מוכן ל־CSS', 'תצוגת צבע'] },
+    guide: { en: ['Paste an HSL color.', 'Convert to HEX.', 'Choose uppercase or no # when needed.'], he: ['הדבק צבע HSL.', 'המר ל־HEX.', 'בחר אותיות גדולות או בלי # לפי הצורך.'] },
+    examples: [
+      { label: { en: 'HSL brand color', he: 'צבע HSL' }, input: 'hsl(243, 76%, 59%)' },
+      { label: { en: 'Warm tone', he: 'גוון חם' }, input: 'hsl(32, 92%, 54%)' }
+    ],
+    options: hexOutputOptions,
+    faq: [faq.private, faq.free],
+    related: ['hex-to-hsl', 'hsl-to-rgb', 'rgb-to-hex']
+  },
+  {
+    slug: 'rgb-to-cmyk',
+    converterId: 'rgbToCmyk',
+    reverseSlug: 'cmyk-to-rgb',
+    category: 'color',
+    inputType: 'rgb',
+    outputType: 'cmyk',
+    title: { en: 'RGB to CMYK Converter', he: 'ממיר RGB ל־CMYK' },
+    shortTitle: { en: 'RGB to CMYK', he: 'RGB ל־CMYK' },
+    description: { en: 'Convert RGB colors into CMYK percentages for print-oriented color work.', he: 'המר צבעי RGB לאחוזי CMYK עבור עבודת צבע שמיועדת לדפוס.' },
+    metaDescription: { en: 'Convert RGB to CMYK online with clear channel percentages and color preview.', he: 'המרת RGB ל־CMYK אונליין עם אחוזי ערוצים ברורים ותצוגת צבע.' },
+    keywords: { en: ['rgb to cmyk', 'cmyk converter'], he: ['RGB ל CMYK', 'ממיר CMYK'] },
+    features: { en: ['CMYK percentages', 'RGB input', 'Color preview'], he: ['אחוזי CMYK', 'קלט RGB', 'תצוגת צבע'] },
+    guide: { en: ['Paste RGB values.', 'Convert to CMYK.', 'Copy the percentages for print handoff.'], he: ['הדבק ערכי RGB.', 'המר ל־CMYK.', 'העתק את האחוזים להעברה לדפוס.'] },
+    examples: [
+      { label: { en: 'Brand RGB', he: 'RGB מותג' }, input: 'rgb(79, 70, 229)' },
+      { label: { en: 'Teal RGB', he: 'RGB טורקיז' }, input: '14, 234, 170' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['cmyk-to-rgb', 'rgb-to-hex', 'rgb-to-hsl']
+  },
+  {
+    slug: 'cmyk-to-rgb',
+    converterId: 'cmykToRgb',
+    reverseSlug: 'rgb-to-cmyk',
+    category: 'color',
+    inputType: 'cmyk',
+    outputType: 'rgb',
+    title: { en: 'CMYK to RGB Converter', he: 'ממיר CMYK ל־RGB' },
+    shortTitle: { en: 'CMYK to RGB', he: 'CMYK ל־RGB' },
+    description: { en: 'Convert CMYK percentages into RGB values for web and CSS usage.', he: 'המר אחוזי CMYK לערכי RGB עבור שימוש בווב וב־CSS.' },
+    metaDescription: { en: 'Convert CMYK to RGB online for web colors, CSS and design-to-code workflows.', he: 'המרת CMYK ל־RGB אונליין עבור צבעי ווב, CSS ועבודה מעיצוב לקוד.' },
+    keywords: { en: ['cmyk to rgb', 'convert cmyk rgb'], he: ['CMYK ל RGB', 'ממיר CMYK RGB'] },
+    features: { en: ['RGB output', 'CSS ready', 'Color preview'], he: ['פלט RGB', 'מוכן ל־CSS', 'תצוגת צבע'] },
+    guide: { en: ['Paste four CMYK percentages.', 'Convert to RGB.', 'Copy the CSS-ready value.'], he: ['הדבק ארבעה אחוזי CMYK.', 'המר ל־RGB.', 'העתק את הערך המוכן ל־CSS.'] },
+    examples: [
+      { label: { en: 'Indigo CMYK', he: 'CMYK אינדיגו' }, input: 'cmyk(65%, 69%, 0%, 10%)' },
+      { label: { en: 'Print values', he: 'ערכי דפוס' }, input: '94, 0, 27, 8' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['rgb-to-cmyk', 'hex-to-rgb', 'rgb-to-hex']
   },
   {
     slug: 'jwt-decoder',

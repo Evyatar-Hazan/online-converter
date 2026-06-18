@@ -337,6 +337,95 @@ function hslToRgbValues([h, s, l]: [number, number, number]): [number, number, n
   return [red, green, blue].map((value) => Math.round((value + match) * 255)) as [number, number, number];
 }
 
+function queryInput(input: string): string {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    throw new Error('Invalid query string: paste a URL or query string first.');
+  }
+
+  try {
+    return new URL(trimmed).search;
+  } catch {
+    return trimmed.startsWith('?') ? trimmed.slice(1) : trimmed;
+  }
+}
+
+function queryStringToObject(input: string): JsonObject {
+  const params = new URLSearchParams(queryInput(input));
+  const output: JsonObject = {};
+
+  params.forEach((value, key) => {
+    const existing = output[key];
+    if (Array.isArray(existing)) {
+      existing.push(value);
+    } else if (existing !== undefined) {
+      output[key] = [existing, value];
+    } else {
+      output[key] = value;
+    }
+  });
+
+  return output;
+}
+
+function objectToQueryString(value: unknown): string {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('Invalid JSON: query string output expects a JSON object with key/value pairs.');
+  }
+
+  const params = new URLSearchParams();
+  Object.entries(value as JsonObject).forEach(([key, item]) => {
+    if (item === undefined || item === null) return;
+    const values = Array.isArray(item) ? item : [item];
+    values.forEach((entry) => {
+      const text = typeof entry === 'object' && entry !== null ? JSON.stringify(entry) : String(entry);
+      params.append(key, text);
+    });
+  });
+
+  return params.toString();
+}
+
+function rgbToCmykValues([r, g, b]: [number, number, number]): [number, number, number, number] {
+  if (r === 0 && g === 0 && b === 0) return [0, 0, 0, 100];
+  const red = r / 255;
+  const green = g / 255;
+  const blue = b / 255;
+  const k = 1 - Math.max(red, green, blue);
+  const c = (1 - red - k) / (1 - k);
+  const m = (1 - green - k) / (1 - k);
+  const y = (1 - blue - k) / (1 - k);
+
+  return [c, m, y, k].map((item) => Math.round(item * 100)) as [number, number, number, number];
+}
+
+function parseCmyk(input: string): [number, number, number, number] {
+  const matches = input.match(/\d+(\.\d+)?/g);
+  if (!matches || matches.length < 4) {
+    throw new Error('Invalid CMYK: enter four values like cmyk(65%, 69%, 0%, 11%) or 65, 69, 0, 11.');
+  }
+
+  const values = matches.slice(0, 4).map((value) => Number(value));
+  if (values.some((value) => Number.isNaN(value) || value < 0 || value > 100)) {
+    throw new Error('Invalid CMYK: each value must be a number between 0 and 100.');
+  }
+
+  return values as [number, number, number, number];
+}
+
+function cmykToRgbValues([c, m, y, k]: [number, number, number, number]): [number, number, number] {
+  const cyan = c / 100;
+  const magenta = m / 100;
+  const yellow = y / 100;
+  const black = k / 100;
+
+  return [
+    Math.round(255 * (1 - cyan) * (1 - black)),
+    Math.round(255 * (1 - magenta) * (1 - black)),
+    Math.round(255 * (1 - yellow) * (1 - black))
+  ];
+}
+
 function decodeJwtPart(part: string): unknown {
   try {
     return JSON.parse(decodeBase64(part, true));
@@ -515,6 +604,18 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(output));
   },
 
+  queryStringToJson(input) {
+    const output = queryStringToObject(input);
+    const json = JSON.stringify(output, null, 2);
+    return result(json, { parameters: Object.keys(output).length }, undefined, jsonPreview(output));
+  },
+
+  jsonToQueryString(input) {
+    const data = parseJson(input);
+    const output = objectToQueryString(data);
+    return result(output, { parameters: new URLSearchParams(output).size });
+  },
+
   htmlEscape(input) {
     const output = escapeHtml(input);
     return result(output, { characters: output.length });
@@ -674,6 +775,38 @@ export const converterFunctions: Record<string, ConverterFunction> = {
   hslToRgb(input) {
     const hsl = parseHsl(input);
     const [r, g, b] = hslToRgbValues(hsl);
+    const css = `rgb(${r}, ${g}, ${b})`;
+    return result([css, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b }, undefined, colorPreview('RGB color', css, { r, g, b }));
+  },
+
+  hexToHsl(input) {
+    const rgb = parseHex(input);
+    const [h, s, l] = rgbToHslValues(rgb);
+    const css = `hsl(${h}, ${s}%, ${l}%)`;
+    return result([css, `H: ${h}`, `S: ${s}%`, `L: ${l}%`].join('\n'), { h, s, l }, undefined, colorPreview('HSL color', css, { h, s, l }));
+  },
+
+  hslToHex(input, options) {
+    const rgb = hslToRgbValues(parseHsl(input));
+    const hexCase = selectOption(options, 'hexCase', 'lower');
+    const includeHash = booleanOption(options, 'includeHash', true);
+    const value = rgb.map((item) => item.toString(16).padStart(2, '0')).join('');
+    const cased = hexCase === 'upper' ? value.toUpperCase() : value.toLowerCase();
+    const output = `${includeHash ? '#' : ''}${cased}`;
+    return result(output, { r: rgb[0], g: rgb[1], b: rgb[2] }, undefined, colorPreview('HEX color', output, { r: rgb[0], g: rgb[1], b: rgb[2] }));
+  },
+
+  rgbToCmyk(input) {
+    const rgb = parseRgb(input);
+    const [c, m, y, k] = rgbToCmykValues(rgb);
+    const css = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+    const output = `cmyk(${c}%, ${m}%, ${y}%, ${k}%)`;
+    return result([output, `C: ${c}%`, `M: ${m}%`, `Y: ${y}%`, `K: ${k}%`].join('\n'), { c, m, y, k }, undefined, colorPreview('CMYK color', css, { c, m, y, k }));
+  },
+
+  cmykToRgb(input) {
+    const cmyk = parseCmyk(input);
+    const [r, g, b] = cmykToRgbValues(cmyk);
     const css = `rgb(${r}, ${g}, ${b})`;
     return result([css, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b }, undefined, colorPreview('RGB color', css, { r, g, b }));
   },

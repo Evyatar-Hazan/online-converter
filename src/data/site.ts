@@ -203,7 +203,7 @@ export const categoryContent: Record<
   color: {
     en: {
       title: 'Color Converters',
-      description: 'Convert HEX and RGB color values online for CSS, design systems and frontend work.',
+      description: 'Convert HEX, RGB, HSL and CMYK color values online for CSS, design systems and frontend work.',
       intro: 'Move between common color formats and copy CSS-ready values for design, UI polish and frontend development.',
       useCases: ['Convert brand colors for CSS', 'Move between design and code formats', 'Copy RGB or HEX values quickly'],
       faq: [
@@ -213,13 +213,13 @@ export const categoryContent: Record<
         },
         {
           question: 'What formats are supported?',
-          answer: 'This category currently supports HEX and RGB conversion.'
+          answer: 'This category currently supports HEX, RGB, HSL and CMYK conversion.'
         }
       ]
     },
     he: {
       title: 'ממירי צבעים',
-      description: 'המרת ערכי צבע HEX ו־RGB אונליין עבור CSS, מערכות עיצוב ופיתוח פרונטאנד.',
+      description: 'המרת ערכי צבע HEX, RGB, HSL ו־CMYK אונליין עבור CSS, מערכות עיצוב ופיתוח פרונטאנד.',
       intro: 'עבור בין פורמטי צבע נפוצים והעתק ערכים מוכנים ל־CSS עבור עיצוב, ליטוש UI ופיתוח פרונטאנד.',
       useCases: ['המרת צבעי מותג ל־CSS', 'מעבר בין פורמט עיצוב לפורמט קוד', 'העתקת ערכי RGB או HEX במהירות'],
       faq: [
@@ -229,7 +229,7 @@ export const categoryContent: Record<
         },
         {
           question: 'אילו פורמטים נתמכים?',
-          answer: 'הקטגוריה תומכת כרגע בהמרה בין HEX ו־RGB.'
+          answer: 'הקטגוריה תומכת כרגע בהמרה בין HEX, RGB, HSL ו־CMYK.'
         }
       ]
     }

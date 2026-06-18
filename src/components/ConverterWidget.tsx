@@ -26,6 +26,7 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     base64: 'Base64',
     decimal: 'Decimal',
     url: 'URL',
+    'query string': 'Query string',
     html: 'HTML',
     'escaped html': 'Escaped HTML',
     slug: 'Slug',
@@ -40,6 +41,7 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     hex: 'HEX',
     rgb: 'RGB',
     hsl: 'HSL',
+    cmyk: 'CMYK',
     jwt: 'JWT'
   },
   he: {
@@ -52,6 +54,7 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     base64: 'Base64',
     decimal: 'Decimal',
     url: 'URL',
+    'query string': 'Query String',
     html: 'HTML',
     'escaped html': 'HTML מקודד',
     slug: 'Slug',
@@ -66,6 +69,7 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     hex: 'HEX',
     rgb: 'RGB',
     hsl: 'HSL',
+    cmyk: 'CMYK',
     jwt: 'JWT'
   }
 };
@@ -80,6 +84,7 @@ const outputExtensions: Record<string, string> = {
   base64: 'txt',
   decimal: 'txt',
   url: 'txt',
+  'query string': 'txt',
   html: 'html',
   'escaped html': 'html',
   slug: 'txt',
@@ -94,6 +99,7 @@ const outputExtensions: Record<string, string> = {
   hex: 'txt',
   rgb: 'css',
   hsl: 'css',
+  cmyk: 'txt',
   jwt: 'json'
 };
 
