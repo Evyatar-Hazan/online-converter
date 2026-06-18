@@ -28,6 +28,19 @@ export interface ToolExample {
   input: string;
 }
 
+export interface ConverterOptionChoice {
+  label: LocalizedText;
+  value: string;
+}
+
+export interface ConverterOption {
+  id: string;
+  label: LocalizedText;
+  type: 'select' | 'toggle';
+  defaultValue: string | boolean;
+  choices?: ConverterOptionChoice[];
+}
+
 export interface ConverterTool {
   slug: string;
   converterId: string;
@@ -43,11 +56,14 @@ export interface ConverterTool {
   features: LocalizedList;
   guide: LocalizedList;
   examples: ToolExample[];
+  options?: ConverterOption[];
   faq: FaqItem[];
   related: string[];
   popular?: boolean;
   new?: boolean;
 }
+
+export type ConverterOptions = Record<string, string | number | boolean>;
 
 export interface ConvertResult {
   output: string;

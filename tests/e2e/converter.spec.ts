@@ -25,6 +25,15 @@ test('Hebrew category page lists matching tools', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
 });
 
+test('converter page exposes useful options', async ({ page }) => {
+  await page.goto('/en/sort-lines/');
+  await page.getByLabel('Input').fill('banana\nApple\ncherry');
+  await page.getByLabel('Sort order').selectOption('desc');
+  await page.getByLabel('Case sensitive').uncheck();
+  await page.getByRole('button', { name: 'Convert' }).click();
+  await expect(page.getByLabel('Output')).toHaveValue('cherry\nbanana\nApple');
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');

@@ -23,6 +23,96 @@ const faq = {
   }
 };
 
+const jsonIndentOptions = [
+  {
+    id: 'indent',
+    type: 'select' as const,
+    defaultValue: '2',
+    label: { en: 'Indent size', he: 'גודל הזחה' },
+    choices: [
+      { value: '2', label: { en: '2 spaces', he: '2 רווחים' } },
+      { value: '4', label: { en: '4 spaces', he: '4 רווחים' } }
+    ]
+  }
+];
+
+const lineSortOptions = [
+  {
+    id: 'direction',
+    type: 'select' as const,
+    defaultValue: 'asc',
+    label: { en: 'Sort order', he: 'סדר מיון' },
+    choices: [
+      { value: 'asc', label: { en: 'A to Z', he: 'א-ת' } },
+      { value: 'desc', label: { en: 'Z to A', he: 'ת-א' } }
+    ]
+  },
+  {
+    id: 'caseSensitive',
+    type: 'toggle' as const,
+    defaultValue: true,
+    label: { en: 'Case sensitive', he: 'רגיש לאותיות גדולות' }
+  },
+  {
+    id: 'trimLines',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'Trim lines first', he: 'נקה רווחים לפני פעולה' }
+  }
+];
+
+const duplicateLineOptions = [
+  {
+    id: 'caseSensitive',
+    type: 'toggle' as const,
+    defaultValue: true,
+    label: { en: 'Case sensitive', he: 'רגיש לאותיות גדולות' }
+  },
+  {
+    id: 'trimLines',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'Trim lines first', he: 'נקה רווחים לפני פעולה' }
+  }
+];
+
+const whitespaceOptions = [
+  {
+    id: 'collapseSpaces',
+    type: 'toggle' as const,
+    defaultValue: false,
+    label: { en: 'Collapse repeated spaces', he: 'צמצם רווחים כפולים' }
+  }
+];
+
+const timestampInputOptions = [
+  {
+    id: 'inputUnit',
+    type: 'select' as const,
+    defaultValue: 'auto',
+    label: { en: 'Timestamp unit', he: 'יחידת timestamp' },
+    choices: [
+      { value: 'auto', label: { en: 'Auto detect', he: 'זיהוי אוטומטי' } },
+      { value: 'seconds', label: { en: 'Seconds', he: 'שניות' } },
+      { value: 'milliseconds', label: { en: 'Milliseconds', he: 'מילישניות' } }
+    ]
+  }
+];
+
+const timestampOutputOptions = [
+  {
+    id: 'outputUnit',
+    type: 'select' as const,
+    defaultValue: 'both',
+    label: { en: 'Output unit', he: 'יחידת פלט' },
+    choices: [
+      { value: 'both', label: { en: 'Seconds and ms', he: 'שניות ומילישניות' } },
+      { value: 'seconds', label: { en: 'Seconds only', he: 'שניות בלבד' } },
+      { value: 'milliseconds', label: { en: 'Milliseconds only', he: 'מילישניות בלבד' } }
+    ]
+  }
+];
+
 export const converters: ConverterTool[] = [
   {
     slug: 'json-to-csv',
@@ -180,6 +270,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Compact JSON', he: 'JSON דחוס' }, input: '{"name":"Dana","items":[1,2,3]}' },
       { label: { en: 'API response', he: 'תגובת API' }, input: '{"ok":true,"data":{"count":2,"items":["he","en"]}}' }
     ],
+    options: jsonIndentOptions,
     faq: [faq.private, faq.free],
     related: ['json-minifier', 'json-to-csv', 'yaml-to-json']
   },
@@ -430,6 +521,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Names', he: 'שמות' }, input: 'Banana\nApple\nCherry' },
       { label: { en: 'Hebrew list', he: 'רשימה בעברית' }, input: 'תל אביב\nירושלים\nחיפה' }
     ],
+    options: lineSortOptions,
     faq: [faq.private, faq.free],
     related: ['remove-duplicate-lines', 'word-counter']
   },
@@ -447,6 +539,7 @@ export const converters: ConverterTool[] = [
     features: { en: ['Unique lines', 'Order preserved', 'List cleanup'], he: ['שורות ייחודיות', 'שמירת סדר', 'ניקוי רשימות'] },
     guide: { en: ['Paste lines.', 'Remove duplicates.', 'Copy the unique list.'], he: ['הדבק שורות.', 'הסר כפילויות.', 'העתק את הרשימה הייחודית.'] },
     examples: [{ label: { en: 'Duplicate list', he: 'רשימה כפולה' }, input: 'apple\nbanana\napple\ncherry\nbanana' }],
+    options: duplicateLineOptions,
     faq: [faq.private, faq.free],
     related: ['sort-lines', 'word-counter']
   },
@@ -467,6 +560,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Messy lines', he: 'שורות לא נקיות' }, input: '  first line  \n   second line   ' },
       { label: { en: 'Padded values', he: 'ערכים עם רווחים' }, input: '  alpha  \n  beta  \n  gamma  ' }
     ],
+    options: whitespaceOptions,
     faq: [faq.private, faq.free],
     related: ['remove-empty-lines', 'remove-duplicate-lines', 'sort-lines']
   },
@@ -547,6 +641,7 @@ export const converters: ConverterTool[] = [
     features: { en: ['Seconds or ms', 'UTC output', 'Local output'], he: ['שניות או מילישניות', 'פלט UTC', 'פלט מקומי'] },
     guide: { en: ['Paste a Unix timestamp.', 'Convert it.', 'Use UTC or local date output.'], he: ['הדבק timestamp של Unix.', 'המר אותו.', 'השתמש בפלט UTC או מקומי.'] },
     examples: [{ label: { en: 'Unix timestamp', he: 'חותמת Unix' }, input: '1704067200' }],
+    options: timestampInputOptions,
     faq: [faq.private, faq.free],
     related: ['date-to-timestamp']
   },
@@ -565,6 +660,7 @@ export const converters: ConverterTool[] = [
     features: { en: ['Seconds', 'Milliseconds', 'ISO date'], he: ['שניות', 'מילישניות', 'תאריך ISO'] },
     guide: { en: ['Paste a date string.', 'Convert it.', 'Copy the timestamp format you need.'], he: ['הדבק מחרוזת תאריך.', 'המר אותה.', 'העתק את פורמט הזמן הרצוי.'] },
     examples: [{ label: { en: 'ISO date', he: 'תאריך ISO' }, input: '2026-06-18T12:00:00Z' }],
+    options: timestampOutputOptions,
     faq: [faq.private, faq.free],
     related: ['timestamp-to-date']
   },

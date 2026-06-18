@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeftRight, CheckCircle2, Clipboard, Download, Eraser, FileText, Play, Sparkles } from 'lucide-react';
 import { convert } from '../lib/converter-functions';
-import type { ConverterTool, Locale } from '../types';
+import type { ConverterOptions, ConverterTool, Locale } from '../types';
 import { ui } from '../data/site';
 
 interface ConverterWidgetProps {
@@ -99,6 +99,9 @@ const outputExtensions: Record<string, string> = {
 
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
+  const defaultOptionValues = useMemo<ConverterOptions>(() => {
+    return Object.fromEntries((tool.options ?? []).map((option) => [option.id, option.defaultValue]));
+  }, [tool.options]);
   const [selectedExampleIndex, setSelectedExampleIndex] = useState(0);
   const activeExample = tool.examples[selectedExampleIndex] ?? tool.examples[0];
   const sample = activeExample?.input ?? '';
@@ -121,6 +124,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const [error, setError] = useState('');
   const [warnings, setWarnings] = useState<string[]>([]);
   const [metadata, setMetadata] = useState<Record<string, string | number>>({});
+  const [optionValues, setOptionValues] = useState<ConverterOptions>(defaultOptionValues);
   const [autoConvert, setAutoConvert] = useState(true);
   const [copied, setCopied] = useState(false);
 
@@ -167,7 +171,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     }
 
     try {
-      const result = convert(tool.converterId, input);
+      const result = convert(tool.converterId, input, optionValues);
       setOutput(result.output);
       setWarnings(result.warnings ?? []);
       setMetadata(result.metadata ?? {});
@@ -182,7 +186,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
         trackEvent('convert_error', { inputCharacters: input.length });
       }
     }
-  }, [input, labels.conversionFailed, tool.converterId, trackEvent]);
+  }, [input, labels.conversionFailed, optionValues, tool.converterId, trackEvent]);
 
   useEffect(() => {
     if (!autoConvert) return;
@@ -221,6 +225,11 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     setWarnings([]);
     setMetadata({});
     trackEvent('load_example', { exampleIndex: index });
+  };
+
+  const updateOption = (id: string, value: string | boolean) => {
+    setOptionValues((current) => ({ ...current, [id]: value }));
+    trackEvent('change_option', { option: id, value: String(value) });
   };
 
   return (
@@ -268,6 +277,40 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
               >
                 {example.label[locale]}
               </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tool.options && tool.options.length > 0 && (
+        <div className="options-strip" aria-label={locale === 'he' ? 'אפשרויות המרה' : 'Conversion options'}>
+          <span>{locale === 'he' ? 'אפשרויות' : 'Options'}</span>
+          <div className="option-actions">
+            {tool.options.map((option) => (
+              option.type === 'toggle' ? (
+                <label className="option-toggle" key={option.id}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(optionValues[option.id])}
+                    onChange={(event) => updateOption(option.id, event.currentTarget.checked)}
+                  />
+                  <span>{option.label[locale]}</span>
+                </label>
+              ) : (
+                <label className="option-select" key={option.id}>
+                  <span>{option.label[locale]}</span>
+                  <select
+                    value={String(optionValues[option.id] ?? option.defaultValue)}
+                    onChange={(event) => updateOption(option.id, event.currentTarget.value)}
+                  >
+                    {(option.choices ?? []).map((choice) => (
+                      <option value={choice.value} key={choice.value}>
+                        {choice.label[locale]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )
             ))}
           </div>
         </div>

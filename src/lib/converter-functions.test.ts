@@ -54,6 +54,14 @@ describe('converter functions', () => {
     expect(convert('removeEmptyLines', 'one\n\n two ').output).toBe('one\n two ');
   });
 
+  it('applies converter options', () => {
+    expect(convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' }).output).toContain('\n    "name"');
+    expect(convert('sortLines', 'banana\nApple\ncherry', { direction: 'desc', caseSensitive: false }).output).toBe('cherry\nbanana\nApple');
+    expect(convert('removeDuplicateLines', 'Apple\napple\n banana \nbanana', { caseSensitive: false, trimLines: true }).output).toBe('Apple\nbanana');
+    expect(convert('trimWhitespace', '  one    two  ', { collapseSpaces: true }).output).toBe('one two');
+    expect(convert('dateToTimestamp', '2026-06-18T12:00:00Z', { outputUnit: 'seconds' }).output).not.toContain('Milliseconds');
+  });
+
   it('throws useful errors for invalid input', () => {
     expect(() => convert('jsonFormatter', '{bad')).toThrow();
     expect(() => convert('csvToJson', '"broken')).toThrow(/unmatched quote/i);

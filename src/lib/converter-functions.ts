@@ -1,8 +1,8 @@
 import { parse, stringify } from 'yaml';
-import type { ConvertResult } from '../types';
+import type { ConverterOptions, ConvertResult } from '../types';
 
 type JsonObject = Record<string, unknown>;
-type ConverterFunction = (input: string) => ConvertResult;
+type ConverterFunction = (input: string, options: ConverterOptions) => ConvertResult;
 
 function result(output: string, metadata?: Record<string, string | number>, warnings?: string[]): ConvertResult {
   return { output, metadata, warnings };
@@ -10,6 +10,21 @@ function result(output: string, metadata?: Record<string, string | number>, warn
 
 function parseJson(input: string): unknown {
   return JSON.parse(input);
+}
+
+function selectOption(options: ConverterOptions, key: string, fallback: string): string {
+  const value = options[key];
+  return typeof value === 'string' ? value : fallback;
+}
+
+function booleanOption(options: ConverterOptions, key: string, fallback: boolean): boolean {
+  const value = options[key];
+  return typeof value === 'boolean' ? value : fallback;
+}
+
+function numberOption(options: ConverterOptions, key: string, fallback: number): number {
+  const value = Number(options[key]);
+  return Number.isFinite(value) ? value : fallback;
 }
 
 function countStats(input: string): Record<string, number> {
@@ -360,9 +375,10 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(output));
   },
 
-  jsonFormatter(input) {
-    const output = JSON.stringify(parseJson(input), null, 2);
-    return result(output, countStats(output));
+  jsonFormatter(input, options) {
+    const indent = Math.min(8, Math.max(2, numberOption(options, 'indent', 2)));
+    const output = JSON.stringify(parseJson(input), null, indent);
+    return result(output, { ...countStats(output), indent });
   },
 
   jsonMinifier(input) {
@@ -444,24 +460,46 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { ...stats, readingMinutes });
   },
 
-  sortLines(input) {
-    const output = input.split(/\r\n|\r|\n/).sort((a, b) => a.localeCompare(b)).join('\n');
-    return result(output, countStats(output));
+  sortLines(input, options) {
+    const direction = selectOption(options, 'direction', 'asc');
+    const caseSensitive = booleanOption(options, 'caseSensitive', true);
+    const trimLines = booleanOption(options, 'trimLines', false);
+    const lines = input.split(/\r\n|\r|\n/).map((line) => (trimLines ? line.trim() : line));
+    const output = lines
+      .sort((a, b) => {
+        const left = caseSensitive ? a : a.toLocaleLowerCase();
+        const right = caseSensitive ? b : b.toLocaleLowerCase();
+        return direction === 'desc' ? right.localeCompare(left) : left.localeCompare(right);
+      })
+      .join('\n');
+    return result(output, { ...countStats(output), direction });
   },
 
-  removeDuplicateLines(input) {
+  removeDuplicateLines(input, options) {
+    const caseSensitive = booleanOption(options, 'caseSensitive', true);
+    const trimLines = booleanOption(options, 'trimLines', false);
     const seen = new Set<string>();
-    const lines = input.split(/\r\n|\r|\n/).filter((line) => {
-      if (seen.has(line)) return false;
-      seen.add(line);
+    const originalLines = input.split(/\r\n|\r|\n/);
+    const lines = originalLines.map((line) => (trimLines ? line.trim() : line)).filter((line) => {
+      const key = caseSensitive ? line : line.toLocaleLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
-    return result(lines.join('\n'), { lines: lines.length, removed: input.split(/\r\n|\r|\n/).length - lines.length });
+    return result(lines.join('\n'), { lines: lines.length, removed: originalLines.length - lines.length });
   },
 
-  trimWhitespace(input) {
-    const output = input.split(/\r\n|\r|\n/).map((line) => line.trim()).join('\n').trim();
-    return result(output, countStats(output));
+  trimWhitespace(input, options) {
+    const collapseSpaces = booleanOption(options, 'collapseSpaces', false);
+    const output = input
+      .split(/\r\n|\r|\n/)
+      .map((line) => {
+        const trimmed = line.trim();
+        return collapseSpaces ? trimmed.replace(/[ \t]+/g, ' ') : trimmed;
+      })
+      .join('\n')
+      .trim();
+    return result(output, countStats(output), collapseSpaces ? ['Repeated spaces and tabs were collapsed inside each line.'] : undefined);
   },
 
   removeEmptyLines(input) {
@@ -482,24 +520,33 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { digits: output.length });
   },
 
-  timestampToDate(input) {
+  timestampToDate(input, options) {
     const raw = Number(input.trim());
     if (Number.isNaN(raw)) throw new Error('Timestamp must be a number.');
-    const milliseconds = raw < 100000000000 ? raw * 1000 : raw;
+    const inputUnit = selectOption(options, 'inputUnit', 'auto');
+    const milliseconds = inputUnit === 'seconds' ? raw * 1000 : inputUnit === 'milliseconds' ? raw : raw < 100000000000 ? raw * 1000 : raw;
     const date = new Date(milliseconds);
     if (Number.isNaN(date.getTime())) throw new Error('Invalid timestamp.');
     return result(
       [`UTC: ${date.toISOString()}`, `Local: ${date.toString()}`, `Unix seconds: ${Math.floor(milliseconds / 1000)}`, `Milliseconds: ${milliseconds}`].join('\n'),
-      { timestamp: Math.floor(milliseconds / 1000) }
+      { timestamp: Math.floor(milliseconds / 1000), inputUnit }
     );
   },
 
-  dateToTimestamp(input) {
+  dateToTimestamp(input, options) {
     const date = new Date(input.trim());
     if (Number.isNaN(date.getTime())) throw new Error('Invalid date.');
+    const outputUnit = selectOption(options, 'outputUnit', 'both');
+    const seconds = Math.floor(date.getTime() / 1000);
+    const milliseconds = date.getTime();
+    const lines = outputUnit === 'seconds'
+      ? [`Unix seconds: ${seconds}`, `ISO: ${date.toISOString()}`]
+      : outputUnit === 'milliseconds'
+        ? [`Milliseconds: ${milliseconds}`, `ISO: ${date.toISOString()}`]
+        : [`Unix seconds: ${seconds}`, `Milliseconds: ${milliseconds}`, `ISO: ${date.toISOString()}`];
     return result(
-      [`Unix seconds: ${Math.floor(date.getTime() / 1000)}`, `Milliseconds: ${date.getTime()}`, `ISO: ${date.toISOString()}`].join('\n'),
-      { timestamp: Math.floor(date.getTime() / 1000) }
+      lines.join('\n'),
+      { timestamp: seconds, milliseconds, outputUnit }
     );
   },
 
@@ -539,10 +586,10 @@ export const converterFunctions: Record<string, ConverterFunction> = {
   }
 };
 
-export function convert(converterId: string, input: string): ConvertResult {
+export function convert(converterId: string, input: string, options: ConverterOptions = {}): ConvertResult {
   const converter = converterFunctions[converterId];
   if (!converter) {
     throw new Error(`Unknown converter: ${converterId}`);
   }
-  return converter(input);
+  return converter(input, options);
 }
