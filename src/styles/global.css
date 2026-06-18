@@ -721,6 +721,21 @@ textarea[aria-invalid='true'] {
   color: var(--danger);
 }
 
+.error-message {
+  display: grid;
+  gap: 6px;
+}
+
+.error-message strong {
+  font-weight: 850;
+}
+
+.error-message span {
+  color: color-mix(in srgb, var(--danger) 70%, var(--muted));
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
 .warning-message {
   border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent);
   background: color-mix(in srgb, var(--warning) 10%, var(--surface));

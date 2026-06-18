@@ -117,6 +117,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     manualHint: locale === 'he' ? 'כבה אוטומטי כדי לעבוד ידנית' : 'Turn off Auto for manual mode',
     examples: locale === 'he' ? 'דוגמאות' : 'Examples',
     sampleName: locale === 'he' ? 'טען דוגמה' : 'Load sample',
+    errorHint: locale === 'he' ? 'בדוק את מבנה הקלט, נסה דוגמה מוכנה או נקה תווים שהועתקו ממקור חיצוני.' : 'Check the input structure, try a sample, or remove characters copied from another source.',
     clearInput: labels.clear
   };
   const [input, setInput] = useState(tool.examples[0]?.input ?? '');
@@ -380,7 +381,12 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       </div>
 
       <div className="status-region" aria-live="polite" aria-atomic="true">
-        {error && <p className="error-message">{error}</p>}
+        {error && (
+          <div className="error-message">
+            <strong>{error}</strong>
+            <span>{widgetText.errorHint}</span>
+          </div>
+        )}
         {warnings.length > 0 && (
           <div className="warning-message">
             <strong>{labels.warnings}</strong>

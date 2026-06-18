@@ -9,7 +9,12 @@ function result(output: string, metadata?: Record<string, string | number>, warn
 }
 
 function parseJson(input: string): unknown {
-  return JSON.parse(input);
+  try {
+    return JSON.parse(input);
+  } catch (caught) {
+    const message = caught instanceof Error ? caught.message : 'Invalid JSON.';
+    throw new Error(`Invalid JSON: ${message}. Check for missing quotes, trailing commas or unclosed brackets.`);
+  }
 }
 
 function selectOption(options: ConverterOptions, key: string, fallback: string): string {
@@ -110,7 +115,7 @@ function csvRows(input: string): string[][] {
   }
 
   if (inQuotes) {
-    throw new Error('Malformed CSV: unmatched quote.');
+    throw new Error('Invalid CSV: one quoted value is not closed. Close the quote or escape inner quotes by doubling them.');
   }
 
   currentRow.push(current);
@@ -123,8 +128,20 @@ function encodeBase64(input: string): string {
 }
 
 function decodeBase64(input: string): string {
-  const binary = atob(input.trim());
-  return new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)));
+  const normalized = input.trim().replace(/\s+/g, '');
+  if (!normalized) {
+    throw new Error('Invalid Base64: paste an encoded value before decoding.');
+  }
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(normalized) || normalized.length % 4 === 1) {
+    throw new Error('Invalid Base64: use only Base64 characters and correct padding.');
+  }
+
+  try {
+    const binary = atob(normalized);
+    return new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)));
+  } catch {
+    throw new Error('Invalid Base64: the value could not be decoded. Check padding and copied characters.');
+  }
 }
 
 function escapeHtml(input: string): string {
@@ -168,11 +185,11 @@ function sentenceCase(input: string): string {
 function parseRgb(input: string): [number, number, number] {
   const matches = input.match(/\d+(\.\d+)?/g);
   if (!matches || matches.length < 3) {
-    throw new Error('RGB input must include three values.');
+    throw new Error('Invalid RGB: enter three values like rgb(79, 70, 229) or 79, 70, 229.');
   }
   const values = matches.slice(0, 3).map((value) => Number(value));
   if (values.some((value) => Number.isNaN(value) || value < 0 || value > 255)) {
-    throw new Error('RGB values must be between 0 and 255.');
+    throw new Error('Invalid RGB: each value must be a number between 0 and 255.');
   }
   return values.map((value) => Math.round(value)) as [number, number, number];
 }
@@ -181,7 +198,7 @@ function parseHex(input: string): [number, number, number] {
   const hex = input.trim().replace(/^#/, '');
   const normalized = hex.length === 3 ? hex.split('').map((char) => char + char).join('') : hex;
   if (!/^[0-9a-f]{6}$/i.test(normalized)) {
-    throw new Error('HEX input must be 3 or 6 hexadecimal characters.');
+    throw new Error('Invalid HEX color: use #RGB or #RRGGBB, for example #4f46e5.');
   }
   return [
     parseInt(normalized.slice(0, 2), 16),
@@ -194,7 +211,7 @@ function parseIntegerInput(input: string, base: 10 | 16): bigint {
   const normalized = input.trim().replace(/^0x/i, '');
   const pattern = base === 16 ? /^[0-9a-f]+$/i : /^[+-]?\d+$/;
   if (!pattern.test(normalized)) {
-    throw new Error(base === 16 ? 'HEX input must contain hexadecimal digits.' : 'Decimal input must be a whole number.');
+    throw new Error(base === 16 ? 'Invalid HEX number: use hexadecimal digits 0-9 and A-F.' : 'Invalid decimal number: use a whole number without commas or spaces.');
   }
   return base === 16 ? BigInt(`0x${normalized}`) : BigInt(normalized);
 }
@@ -229,12 +246,12 @@ function rgbToHslValues([r, g, b]: [number, number, number]): [number, number, n
 function parseHsl(input: string): [number, number, number] {
   const matches = input.match(/-?\d+(\.\d+)?/g);
   if (!matches || matches.length < 3) {
-    throw new Error('HSL input must include hue, saturation and lightness.');
+    throw new Error('Invalid HSL: enter hue, saturation and lightness like hsl(243, 76%, 59%).');
   }
 
   const [h, s, l] = matches.slice(0, 3).map((value) => Number(value));
   if ([h, s, l].some((value) => Number.isNaN(value)) || s < 0 || s > 100 || l < 0 || l > 100) {
-    throw new Error('HSL saturation and lightness must be between 0 and 100.');
+    throw new Error('Invalid HSL: saturation and lightness must be between 0 and 100.');
   }
 
   return [((h % 360) + 360) % 360, s, l];
@@ -269,7 +286,11 @@ function hslToRgbValues([h, s, l]: [number, number, number]): [number, number, n
 
 function decodeJwtPart(part: string): unknown {
   const padded = part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '=');
-  return JSON.parse(decodeBase64(padded));
+  try {
+    return JSON.parse(decodeBase64(padded));
+  } catch {
+    throw new Error('Invalid JWT: header or payload is not valid Base64URL JSON.');
+  }
 }
 
 export const converterFunctions: Record<string, ConverterFunction> = {
@@ -333,7 +354,7 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const parser = new DOMParser();
     const xml = parser.parseFromString(input, 'application/xml');
     if (xml.getElementsByTagName('parsererror').length) {
-      throw new Error('Invalid XML format.');
+      throw new Error('Invalid XML: check that tags are closed correctly and the document has one root element.');
     }
 
     const walk = (node: Element): unknown => {
@@ -417,7 +438,12 @@ export const converterFunctions: Record<string, ConverterFunction> = {
   },
 
   urlDecode(input) {
-    const output = decodeURIComponent(input);
+    let output = '';
+    try {
+      output = decodeURIComponent(input);
+    } catch {
+      throw new Error('Invalid URL encoding: percent escapes must use two hexadecimal characters, like %20.');
+    }
     return result(output, countStats(output));
   },
 
@@ -522,11 +548,11 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
   timestampToDate(input, options) {
     const raw = Number(input.trim());
-    if (Number.isNaN(raw)) throw new Error('Timestamp must be a number.');
+    if (!Number.isFinite(raw)) throw new Error('Invalid timestamp: paste a numeric Unix timestamp in seconds or milliseconds.');
     const inputUnit = selectOption(options, 'inputUnit', 'auto');
     const milliseconds = inputUnit === 'seconds' ? raw * 1000 : inputUnit === 'milliseconds' ? raw : raw < 100000000000 ? raw * 1000 : raw;
     const date = new Date(milliseconds);
-    if (Number.isNaN(date.getTime())) throw new Error('Invalid timestamp.');
+    if (Number.isNaN(date.getTime())) throw new Error('Invalid timestamp: the value is outside the supported date range.');
     return result(
       [`UTC: ${date.toISOString()}`, `Local: ${date.toString()}`, `Unix seconds: ${Math.floor(milliseconds / 1000)}`, `Milliseconds: ${milliseconds}`].join('\n'),
       { timestamp: Math.floor(milliseconds / 1000), inputUnit }
@@ -535,7 +561,7 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
   dateToTimestamp(input, options) {
     const date = new Date(input.trim());
-    if (Number.isNaN(date.getTime())) throw new Error('Invalid date.');
+    if (Number.isNaN(date.getTime())) throw new Error('Invalid date: use an ISO date like 2026-06-18T12:00:00Z or a readable date string.');
     const outputUnit = selectOption(options, 'outputUnit', 'both');
     const seconds = Math.floor(date.getTime() / 1000);
     const milliseconds = date.getTime();
@@ -575,7 +601,7 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
   jwtDecoder(input) {
     const parts = input.trim().split('.');
-    if (parts.length < 2) throw new Error('JWT must include header and payload.');
+    if (parts.length < 2) throw new Error('Invalid JWT: paste a token with at least header and payload separated by dots.');
     const header = decodeJwtPart(parts[0]);
     const payload = decodeJwtPart(parts[1]);
     return result(

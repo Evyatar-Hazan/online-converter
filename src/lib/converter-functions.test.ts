@@ -63,9 +63,16 @@ describe('converter functions', () => {
   });
 
   it('throws useful errors for invalid input', () => {
-    expect(() => convert('jsonFormatter', '{bad')).toThrow();
-    expect(() => convert('csvToJson', '"broken')).toThrow(/unmatched quote/i);
-    expect(() => convert('hexToRgb', '#zzzzzz')).toThrow();
+    expect(() => convert('jsonFormatter', '{bad')).toThrow(/Invalid JSON/i);
+    expect(() => convert('csvToJson', '"broken')).toThrow(/Invalid CSV/i);
+    expect(() => convert('hexToRgb', '#zzzzzz')).toThrow(/Invalid HEX color/i);
     expect(() => convert('binaryToText', '101')).toThrow(/8-bit/i);
+    expect(() => convert('base64Decode', 'abc#')).toThrow(/Invalid Base64/i);
+    expect(() => convert('urlDecode', '%E0%A4%A')).toThrow(/Invalid URL encoding/i);
+    expect(() => convert('timestampToDate', 'not-a-date')).toThrow(/Invalid timestamp/i);
+    expect(() => convert('dateToTimestamp', 'not-a-date')).toThrow(/Invalid date/i);
+    expect(() => convert('rgbToHex', 'rgb(999, 0, 0)')).toThrow(/Invalid RGB/i);
+    expect(() => convert('hslToRgb', 'hsl(10, 200%, 50%)')).toThrow(/Invalid HSL/i);
+    expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
 });
