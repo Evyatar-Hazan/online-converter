@@ -33,7 +33,14 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout locale={locale} title={title} description={description} canonicalPath={`/${locale}/`} jsonLd={jsonLd}>
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={description}
+  canonicalPath={`/${locale}/`}
+  jsonLd={jsonLd}
+  analyticsContext={{ pageType: 'home', locale }}
+>
   <section class="hero-section">
     <div class="hero-copy">
       <p class="eyebrow">{labels.heroEyebrow}</p>
@@ -92,6 +99,11 @@ const jsonLd = [
     const cards = [...document.querySelectorAll<HTMLElement>('[data-tool-card]')];
     const filters = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
     let activeFilter = 'all';
+    let searchTimer: number | undefined;
+
+    function trackHomeEvent(name: string, props: Record<string, string | number | boolean> = {}) {
+      window.dispatchEvent(new CustomEvent('online-converter:event', { detail: { name, props } }));
+    }
 
     function applyFilters() {
       const query = search?.value.trim().toLowerCase() ?? '';
@@ -102,12 +114,28 @@ const jsonLd = [
       });
     }
 
-    search?.addEventListener('input', applyFilters);
+    search?.addEventListener('input', () => {
+      applyFilters();
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(() => {
+        const queryLength = search.value.trim().length;
+        if (queryLength > 1) {
+          trackHomeEvent('search_tools', {
+            queryLength,
+            visibleTools: cards.filter((card) => !card.hidden).length
+          });
+        }
+      }, 500);
+    });
     filters.forEach((filter) => {
       filter.addEventListener('click', () => {
         activeFilter = filter.dataset.filter ?? 'all';
         filters.forEach((item) => item.classList.toggle('active', item === filter));
         applyFilters();
+        trackHomeEvent('filter_tools', {
+          category: activeFilter,
+          visibleTools: cards.filter((card) => !card.hidden).length
+        });
       });
     });
   </script>

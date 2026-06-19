@@ -271,7 +271,15 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout locale={locale} title={title} description={description} canonicalPath={canonicalPath} alternateSlug={tool.slug} jsonLd={jsonLd}>
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  alternateSlug={tool.slug}
+  jsonLd={jsonLd}
+  analyticsContext={{ pageType: 'tool', locale, category: tool.category, tool: tool.slug, converter: tool.converterId }}
+>
   <nav class="breadcrumbs" aria-label="Breadcrumbs">
     <a href={`/${locale}/`}>{labels.home}</a>
     <span>/</span>

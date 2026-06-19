@@ -1,6 +1,23 @@
 ---
+import type { Locale } from '../types';
+
+interface AnalyticsContext {
+  pageType: 'home' | 'category' | 'tool';
+  locale: Locale;
+  category?: string;
+  tool?: string;
+  converter?: string;
+}
+
+interface Props {
+  context: AnalyticsContext;
+}
+
 const cloudflareToken = import.meta.env.PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN;
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+const { context } = Astro.props;
+const initialEvent =
+  context.pageType === 'tool' ? 'view_tool' : context.pageType === 'category' ? 'view_category' : 'view_home';
 ---
 
 {cloudflareToken && (
@@ -12,21 +29,82 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
   />
 )}
 
-{plausibleDomain && (
-  <>
-    <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>
-    <script is:inline>
-      window.plausible =
-        window.plausible ||
-        function () {
-          (window.plausible.q = window.plausible.q || []).push(arguments);
-        };
+<script is:inline define:vars={{ context, initialEvent, plausibleDomain }}>
+  window.dataLayer = window.dataLayer || [];
+  window.plausible =
+    window.plausible ||
+    function () {
+      (window.plausible.q = window.plausible.q || []).push(arguments);
+    };
 
-      window.addEventListener('online-converter:event', (event) => {
-        const detail = event.detail || {};
-        if (!detail.name) return;
-        window.plausible(detail.name, { props: detail.props || {} });
+  const trackedAds = new Set();
+
+  function sanitizeProps(props) {
+    return Object.fromEntries(
+      Object.entries(props || {}).filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value))
+    );
+  }
+
+  function track(name, props = {}) {
+    const payload = { ...context, ...sanitizeProps(props) };
+    window.dataLayer.push({ event: name, ...payload });
+    if (plausibleDomain) {
+      window.plausible(name, { props: payload });
+    }
+  }
+
+  window.onlineConverterTrack = track;
+
+  window.addEventListener('online-converter:event', (event) => {
+    const detail = event.detail || {};
+    if (!detail.name) return;
+    track(detail.name, detail.props || {});
+  });
+
+  function observeAdSlots() {
+    const slots = [...document.querySelectorAll('[data-ad-placement]')];
+    if (!slots.length || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || entry.intersectionRatio < 0.5) return;
+          const placement = entry.target.dataset.adPlacement;
+          if (!placement || trackedAds.has(placement)) return;
+          trackedAds.add(placement);
+          track('view_ad_slot', {
+            placement,
+            realAd: entry.target.dataset.adReal === 'true'
+          });
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: [0.5] }
+    );
+
+    slots.forEach((slot) => observer.observe(slot));
+  }
+
+  function trackOutboundClicks() {
+    document.addEventListener('click', (event) => {
+      const link = event.target?.closest?.('a[href^="http"]');
+      if (!link) return;
+      const url = new URL(link.href);
+      if (url.hostname === window.location.hostname) return;
+      track('click_outbound_link', {
+        host: url.hostname,
+        label: link.textContent?.trim().slice(0, 80) || 'external'
       });
-    </script>
-  </>
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    track(initialEvent);
+    observeAdSlots();
+    trackOutboundClicks();
+  });
+</script>
+
+{plausibleDomain && (
+  <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>
 )}

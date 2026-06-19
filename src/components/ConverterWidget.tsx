@@ -9,12 +9,6 @@ interface ConverterWidgetProps {
   locale: Locale;
 }
 
-declare global {
-  interface Window {
-    plausible?: (eventName: string, options?: { props?: Record<string, string | number | boolean> }) => void;
-  }
-}
-
 const formatLabels: Record<Locale, Record<string, string>> = {
   en: {
     json: 'JSON',
@@ -175,8 +169,6 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const initialInput = useMemo(() => readLinkedInput(tool.examples[0]?.input ?? ''), [tool.examples]);
   const initialOptionValues = useMemo(() => readLinkedOptions(defaultOptionValues), [defaultOptionValues]);
   const [selectedExampleIndex, setSelectedExampleIndex] = useState(initialInput === (tool.examples[0]?.input ?? '') ? 0 : -1);
-  const activeExample = tool.examples[selectedExampleIndex] ?? tool.examples[0];
-  const sample = activeExample?.input ?? '';
   const inputTypeLabel = formatLabels[locale][tool.inputType] ?? tool.inputType;
   const outputTypeLabel = formatLabels[locale][tool.outputType] ?? tool.outputType;
   const widgetText = {
@@ -233,7 +225,6 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       };
 
       window.dispatchEvent(new CustomEvent('online-converter:event', { detail }));
-      window.plausible?.(name, { props: detail.props });
     },
     [locale, tool.converterId, tool.slug]
   );
@@ -324,6 +315,31 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     trackEvent('load_example', { exampleIndex: index });
   };
 
+  const loadSelectedExample = () => {
+    const index = selectedExampleIndex >= 0 ? selectedExampleIndex : 0;
+    const example = tool.examples[index];
+    if (!example) return;
+    setInput(example.input);
+    trackEvent('load_sample', { exampleIndex: index });
+  };
+
+  const clearInput = () => {
+    setInput('');
+    setOutput('');
+    setError('');
+    setWarnings([]);
+    setMetadata({});
+    setPreview(null);
+    trackEvent('clear_input', { hadInput: Boolean(input.trim()), hadOutput: Boolean(output.trim()) });
+  };
+
+  const toggleAutoConvert = () => {
+    setAutoConvert((value) => {
+      trackEvent('toggle_auto_convert', { enabled: !value });
+      return !value;
+    });
+  };
+
   const updateOption = (id: string, value: string | boolean) => {
     setOptionValues((current) => ({ ...current, [id]: value }));
     trackEvent('change_option', { option: id, value: String(value) });
@@ -342,18 +358,18 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
           </div>
         </div>
         <div className="toolbar-actions" role="toolbar" aria-label={tool.title[locale]}>
-          <button className="icon-button text-button" type="button" onClick={() => setAutoConvert((value) => !value)} aria-pressed={autoConvert} title={widgetText.manualHint}>
+          <button className="icon-button text-button" type="button" onClick={toggleAutoConvert} aria-pressed={autoConvert} title={widgetText.manualHint}>
             <Sparkles size={16} aria-hidden="true" />
             {labels.autoConvert}
           </button>
-          <button className="icon-button" type="button" onClick={() => setInput(sample)} aria-label={widgetText.sampleName} title={widgetText.sampleName}>
+          <button className="icon-button" type="button" onClick={loadSelectedExample} aria-label={widgetText.sampleName} title={widgetText.sampleName}>
             <Play size={16} aria-hidden="true" />
           </button>
-          <button className="icon-button" type="button" onClick={() => setInput('')} aria-label={widgetText.clearInput} title={widgetText.clearInput}>
+          <button className="icon-button" type="button" onClick={clearInput} aria-label={widgetText.clearInput} title={widgetText.clearInput}>
             <Eraser size={16} aria-hidden="true" />
           </button>
           {tool.reverseSlug && (
-            <a className="icon-button" href={`/${locale}/${tool.reverseSlug}/`} aria-label={labels.swap} title={labels.swap}>
+            <a className="icon-button" href={`/${locale}/${tool.reverseSlug}/`} aria-label={labels.swap} title={labels.swap} onClick={() => trackEvent('open_reverse_tool', { reverseSlug: tool.reverseSlug ?? '' })}>
               <ArrowLeftRight size={16} aria-hidden="true" />
             </a>
           )}

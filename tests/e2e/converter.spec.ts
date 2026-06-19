@@ -61,6 +61,27 @@ test('converter page applies new format options', async ({ page }) => {
   await expect(page.getByLabel('Output')).toHaveValue('4F46E5');
 });
 
+test('tool pages emit privacy-safe analytics events', async ({ page }) => {
+  await page.goto('/en/json-to-csv/');
+  await expect
+    .poll(() => page.evaluate(() => (window as Window & { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.some((event) => event.event === 'view_tool')))
+    .toBe(true);
+
+  await page.getByLabel('Input').fill('[{"name":"Avi","city":"Jerusalem"}]');
+  await page.getByRole('button', { name: 'Convert' }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as Window & { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.some(
+          (event) => event.event === 'convert_tool' && event.tool === 'json-to-csv'
+        )
+      )
+    )
+    .toBe(true);
+
+  await expect(page.locator('[data-ad-placement="top"]')).toHaveAttribute('data-ad-real', /true|false/);
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');

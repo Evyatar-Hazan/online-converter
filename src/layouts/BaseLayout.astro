@@ -6,6 +6,14 @@ import { locales, siteName, siteUrl, ui } from '../data/site';
 import type { Locale } from '../types';
 import '../styles/global.css';
 
+interface AnalyticsContext {
+  pageType: 'home' | 'category' | 'tool';
+  locale: Locale;
+  category?: string;
+  tool?: string;
+  converter?: string;
+}
+
 interface Props {
   locale: Locale;
   title: string;
@@ -13,13 +21,15 @@ interface Props {
   canonicalPath: string;
   alternateSlug?: string;
   jsonLd?: Record<string, unknown>[];
+  analyticsContext?: AnalyticsContext;
 }
 
-const { locale, title, description, canonicalPath, alternateSlug = '', jsonLd = [] } = Astro.props;
+const { locale, title, description, canonicalPath, alternateSlug = '', jsonLd = [], analyticsContext } = Astro.props;
 const labels = ui[locale];
 const otherLocale = locale === 'he' ? 'en' : 'he';
 const alternatePath = alternateSlug ? `/${otherLocale}/${alternateSlug}/` : `/${otherLocale}/`;
 const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+const pageContext = analyticsContext ?? { pageType: 'home', locale };
 ---
 
 <!doctype html>
@@ -41,7 +51,7 @@ const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <ThemeScript />
-    <Analytics />
+    <Analytics context={pageContext} />
     <AdSenseScript />
     {jsonLd.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
   </head>

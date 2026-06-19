@@ -63,6 +63,7 @@ const jsonLd = [
   canonicalPath={canonicalPath}
   alternateSlug={category}
   jsonLd={jsonLd}
+  analyticsContext={{ pageType: 'category', locale, category }}
 >
   <nav class="breadcrumbs" aria-label="Breadcrumbs">
     <a href={`/${locale}/`}>{labels.home}</a>

@@ -21,7 +21,7 @@ const adSlot = adSlots[placement];
 const showRealAd = Boolean(adClient && adSlot);
 ---
 
-<aside class={`ad-slot ad-slot-${placement}`} aria-label={labels.adLabel}>
+<aside class={`ad-slot ad-slot-${placement}`} aria-label={labels.adLabel} data-ad-placement={placement} data-ad-real={showRealAd ? 'true' : 'false'}>
   <span>{labels.adLabel}</span>
   {showRealAd ? (
     <>
