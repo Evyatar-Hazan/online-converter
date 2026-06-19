@@ -6,7 +6,7 @@ test('English tool page converts JSON to CSV', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('JSON to CSV');
   await page.getByLabel('Input').fill('[{"name":"Avi","city":"Jerusalem"}]');
   await page.getByRole('button', { name: 'Convert' }).click();
-  await expect(page.getByLabel('Output')).toHaveValue(/name,city/);
+  await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue(/name,city/);
 });
 
 test('Hebrew home page supports RTL and search filtering', async ({ page }) => {
@@ -45,7 +45,7 @@ test('converter page exposes useful options', async ({ page }) => {
   await page.getByLabel('Sort order').selectOption('desc');
   await page.getByLabel('Case sensitive').uncheck();
   await page.getByRole('button', { name: 'Convert' }).click();
-  await expect(page.getByLabel('Output')).toHaveValue('cherry\nbanana\nApple');
+  await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue('cherry\nbanana\nApple');
 });
 
 test('converter page shows a quick preview', async ({ page }) => {
@@ -62,7 +62,7 @@ test('converter page can load input and options from a share link', async ({ pag
   await expect(page.getByLabel('Sort order')).toHaveValue('desc');
   await expect(page.getByLabel('Case sensitive')).not.toBeChecked();
   await page.getByRole('button', { name: 'Convert' }).click();
-  await expect(page.getByLabel('Output')).toHaveValue('cherry\nbanana\nApple');
+  await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue('cherry\nbanana\nApple');
 });
 
 test('converter page applies new format options', async ({ page }) => {
@@ -71,7 +71,52 @@ test('converter page applies new format options', async ({ page }) => {
   await page.getByLabel('HEX case').selectOption('upper');
   await page.getByLabel('Include #').uncheck();
   await page.getByRole('button', { name: 'Convert' }).click();
-  await expect(page.getByLabel('Output')).toHaveValue('4F46E5');
+  await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue('4F46E5');
+});
+
+test('representative converters work across major categories', async ({ page }) => {
+  const cases = [
+    { path: '/en/base64-encode/', input: 'hello', output: 'aGVsbG8=' },
+    { path: '/en/html-escape/', input: '<strong>Avi</strong>', output: '&lt;strong&gt;Avi&lt;/strong&gt;' },
+    { path: '/en/percentage-calculator/', input: '20, 150', output: '20% of 150 = 30' },
+    { path: '/en/hex-to-rgb/', input: '#4f46e5', output: 'rgb(79, 70, 229)' },
+    { path: '/en/date-to-timestamp/', input: '2026-06-19T00:00:00Z', output: '1781827200' }
+  ];
+
+  for (const item of cases) {
+    await page.goto(item.path);
+    await page.getByLabel('Input').fill(item.input);
+    await page.getByRole('button', { name: 'Convert' }).click();
+    await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue(new RegExp(item.output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+});
+
+test('invalid input exposes an accessible error state', async ({ page }) => {
+  await page.goto('/en/json-to-csv/');
+  const input = page.getByLabel('Input');
+  await input.fill('{bad json');
+  await page.getByRole('button', { name: 'Convert' }).click();
+
+  await expect(input).toHaveAttribute('aria-invalid', 'true');
+  await expect(input).toHaveAttribute('aria-errormessage', /error/);
+  await expect(page.getByText('Input needs attention')).toBeVisible();
+  await expect(page.getByText('Check brackets, quotes, headers and separators.')).toBeVisible();
+});
+
+test('primary converter flow has no browser console errors', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      errors.push(message.text());
+    }
+  });
+  page.on('pageerror', (error) => errors.push(error.message));
+
+  await page.goto('/en/json-to-csv/');
+  await page.getByLabel('Input').fill('[{"name":"Avi","city":"Jerusalem"}]');
+  await page.getByRole('button', { name: 'Convert' }).click();
+  await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue(/name,city/);
+  expect(errors).toEqual([]);
 });
 
 test('tool pages emit privacy-safe analytics events', async ({ page }) => {

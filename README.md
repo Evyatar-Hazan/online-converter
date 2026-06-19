@@ -79,6 +79,7 @@ npm run lint
 npm run test
 npm run test:e2e
 npm audit --omit=dev
+npm run smoke:prod
 ```
 
 ## Adding a Converter
@@ -88,3 +89,5 @@ npm audit --omit=dev
 3. Add or extend unit tests in `src/lib/converter-functions.test.ts`.
 4. Run `npm run test` to verify registry, SEO and converter behavior.
 5. Run `npm run build` and `npm run test:e2e` before pushing.
+
+The next SEO-focused converter ideas are tracked in `docs/next-converters.md`.

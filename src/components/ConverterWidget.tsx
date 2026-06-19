@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeftRight, CheckCircle2, Clipboard, Download, Eraser, FileText, Link, Play, Sparkles } from 'lucide-react';
 import { convert } from '../lib/converter-functions';
 import type { ConvertPreview, ConverterOptions, ConverterTool, Locale } from '../types';
@@ -161,8 +161,59 @@ function readLinkedOptions(defaults: ConverterOptions): ConverterOptions {
   }
 }
 
+function inputGuidance(tool: ConverterTool, locale: Locale) {
+  const fallback = locale === 'he'
+    ? 'הדבק כאן קלט, ערוך אותו לפי הצורך ולחץ המרה.'
+    : 'Paste input here, adjust it if needed, then convert.';
+
+  const guidance: Partial<Record<string, Record<Locale, string>>> = {
+    data: {
+      en: 'Paste structured data here. Valid brackets, quotes and separators matter.',
+      he: 'הדבק כאן נתונים מובנים. סוגריים, מרכאות ומפרידים צריכים להיות תקינים.'
+    },
+    text: {
+      en: 'Paste text here. Line breaks and spaces are kept unless the tool changes them.',
+      he: 'הדבק כאן טקסט. שורות ורווחים נשמרים אלא אם הכלי משנה אותם.'
+    },
+    encoding: {
+      en: 'Paste the text or encoded value here. Keep a copy of the original until the result looks right.',
+      he: 'הדבק כאן טקסט או ערך מקודד. שמור עותק של המקור עד שהתוצאה נראית תקינה.'
+    },
+    calculator: {
+      en: 'Enter the numbers in the order shown by the sample. Commas, spaces and line breaks are supported.',
+      he: 'הזן מספרים לפי הסדר שמופיע בדוגמה. פסיקים, רווחים ושורות נתמכים.'
+    }
+  };
+
+  return guidance[tool.category]?.[locale] ?? fallback;
+}
+
+function errorGuidance(tool: ConverterTool, locale: Locale) {
+  const fallback = locale === 'he'
+    ? 'בדוק את מבנה הקלט, נסה דוגמה מוכנה או נקה תווים שהועתקו ממקור חיצוני.'
+    : 'Check the input structure, try a sample, or remove characters copied from another source.';
+
+  const guidance: Partial<Record<string, Record<Locale, string>>> = {
+    data: {
+      en: 'Check brackets, quotes, headers and separators. Loading a sample is the fastest way to compare the expected shape.',
+      he: 'בדוק סוגריים, מרכאות, כותרות ומפרידים. טעינת דוגמה היא הדרך המהירה להשוות למבנה הצפוי.'
+    },
+    color: {
+      en: 'Check that every color channel is inside the valid range and that the format matches the selected tool.',
+      he: 'בדוק שכל ערוץ צבע נמצא בטווח תקין ושהפורמט מתאים לכלי שנבחר.'
+    },
+    calculator: {
+      en: 'Check that all required numbers are present, in the right order, and that percent values are written as numbers.',
+      he: 'בדוק שכל המספרים הדרושים קיימים, בסדר הנכון, ושאחוזים נכתבים כמספרים.'
+    }
+  };
+
+  return guidance[tool.category]?.[locale] ?? fallback;
+}
+
 export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const labels = ui[locale];
+  const widgetId = useId();
   const defaultOptionValues = useMemo<ConverterOptions>(() => {
     return Object.fromEntries((tool.options ?? []).map((option) => [option.id, option.defaultValue]));
   }, [tool.options]);
@@ -184,8 +235,11 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     sampleName: locale === 'he' ? 'טען דוגמה' : 'Load sample',
     share: locale === 'he' ? 'העתק קישור שיתוף' : 'Copy share link',
     shared: locale === 'he' ? 'קישור הועתק' : 'Link copied',
-    errorHint: locale === 'he' ? 'בדוק את מבנה הקלט, נסה דוגמה מוכנה או נקה תווים שהועתקו ממקור חיצוני.' : 'Check the input structure, try a sample, or remove characters copied from another source.',
-    clearInput: labels.clear
+    errorHint: errorGuidance(tool, locale),
+    clearInput: labels.clear,
+    inputHelp: inputGuidance(tool, locale),
+    outputHelp: locale === 'he' ? 'התוצאה מופיעה כאן אחרי המרה תקינה.' : 'The result appears here after a valid conversion.',
+    fixInput: locale === 'he' ? 'צריך לתקן את הקלט' : 'Input needs attention'
   };
   const [input, setInput] = useState(initialInput);
   const [output, setOutput] = useState('');
@@ -209,8 +263,13 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   }, [output]);
 
   const status = error ? 'error' : output ? 'success' : 'idle';
-  const statusLabel = error ? labels.conversionFailed : output ? widgetText.converted : widgetText.ready;
+  const statusLabel = error ? widgetText.fixInput : output ? widgetText.converted : widgetText.ready;
   const downloadExtension = outputExtensions[tool.outputType] ?? 'txt';
+  const inputId = `${widgetId}-input`;
+  const outputId = `${widgetId}-output`;
+  const inputHelpId = `${widgetId}-input-help`;
+  const outputHelpId = `${widgetId}-output-help`;
+  const errorId = `${widgetId}-error`;
 
   const trackEvent = useCallback(
     (name: string, props: Record<string, string | number | boolean> = {}) => {
@@ -435,32 +494,37 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
       </div>
 
       <div className="editor-grid">
-        <label className="editor-panel">
+        <label className="editor-panel" htmlFor={inputId}>
           <span className="panel-header">
             <span>{labels.input}</span>
             <small>
               {inputStats.characters} {labels.characters} · {inputStats.lines} {labels.lines}
             </small>
           </span>
+          <span className="sr-only" id={inputHelpId}>{widgetText.inputHelp}</span>
           <textarea
+            id={inputId}
             value={input}
             onChange={(event) => setInput(event.target.value)}
             spellCheck={false}
             dir="ltr"
             aria-invalid={Boolean(error)}
+            aria-describedby={inputHelpId}
+            aria-errormessage={error ? errorId : undefined}
           />
         </label>
 
-        <label className="editor-panel">
+        <label className="editor-panel" htmlFor={outputId}>
           <span className="panel-header">
             <span>{labels.output}</span>
             <small>
               {outputStats.characters} {labels.characters} · {outputStats.lines} {labels.lines}
             </small>
           </span>
-          <textarea value={output} readOnly spellCheck={false} dir="ltr" />
+          <span className="sr-only" id={outputHelpId}>{widgetText.outputHelp}</span>
+          <textarea id={outputId} value={output} readOnly spellCheck={false} dir="ltr" aria-describedby={outputHelpId} />
           {!output && (
-            <div className="empty-output" aria-hidden="true">
+            <div className="empty-output">
               <FileText size={22} />
               <span>{widgetText.emptyOutput}</span>
             </div>
@@ -548,7 +612,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
 
       <div className="status-region" aria-live="polite" aria-atomic="true">
         {error && (
-          <div className="error-message">
+          <div className="error-message" id={errorId}>
             <strong>{error}</strong>
             <span>{widgetText.errorHint}</span>
           </div>

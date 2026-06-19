@@ -79,6 +79,7 @@ npm run lint
 npm run test
 npm run test:e2e
 npm audit --omit=dev
+npm run smoke:prod
 ```
 
 ## הוספת ממיר חדש
@@ -88,3 +89,5 @@ npm audit --omit=dev
 3. מוסיפים או מרחיבים בדיקות יחידה ב־`src/lib/converter-functions.test.ts`.
 4. מריצים `npm run test` כדי לבדוק registry, SEO והתנהגות ממירים.
 5. מריצים `npm run build` ו־`npm run test:e2e` לפני push.
+
+רעיונות הממירים הבאים לפי SEO מרוכזים ב־`docs/next-converters.md`.
