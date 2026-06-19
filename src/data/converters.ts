@@ -702,7 +702,67 @@ export const converters: ConverterTool[] = [
     guide: { en: ['Paste text.', 'Convert to see common case formats.', 'Copy the line you need.'], he: ['הדבק טקסט.', 'המר כדי לראות פורמטים נפוצים.', 'העתק את השורה הרצויה.'] },
     examples: [{ label: { en: 'Mixed case', he: 'טקסט מעורב' }, input: 'hello world from Online Converter' }],
     faq: [faq.private, faq.free],
-    related: ['slug-generator', 'word-counter', 'remove-duplicate-lines']
+    related: ['text-to-camel-case', 'text-to-snake-case', 'slug-generator']
+  },
+  {
+    slug: 'text-to-camel-case',
+    converterId: 'textToCamelCase',
+    category: 'text',
+    inputType: 'text',
+    outputType: 'camel case',
+    title: { en: 'Text to camelCase Converter', he: 'ממיר טקסט ל־camelCase' },
+    shortTitle: { en: 'Text to camelCase', he: 'טקסט ל־camelCase' },
+    description: { en: 'Convert titles, labels and phrases into camelCase for variables, keys and code identifiers.', he: 'המר כותרות, תוויות וביטויים ל־camelCase עבור משתנים, מפתחות ומזהים בקוד.' },
+    metaDescription: { en: 'Convert text to camelCase online for code variables, JSON keys and clean identifiers in your browser.', he: 'המרת טקסט ל־camelCase אונליין עבור משתני קוד, מפתחות JSON ומזהים נקיים בדפדפן.' },
+    keywords: { en: ['text to camelcase', 'camel case converter'], he: ['טקסט ל camelCase', 'ממיר camelCase'] },
+    features: { en: ['Code identifiers', 'Clean words', 'Instant copy'], he: ['מזהים לקוד', 'מילים נקיות', 'העתקה מידית'] },
+    guide: { en: ['Paste a phrase.', 'Convert to camelCase.', 'Copy the identifier into code or docs.'], he: ['הדבק ביטוי.', 'המר ל־camelCase.', 'העתק את המזהה לקוד או תיעוד.'] },
+    examples: [
+      { label: { en: 'Variable name', he: 'שם משתנה' }, input: 'user profile image' },
+      { label: { en: 'API key name', he: 'שם מפתח API' }, input: 'billing account id' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['text-to-snake-case', 'text-to-kebab-case', 'text-case-converter']
+  },
+  {
+    slug: 'text-to-snake-case',
+    converterId: 'textToSnakeCase',
+    category: 'text',
+    inputType: 'text',
+    outputType: 'snake case',
+    title: { en: 'Text to snake_case Converter', he: 'ממיר טקסט ל־snake_case' },
+    shortTitle: { en: 'Text to snake_case', he: 'טקסט ל־snake_case' },
+    description: { en: 'Convert phrases into snake_case for filenames, database fields, configs and code keys.', he: 'המר ביטויים ל־snake_case עבור שמות קבצים, שדות דאטה, קונפיגים ומפתחות קוד.' },
+    metaDescription: { en: 'Convert text to snake_case online. Create clean underscore-separated names locally in your browser.', he: 'המרת טקסט ל־snake_case אונליין. יצירת שמות נקיים עם קו תחתון בדפדפן.' },
+    keywords: { en: ['text to snake case', 'snake_case converter'], he: ['טקסט ל snake_case', 'ממיר snake_case'] },
+    features: { en: ['Underscore output', 'Code friendly', 'Filename friendly'], he: ['פלט עם קו תחתון', 'נוח לקוד', 'נוח לשמות קבצים'] },
+    guide: { en: ['Paste text.', 'Convert to snake_case.', 'Use the result in code, filenames or fields.'], he: ['הדבק טקסט.', 'המר ל־snake_case.', 'השתמש בתוצאה בקוד, שמות קבצים או שדות.'] },
+    examples: [
+      { label: { en: 'Field name', he: 'שם שדה' }, input: 'Customer Account Number' },
+      { label: { en: 'File name', he: 'שם קובץ' }, input: 'Monthly Revenue Report' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['text-to-camel-case', 'text-to-kebab-case', 'slug-generator']
+  },
+  {
+    slug: 'text-to-kebab-case',
+    converterId: 'textToKebabCase',
+    category: 'text',
+    inputType: 'text',
+    outputType: 'kebab case',
+    title: { en: 'Text to kebab-case Converter', he: 'ממיר טקסט ל־kebab-case' },
+    shortTitle: { en: 'Text to kebab-case', he: 'טקסט ל־kebab-case' },
+    description: { en: 'Convert phrases into kebab-case for URLs, CSS classes, slugs and filenames.', he: 'המר ביטויים ל־kebab-case עבור URL, מחלקות CSS, slugs ושמות קבצים.' },
+    metaDescription: { en: 'Convert text to kebab-case online for URLs, CSS class names, slugs and clean filenames.', he: 'המרת טקסט ל־kebab-case אונליין עבור URL, מחלקות CSS, slugs ושמות קבצים נקיים.' },
+    keywords: { en: ['text to kebab case', 'kebab-case converter'], he: ['טקסט ל kebab-case', 'ממיר kebab-case'] },
+    features: { en: ['Dash separated', 'URL friendly', 'CSS friendly'], he: ['מופרד במקפים', 'ידידותי ל־URL', 'נוח ל־CSS'] },
+    guide: { en: ['Paste a phrase.', 'Convert to kebab-case.', 'Use the output in URLs, CSS or filenames.'], he: ['הדבק ביטוי.', 'המר ל־kebab-case.', 'השתמש בפלט ב־URL, CSS או שמות קבצים.'] },
+    examples: [
+      { label: { en: 'CSS class', he: 'מחלקת CSS' }, input: 'Primary Action Button' },
+      { label: { en: 'SEO phrase', he: 'ביטוי SEO' }, input: 'Best Online Converter Tools' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['slug-generator', 'text-to-snake-case', 'text-to-camel-case']
   },
   {
     slug: 'slug-generator',
@@ -722,7 +782,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Hebrew title', he: 'כותרת בעברית' }, input: 'ממירים שימושיים למפתחים' }
     ],
     faq: [faq.private, faq.free],
-    related: ['text-case-converter', 'url-encode']
+    related: ['text-to-kebab-case', 'text-case-converter', 'url-encode']
   },
   {
     slug: 'word-counter',
@@ -760,7 +820,49 @@ export const converters: ConverterTool[] = [
     ],
     options: lineSortOptions,
     faq: [faq.private, faq.free],
-    related: ['remove-duplicate-lines', 'word-counter']
+    related: ['add-line-numbers', 'remove-duplicate-lines', 'word-counter']
+  },
+  {
+    slug: 'add-line-numbers',
+    converterId: 'addLineNumbers',
+    reverseSlug: 'remove-line-numbers',
+    category: 'text',
+    inputType: 'lines',
+    outputType: 'numbered lines',
+    title: { en: 'Add Line Numbers Tool', he: 'הוספת מספרי שורות' },
+    shortTitle: { en: 'Add Line Numbers', he: 'הוספת מספרי שורות' },
+    description: { en: 'Add clear line numbers to lists, notes, code snippets and multiline text.', he: 'הוסף מספרי שורות ברורים לרשימות, הערות, קטעי קוד וטקסט רב־שורות.' },
+    metaDescription: { en: 'Add line numbers online to text, lists and code snippets with a fast browser-based tool.', he: 'הוספת מספרי שורות אונליין לטקסט, רשימות וקטעי קוד באמצעות כלי מהיר בדפדפן.' },
+    keywords: { en: ['add line numbers', 'number lines'], he: ['הוספת מספרי שורות', 'מספור שורות'] },
+    features: { en: ['Numbered lines', 'Keeps order', 'Fast cleanup'], he: ['שורות ממוספרות', 'שומר סדר', 'ניקוי מהיר'] },
+    guide: { en: ['Paste multiline text.', 'Add line numbers.', 'Copy the numbered output.'], he: ['הדבק טקסט רב־שורות.', 'הוסף מספרי שורות.', 'העתק את הפלט הממוספר.'] },
+    examples: [
+      { label: { en: 'Task list', he: 'רשימת משימות' }, input: 'Write draft\nReview copy\nPublish page' },
+      { label: { en: 'Hebrew list', he: 'רשימה בעברית' }, input: 'פתיחה\nגוף הטקסט\nסיכום' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['remove-line-numbers', 'sort-lines', 'remove-empty-lines']
+  },
+  {
+    slug: 'remove-line-numbers',
+    converterId: 'removeLineNumbers',
+    reverseSlug: 'add-line-numbers',
+    category: 'text',
+    inputType: 'numbered lines',
+    outputType: 'lines',
+    title: { en: 'Remove Line Numbers Tool', he: 'הסרת מספרי שורות' },
+    shortTitle: { en: 'Remove Line Numbers', he: 'הסרת מספרי שורות' },
+    description: { en: 'Remove leading line numbers from copied lists, code examples and numbered notes.', he: 'הסר מספרי שורות בתחילת שורות מרשימות, דוגמאות קוד והערות ממוספרות.' },
+    metaDescription: { en: 'Remove line numbers online from copied text, numbered lists and code snippets directly in your browser.', he: 'הסרת מספרי שורות אונליין מטקסט מועתק, רשימות ממוספרות וקטעי קוד ישירות בדפדפן.' },
+    keywords: { en: ['remove line numbers', 'delete line numbers'], he: ['הסרת מספרי שורות', 'מחיקת מספור שורות'] },
+    features: { en: ['Removes prefixes', 'Keeps text', 'List cleanup'], he: ['מסיר קידומות', 'שומר טקסט', 'ניקוי רשימות'] },
+    guide: { en: ['Paste numbered lines.', 'Remove line numbers.', 'Copy the clean text.'], he: ['הדבק שורות ממוספרות.', 'הסר מספרי שורות.', 'העתק את הטקסט הנקי.'] },
+    examples: [
+      { label: { en: 'Numbered notes', he: 'הערות ממוספרות' }, input: '1. Write draft\n2. Review copy\n3. Publish page' },
+      { label: { en: 'Code copy', he: 'קוד מועתק' }, input: '01 const name = "Dana";\n02 console.log(name);' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['add-line-numbers', 'remove-empty-lines', 'trim-whitespace']
   },
   {
     slug: 'remove-duplicate-lines',
@@ -799,7 +901,27 @@ export const converters: ConverterTool[] = [
     ],
     options: whitespaceOptions,
     faq: [faq.private, faq.free],
-    related: ['remove-empty-lines', 'remove-duplicate-lines', 'sort-lines']
+    related: ['remove-punctuation', 'remove-empty-lines', 'remove-duplicate-lines']
+  },
+  {
+    slug: 'remove-punctuation',
+    converterId: 'removePunctuation',
+    category: 'text',
+    inputType: 'text',
+    outputType: 'clean text',
+    title: { en: 'Remove Punctuation Tool', he: 'הסרת סימני פיסוק' },
+    shortTitle: { en: 'Remove Punctuation', he: 'הסרת פיסוק' },
+    description: { en: 'Remove punctuation and symbols from text for keyword cleanup, lists and simple text processing.', he: 'הסר סימני פיסוק וסמלים מטקסט עבור ניקוי מילות מפתח, רשימות ועיבוד טקסט פשוט.' },
+    metaDescription: { en: 'Remove punctuation online from English, Hebrew and Unicode text for keywords, lists and cleanup workflows.', he: 'הסרת סימני פיסוק אונליין מטקסט עברי, אנגלי ו־Unicode עבור מילות מפתח, רשימות וניקוי טקסט.' },
+    keywords: { en: ['remove punctuation', 'punctuation remover'], he: ['הסרת סימני פיסוק', 'מסיר פיסוק'] },
+    features: { en: ['Punctuation cleanup', 'Unicode text', 'Keyword friendly'], he: ['ניקוי פיסוק', 'טקסט Unicode', 'נוח למילות מפתח'] },
+    guide: { en: ['Paste text.', 'Remove punctuation.', 'Copy the cleaned words or list.'], he: ['הדבק טקסט.', 'הסר סימני פיסוק.', 'העתק את המילים או הרשימה הנקייה.'] },
+    examples: [
+      { label: { en: 'Keyword text', he: 'טקסט מילות מפתח' }, input: 'SEO tools, converters & calculators!' },
+      { label: { en: 'Hebrew sentence', he: 'משפט בעברית' }, input: 'שלום, עולם! זה טקסט לבדיקה.' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['trim-whitespace', 'word-counter', 'text-to-kebab-case']
   },
   {
     slug: 'remove-empty-lines',

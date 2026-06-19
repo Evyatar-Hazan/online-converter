@@ -91,6 +91,15 @@ describe('converter functions', () => {
     expect(uuids[0]).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 
+  it('converts text into SEO and editor helper formats', () => {
+    expect(convert('textToCamelCase', 'user profile image').output).toBe('userProfileImage');
+    expect(convert('textToSnakeCase', 'Customer Account Number').output).toBe('customer_account_number');
+    expect(convert('textToKebabCase', 'Best Online Converter Tools').output).toBe('best-online-converter-tools');
+    expect(convert('removePunctuation', 'שלום, עולם! SEO tools & converters.').output).toBe('שלום עולם SEO tools converters');
+    expect(convert('addLineNumbers', 'Write draft\nReview copy').output).toBe('1. Write draft\n2. Review copy');
+    expect(convert('removeLineNumbers', '01. Write draft\n02. Review copy').output).toBe('Write draft\nReview copy');
+  });
+
   it('applies converter options', () => {
     const formatted = convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' });
     expect(formatted.output).toContain('\n    "name"');

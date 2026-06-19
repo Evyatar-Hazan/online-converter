@@ -235,6 +235,34 @@ function sentenceCase(input: string): string {
   return lower.replace(/(^\s*\p{L}|[.!?]\s+\p{L})/gu, (match) => match.toUpperCase());
 }
 
+function textWords(input: string): string[] {
+  return input
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .match(/[\p{L}\p{N}]+/gu) ?? [];
+}
+
+function pascalPart(word: string): string {
+  const lower = word.toLocaleLowerCase();
+  return lower.charAt(0).toLocaleUpperCase() + lower.slice(1);
+}
+
+function camelCase(input: string): string {
+  const words = textWords(input);
+  return words.map((word, index) => {
+    const lower = word.toLocaleLowerCase();
+    return index === 0 ? lower : pascalPart(word);
+  }).join('');
+}
+
+function snakeCase(input: string): string {
+  return textWords(input).map((word) => word.toLocaleLowerCase()).join('_');
+}
+
+function kebabCase(input: string): string {
+  return textWords(input).map((word) => word.toLocaleLowerCase()).join('-');
+}
+
 function parseRgb(input: string): [number, number, number] {
   const matches = input.match(/\d+(\.\d+)?/g);
   if (!matches || matches.length < 3) {
@@ -725,9 +753,35 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(input));
   },
 
+  textToCamelCase(input) {
+    const output = camelCase(input);
+    return result(output, { words: textWords(input).length, characters: output.length });
+  },
+
+  textToSnakeCase(input) {
+    const output = snakeCase(input);
+    return result(output, { words: textWords(input).length, characters: output.length });
+  },
+
+  textToKebabCase(input) {
+    const output = kebabCase(input);
+    return result(output, { words: textWords(input).length, characters: output.length });
+  },
+
   slugGenerator(input) {
     const output = slugify(input);
     return result(output, { characters: output.length });
+  },
+
+  removePunctuation(input) {
+    const output = input
+      .replace(/[\p{P}\p{S}]+/gu, ' ')
+      .replace(/[ \t]+/g, ' ')
+      .split(/\r\n|\r|\n/)
+      .map((line) => line.trim())
+      .join('\n')
+      .trim();
+    return result(output, countStats(output));
   },
 
   wordCounter(input) {
@@ -760,6 +814,21 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       })
       .join('\n');
     return result(output, { ...countStats(output), direction });
+  },
+
+  addLineNumbers(input) {
+    const lines = input.split(/\r\n|\r|\n/);
+    const width = String(lines.length).length;
+    const output = lines.map((line, index) => `${String(index + 1).padStart(width, '0')}. ${line}`).join('\n');
+    return result(output, { lines: lines.length, characters: output.length });
+  },
+
+  removeLineNumbers(input) {
+    const output = input
+      .split(/\r\n|\r|\n/)
+      .map((line) => line.replace(/^\s*\d+\s*[).:-]?\s*/, ''))
+      .join('\n');
+    return result(output, countStats(output));
   },
 
   removeDuplicateLines(input, options) {
