@@ -547,6 +547,48 @@ export const converters: ConverterTool[] = [
     related: ['query-string-to-json', 'url-encode', 'json-formatter']
   },
   {
+    slug: 'json-to-jsonl',
+    converterId: 'jsonToJsonLines',
+    reverseSlug: 'jsonl-to-json',
+    category: 'developer',
+    inputType: 'json',
+    outputType: 'jsonl',
+    title: { en: 'JSON to JSONL Converter', he: 'ממיר JSON ל־JSONL' },
+    shortTitle: { en: 'JSON to JSONL', he: 'JSON ל־JSONL' },
+    description: { en: 'Convert JSON arrays or objects into newline-delimited JSON for logs, data pipelines and AI datasets.', he: 'המר מערכי JSON או אובייקטים ל־JSON בשורות עבור לוגים, תהליכי נתונים ודאטה ל־AI.' },
+    metaDescription: { en: 'Convert JSON to JSONL online. Create newline-delimited JSON locally in your browser with Hebrew and English support.', he: 'המרת JSON ל־JSONL אונליין. יצירת JSON בשורות בדפדפן עם תמיכה מלאה בעברית ובאנגלית.' },
+    keywords: { en: ['json to jsonl', 'json lines converter'], he: ['JSON ל JSONL', 'ממיר JSON Lines'] },
+    features: { en: ['Array support', 'One JSON value per line', 'Dataset friendly'], he: ['תמיכה במערכים', 'ערך JSON אחד בכל שורה', 'מתאים לדאטה'] },
+    guide: { en: ['Paste a JSON array or object.', 'Convert to JSONL.', 'Copy the newline-delimited output.'], he: ['הדבק מערך או אובייקט JSON.', 'המר ל־JSONL.', 'העתק את הפלט שמופרד לפי שורות.'] },
+    examples: [
+      { label: { en: 'Events array', he: 'מערך אירועים' }, input: '[{"event":"signup","user":"Dana"},{"event":"purchase","user":"Avi"}]' },
+      { label: { en: 'Single object', he: 'אובייקט יחיד' }, input: '{"event":"page_view","path":"/he/"}' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['jsonl-to-json', 'json-formatter', 'json-to-csv']
+  },
+  {
+    slug: 'jsonl-to-json',
+    converterId: 'jsonLinesToJson',
+    reverseSlug: 'json-to-jsonl',
+    category: 'developer',
+    inputType: 'jsonl',
+    outputType: 'json',
+    title: { en: 'JSONL to JSON Converter', he: 'ממיר JSONL ל־JSON' },
+    shortTitle: { en: 'JSONL to JSON', he: 'JSONL ל־JSON' },
+    description: { en: 'Parse newline-delimited JSON into a formatted JSON array for inspection, scripts and data cleanup.', he: 'פענח JSON בשורות למערך JSON מעוצב עבור בדיקה, סקריפטים וניקוי נתונים.' },
+    metaDescription: { en: 'Convert JSONL to JSON online. Parse JSON Lines into a pretty JSON array locally in your browser.', he: 'המרת JSONL ל־JSON אונליין. פענוח JSON Lines למערך JSON קריא בדפדפן.' },
+    keywords: { en: ['jsonl to json', 'json lines to json'], he: ['JSONL ל JSON', 'JSON Lines ל JSON'] },
+    features: { en: ['Line validation', 'Pretty JSON array', 'Local parsing'], he: ['אימות לפי שורה', 'מערך JSON קריא', 'פענוח מקומי'] },
+    guide: { en: ['Paste JSONL with one JSON value per line.', 'Convert to JSON.', 'Fix any line number error if shown.'], he: ['הדבק JSONL עם ערך JSON אחד בכל שורה.', 'המר ל־JSON.', 'תקן שגיאת מספר שורה אם מופיעה.'] },
+    examples: [
+      { label: { en: 'Event lines', he: 'שורות אירועים' }, input: '{"event":"signup","user":"Dana"}\n{"event":"purchase","user":"Avi"}' },
+      { label: { en: 'Log lines', he: 'שורות לוג' }, input: '{"level":"info","message":"started"}\n{"level":"warn","message":"slow request"}' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['json-to-jsonl', 'json-formatter', 'json-to-csv']
+  },
+  {
     slug: 'html-escape',
     converterId: 'htmlEscape',
     reverseSlug: 'html-unescape',
@@ -581,6 +623,68 @@ export const converters: ConverterTool[] = [
     examples: [{ label: { en: 'Escaped snippet', he: 'קטע ממולט' }, input: '&lt;strong&gt;Hello &amp; welcome&lt;/strong&gt;' }],
     faq: [faq.private, faq.free],
     related: ['html-escape', 'url-decode']
+  },
+  {
+    slug: 'regex-escape',
+    converterId: 'regexEscape',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'regex',
+    title: { en: 'Regex Escape Tool', he: 'כלי Regex Escape' },
+    shortTitle: { en: 'Regex Escape', he: 'Regex Escape' },
+    description: { en: 'Escape special regex characters so plain text can be used safely inside regular expressions.', he: 'המלט תווים מיוחדים של Regex כדי להשתמש בטקסט רגיל בביטויים רגולריים בצורה בטוחה.' },
+    metaDescription: { en: 'Escape regex special characters online. Turn plain text into a safe regular expression pattern locally.', he: 'המלטת תווי Regex מיוחדים אונליין. הפיכת טקסט רגיל לתבנית regex בטוחה בדפדפן.' },
+    keywords: { en: ['regex escape', 'escape regular expression'], he: ['Regex escape', 'המלטת Regex'] },
+    features: { en: ['Escapes metacharacters', 'Pattern friendly', 'Instant copy'], he: ['ממלט תווים מיוחדים', 'מתאים לתבניות', 'העתקה מידית'] },
+    guide: { en: ['Paste plain text.', 'Escape regex characters.', 'Use the output inside a regular expression.'], he: ['הדבק טקסט רגיל.', 'המלט תווי Regex.', 'השתמש בפלט בתוך ביטוי רגולרי.'] },
+    examples: [
+      { label: { en: 'Search text', he: 'טקסט לחיפוש' }, input: 'price is $19.99 (sale)' },
+      { label: { en: 'URL path', he: 'נתיב URL' }, input: '/users/[id]?tab=profile' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['html-escape', 'url-encode', 'text-case-converter']
+  },
+  {
+    slug: 'text-to-unicode-escape',
+    converterId: 'textToUnicodeEscape',
+    reverseSlug: 'unicode-escape-to-text',
+    category: 'encoding',
+    inputType: 'text',
+    outputType: 'unicode escape',
+    title: { en: 'Text to Unicode Escape Converter', he: 'ממיר טקסט ל־Unicode Escape' },
+    shortTitle: { en: 'Text to Unicode Escape', he: 'טקסט ל־Unicode Escape' },
+    description: { en: 'Convert text into Unicode escape sequences for source code, debugging and encoded strings.', he: 'המר טקסט לרצפי Unicode escape עבור קוד, דיבוג ומחרוזות מקודדות.' },
+    metaDescription: { en: 'Convert text to Unicode escape sequences online with Hebrew, emoji and Unicode support.', he: 'המרת טקסט ל־Unicode escape אונליין עם תמיכה בעברית, אימוג׳י ו־Unicode.' },
+    keywords: { en: ['text to unicode escape', 'unicode escape converter'], he: ['טקסט ל Unicode escape', 'ממיר Unicode'] },
+    features: { en: ['Hebrew support', 'Emoji support', 'Code friendly'], he: ['תמיכה בעברית', 'תמיכה באימוג׳י', 'מתאים לקוד'] },
+    guide: { en: ['Paste text.', 'Convert to Unicode escapes.', 'Copy the escaped string into code or tests.'], he: ['הדבק טקסט.', 'המר ל־Unicode escapes.', 'העתק את המחרוזת לקוד או בדיקות.'] },
+    examples: [
+      { label: { en: 'Hebrew greeting', he: 'ברכה בעברית' }, input: 'שלום' },
+      { label: { en: 'Emoji text', he: 'טקסט עם אימוג׳י' }, input: 'Hi 👋' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['unicode-escape-to-text', 'url-encode', 'base64-encode']
+  },
+  {
+    slug: 'unicode-escape-to-text',
+    converterId: 'unicodeEscapeToText',
+    reverseSlug: 'text-to-unicode-escape',
+    category: 'encoding',
+    inputType: 'unicode escape',
+    outputType: 'text',
+    title: { en: 'Unicode Escape to Text Converter', he: 'ממיר Unicode Escape לטקסט' },
+    shortTitle: { en: 'Unicode Escape to Text', he: 'Unicode Escape לטקסט' },
+    description: { en: 'Decode Unicode escape sequences back into readable text for debugging encoded strings.', he: 'פענח רצפי Unicode escape בחזרה לטקסט קריא עבור דיבוג מחרוזות מקודדות.' },
+    metaDescription: { en: 'Decode Unicode escape sequences to text online. Supports \\uXXXX and \\u{...} notation in the browser.', he: 'פענוח Unicode escape לטקסט אונליין. תמיכה ברצפי Unicode קצרים וארוכים בדפדפן.' },
+    keywords: { en: ['unicode escape to text', 'decode unicode escape'], he: ['Unicode escape לטקסט', 'פענוח Unicode'] },
+    features: { en: ['\\uXXXX support', '\\u{...} support', 'Readable text'], he: ['רצפי Unicode קצרים', 'רצפי Unicode ארוכים', 'טקסט קריא'] },
+    guide: { en: ['Paste Unicode escape text.', 'Decode it.', 'Copy the readable result.'], he: ['הדבק טקסט Unicode escape.', 'פענח אותו.', 'העתק את התוצאה הקריאה.'] },
+    examples: [
+      { label: { en: 'Hebrew escapes', he: 'Unicode עברית' }, input: '\\u05e9\\u05dc\\u05d5\\u05dd' },
+      { label: { en: 'Emoji escape', he: 'Unicode אימוג׳י' }, input: 'Hi \\u{1f44b}' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['text-to-unicode-escape', 'url-decode', 'base64-decode']
   },
   {
     slug: 'text-case-converter',
@@ -758,6 +862,26 @@ export const converters: ConverterTool[] = [
     ],
     faq: [faq.private, faq.free],
     related: ['decimal-to-hex', 'hex-to-rgb', 'rgb-to-hex']
+  },
+  {
+    slug: 'uuid-generator',
+    converterId: 'uuidGenerator',
+    category: 'developer',
+    inputType: 'count',
+    outputType: 'uuid',
+    title: { en: 'UUID Generator', he: 'יוצר UUID' },
+    shortTitle: { en: 'UUID Generator', he: 'יצירת UUID' },
+    description: { en: 'Generate one or more UUID v4 values locally for testing, development and mock data.', he: 'צור ערכי UUID v4 אחד או יותר מקומית עבור בדיקות, פיתוח ונתוני דמה.' },
+    metaDescription: { en: 'Generate UUID v4 values online in your browser. Enter a count and copy unique IDs for development or testing.', he: 'יצירת UUID v4 אונליין בדפדפן. הזן כמות והעתק מזהים ייחודיים לפיתוח או בדיקות.' },
+    keywords: { en: ['uuid generator', 'guid generator'], he: ['יוצר UUID', 'מחולל GUID'] },
+    features: { en: ['UUID v4', 'Multiple IDs', 'Local generation'], he: ['UUID v4', 'כמה מזהים', 'יצירה מקומית'] },
+    guide: { en: ['Enter how many UUIDs to generate.', 'Convert to generate IDs.', 'Copy the list into code, tests or mock data.'], he: ['הזן כמה UUID ליצור.', 'לחץ המרה כדי ליצור מזהים.', 'העתק את הרשימה לקוד, בדיקות או נתוני דמה.'] },
+    examples: [
+      { label: { en: 'Five UUIDs', he: 'חמישה UUID' }, input: '5' },
+      { label: { en: 'Single UUID', he: 'UUID אחד' }, input: '1' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['json-formatter', 'decimal-to-hex', 'regex-escape']
   },
   {
     slug: 'timestamp-to-date',

@@ -386,6 +386,66 @@ function objectToQueryString(value: unknown): string {
   return params.toString();
 }
 
+function jsonToLines(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [value];
+}
+
+function parseJsonLines(input: string): unknown[] {
+  const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+  if (!lines.length) {
+    throw new Error('Invalid JSON Lines: paste at least one JSON object or value per line.');
+  }
+
+  return lines.map((line, index) => {
+    try {
+      return JSON.parse(line);
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : 'Invalid JSON.';
+      throw new Error(`Invalid JSON Lines: line ${index + 1} is not valid JSON. ${message}`);
+    }
+  });
+}
+
+function escapeRegex(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function encodeUnicodeEscapes(input: string): string {
+  return Array.from(input).map((char) => {
+    const codePoint = char.codePointAt(0) ?? 0;
+    return codePoint <= 0xffff
+      ? `\\u${codePoint.toString(16).padStart(4, '0')}`
+      : `\\u{${codePoint.toString(16)}}`;
+  }).join('');
+}
+
+function decodeUnicodeEscapes(input: string): string {
+  const invalidEscape = input.match(/\\u(?!\{[0-9a-fA-F]+\}|[0-9a-fA-F]{4})/);
+  if (invalidEscape) {
+    throw new Error('Invalid Unicode escape: use \\uXXXX or \\u{X...} notation.');
+  }
+
+  return input.replace(/\\u\{([0-9a-fA-F]+)\}|\\u([0-9a-fA-F]{4})/g, (_match, braced: string | undefined, plain: string | undefined) => {
+    const codePoint = parseInt(braced ?? plain ?? '0', 16);
+    try {
+      return String.fromCodePoint(codePoint);
+    } catch {
+      throw new Error('Invalid Unicode escape: code point is outside the valid Unicode range.');
+    }
+  });
+}
+
+function uuidFallback(): string {
+  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (char) => {
+    const value = Number(char) ^ (Math.random() * 16 >> Number(char) / 4);
+    return value.toString(16);
+  });
+}
+
+function randomUuid(): string {
+  return globalThis.crypto?.randomUUID?.() ?? uuidFallback();
+}
+
 function rgbToCmykValues([r, g, b]: [number, number, number]): [number, number, number, number] {
   if (r === 0 && g === 0 && b === 0) return [0, 0, 0, 100];
   const red = r / 255;
@@ -616,6 +676,19 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { parameters: new URLSearchParams(output).size });
   },
 
+  jsonToJsonLines(input) {
+    const data = parseJson(input);
+    const rows = jsonToLines(data);
+    const output = rows.map((row) => JSON.stringify(row)).join('\n');
+    return result(output, { rows: rows.length, characters: output.length });
+  },
+
+  jsonLinesToJson(input) {
+    const rows = parseJsonLines(input);
+    const output = JSON.stringify(rows, null, 2);
+    return result(output, { rows: rows.length, characters: output.length }, undefined, jsonPreview(rows));
+  },
+
   htmlEscape(input) {
     const output = escapeHtml(input);
     return result(output, { characters: output.length });
@@ -623,6 +696,21 @@ export const converterFunctions: Record<string, ConverterFunction> = {
 
   htmlUnescape(input) {
     const output = unescapeHtml(input);
+    return result(output, countStats(output));
+  },
+
+  regexEscape(input) {
+    const output = escapeRegex(input);
+    return result(output, { escapedCharacters: output.length - input.length, characters: output.length });
+  },
+
+  textToUnicodeEscape(input) {
+    const output = encodeUnicodeEscapes(input);
+    return result(output, { characters: input.length, codePoints: Array.from(input).length });
+  },
+
+  unicodeEscapeToText(input) {
+    const output = decodeUnicodeEscapes(input);
     return result(output, countStats(output));
   },
 
@@ -717,6 +805,16 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const value = parseIntegerInput(input, 16);
     const output = value.toString(10);
     return result(output, { digits: output.length });
+  },
+
+  uuidGenerator(input) {
+    const rawCount = Number(input.trim());
+    if (!Number.isInteger(rawCount) || rawCount < 1) {
+      throw new Error('Invalid UUID count: enter a whole number between 1 and 100.');
+    }
+    const count = Math.min(rawCount, 100);
+    const output = Array.from({ length: count }, randomUuid).join('\n');
+    return result(output, { count }, rawCount > 100 ? ['Generated the first 100 UUIDs to keep the output manageable.'] : undefined);
   },
 
   timestampToDate(input, options) {

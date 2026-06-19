@@ -18,6 +18,7 @@ declare global {
 const formatLabels: Record<Locale, Record<string, string>> = {
   en: {
     json: 'JSON',
+    jsonl: 'JSONL',
     csv: 'CSV',
     xml: 'XML',
     yaml: 'YAML',
@@ -42,10 +43,15 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     rgb: 'RGB',
     hsl: 'HSL',
     cmyk: 'CMYK',
-    jwt: 'JWT'
+    jwt: 'JWT',
+    regex: 'Regex',
+    'unicode escape': 'Unicode escape',
+    count: 'Count',
+    uuid: 'UUID'
   },
   he: {
     json: 'JSON',
+    jsonl: 'JSONL',
     csv: 'CSV',
     xml: 'XML',
     yaml: 'YAML',
@@ -70,12 +76,17 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     rgb: 'RGB',
     hsl: 'HSL',
     cmyk: 'CMYK',
-    jwt: 'JWT'
+    jwt: 'JWT',
+    regex: 'Regex',
+    'unicode escape': 'Unicode Escape',
+    count: 'כמות',
+    uuid: 'UUID'
   }
 };
 
 const outputExtensions: Record<string, string> = {
   json: 'json',
+  jsonl: 'jsonl',
   csv: 'csv',
   xml: 'xml',
   yaml: 'yaml',
@@ -100,7 +111,11 @@ const outputExtensions: Record<string, string> = {
   rgb: 'css',
   hsl: 'css',
   cmyk: 'txt',
-  jwt: 'json'
+  jwt: 'json',
+  regex: 'txt',
+  'unicode escape': 'txt',
+  count: 'txt',
+  uuid: 'txt'
 };
 
 function previewEntries(preview: ConvertPreview) {

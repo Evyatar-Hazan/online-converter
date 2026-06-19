@@ -53,6 +53,7 @@ function exampleOutputNote(tool: ConverterTool, locale: Locale) {
 function formatName(value: string) {
   const names: Record<string, string> = {
     json: 'JSON',
+    jsonl: 'JSONL',
     csv: 'CSV',
     xml: 'XML',
     yaml: 'YAML',
@@ -68,6 +69,10 @@ function formatName(value: string) {
     rgb: 'RGB',
     hsl: 'HSL',
     cmyk: 'CMYK',
+    regex: 'Regex',
+    'unicode escape': 'Unicode escape',
+    count: 'count',
+    uuid: 'UUID',
     'trimmed text': 'trimmed text',
     'compact lines': 'compact lines',
     lines: 'lines',

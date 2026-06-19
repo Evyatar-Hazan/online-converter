@@ -72,6 +72,25 @@ describe('converter functions', () => {
     expect(query.metadata?.parameters).toBe(3);
   });
 
+  it('converts JSON, JSONL and developer string helpers', () => {
+    const jsonl = convert('jsonToJsonLines', '[{"event":"signup"},{"event":"purchase"}]');
+    expect(jsonl.output).toBe('{"event":"signup"}\n{"event":"purchase"}');
+    expect(jsonl.metadata?.rows).toBe(2);
+
+    const json = convert('jsonLinesToJson', jsonl.output);
+    expect(JSON.parse(json.output)).toEqual([{ event: 'signup' }, { event: 'purchase' }]);
+    expect(json.preview?.values?.items).toBe(2);
+
+    expect(convert('regexEscape', 'price is $19.99 (sale)').output).toBe('price is \\$19\\.99 \\(sale\\)');
+    const escaped = convert('textToUnicodeEscape', 'שלום 👋');
+    expect(escaped.output).toContain('\\u05e9');
+    expect(convert('unicodeEscapeToText', escaped.output).output).toBe('שלום 👋');
+
+    const uuids = convert('uuidGenerator', '2').output.split('\n');
+    expect(uuids).toHaveLength(2);
+    expect(uuids[0]).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  });
+
   it('applies converter options', () => {
     const formatted = convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' });
     expect(formatted.output).toContain('\n    "name"');
@@ -103,6 +122,9 @@ describe('converter functions', () => {
     expect(() => convert('hslToRgb', 'hsl(10, 200%, 50%)')).toThrow(/Invalid HSL/i);
     expect(() => convert('cmykToRgb', '10, 200, 0, 0')).toThrow(/Invalid CMYK/i);
     expect(() => convert('jsonToQueryString', '["not","object"]')).toThrow(/query string output/i);
+    expect(() => convert('jsonLinesToJson', '{"ok":true}\n{bad')).toThrow(/line 2/i);
+    expect(() => convert('unicodeEscapeToText', '\\u12')).toThrow(/Invalid Unicode escape/i);
+    expect(() => convert('uuidGenerator', '0')).toThrow(/Invalid UUID count/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
 });
