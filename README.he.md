@@ -4,7 +4,7 @@
 
 ## יכולות
 
-- 24 ממירים בקטגוריות נתונים, טקסט, קידוד, תאריכים, צבעים וכלי פיתוח.
+- 50 ממירים בקטגוריות נתונים, טקסט, קידוד, תאריכים, צבעים, מחשבונים וכלי פיתוח.
 - דפי SEO סטטיים לכל כלי ולכל קטגוריה בעברית ובאנגלית.
 - המרה מקומית בדפדפן: הקלט לא נשלח לשרת.
 - canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap ו־robots.txt.
@@ -80,3 +80,11 @@ npm run test
 npm run test:e2e
 npm audit --omit=dev
 ```
+
+## הוספת ממיר חדש
+
+1. מוסיפים את פונקציית ההמרה ב־`src/lib/converter-functions.ts`.
+2. רושמים את ה־metadata של הכלי ב־`src/data/converters.ts` כולל כותרת, תיאור, keywords, דוגמאות, FAQ וקישורים קשורים בעברית ובאנגלית.
+3. מוסיפים או מרחיבים בדיקות יחידה ב־`src/lib/converter-functions.test.ts`.
+4. מריצים `npm run test` כדי לבדוק registry, SEO והתנהגות ממירים.
+5. מריצים `npm run build` ו־`npm run test:e2e` לפני push.

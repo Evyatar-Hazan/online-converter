@@ -4,7 +4,7 @@ A bilingual SEO-first converter hub built with Astro and React islands. The site
 
 ## Features
 
-- 24 converter tools across data formats, text, encoding, dates, colors and developer utilities.
+- 50 converter tools across data formats, text, encoding, dates, colors, calculators and developer utilities.
 - Static SEO pages for every tool and category in English and Hebrew.
 - Browser-only conversion: pasted input is not uploaded to a server.
 - Canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap and robots.txt.
@@ -80,3 +80,11 @@ npm run test
 npm run test:e2e
 npm audit --omit=dev
 ```
+
+## Adding a Converter
+
+1. Add the converter function in `src/lib/converter-functions.ts`.
+2. Register the tool metadata in `src/data/converters.ts` with English and Hebrew title, description, keywords, examples, FAQ and related tools.
+3. Add or extend unit tests in `src/lib/converter-functions.test.ts`.
+4. Run `npm run test` to verify registry, SEO and converter behavior.
+5. Run `npm run build` and `npm run test:e2e` before pushing.

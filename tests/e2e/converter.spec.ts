@@ -26,6 +26,19 @@ test('Hebrew category page lists matching tools', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
 });
 
+test('all English category pages expose tool cards and SEO content', async ({ page }) => {
+  const categories = ['data', 'text', 'encoding', 'time', 'developer', 'color', 'calculator'];
+
+  for (const category of categories) {
+    await page.goto(`/en/${category}/`);
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`/en/${category}/$`));
+    await expect(page.locator('link[hreflang="he"]')).toHaveAttribute('href', new RegExp(`/he/${category}/$`));
+    await expect(page.locator('[data-tool-card]').first()).toBeVisible();
+    await expect(page.getByText('FAQ').first()).toBeVisible();
+  }
+});
+
 test('converter page exposes useful options', async ({ page }) => {
   await page.goto('/en/sort-lines/');
   await page.getByLabel('Input').fill('banana\nApple\ncherry');
@@ -80,6 +93,31 @@ test('tool pages emit privacy-safe analytics events', async ({ page }) => {
     .toBe(true);
 
   await expect(page.locator('[data-ad-placement="top"]')).toHaveAttribute('data-ad-real', /true|false/);
+});
+
+test('home search and category filters emit analytics without raw query text', async ({ page }) => {
+  await page.goto('/en/');
+  await page.getByLabel('Search converters').fill('json');
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as Window & { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.some(
+          (event) => event.event === 'search_tools' && event.queryLength === 4 && !('query' in event)
+        )
+      )
+    )
+    .toBe(true);
+
+  await page.getByRole('button', { name: 'Calculators' }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as Window & { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.some(
+          (event) => event.event === 'filter_tools' && event.category === 'calculator'
+        )
+      )
+    )
+    .toBe(true);
 });
 
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
