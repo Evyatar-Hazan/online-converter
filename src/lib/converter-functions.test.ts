@@ -100,6 +100,15 @@ describe('converter functions', () => {
     expect(convert('removeLineNumbers', '01. Write draft\n02. Review copy').output).toBe('Write draft\nReview copy');
   });
 
+  it('calculates percentages, discounts, averages and ratios', () => {
+    expect(convert('percentageOf', '20, 150').output).toContain('20% of 150 = 30');
+    expect(convert('percentageChange', '100, 125').output).toContain('Change: 25%');
+    expect(convert('discountCalculator', '200, 25').output).toContain('Final price: 150');
+    expect(convert('vatCalculator', '100, 17').output).toContain('Total: 117');
+    expect(convert('averageCalculator', '82, 91, 77, 88, 95').output).toContain('Average: 86.6');
+    expect(convert('ratioSimplifier', '1920:1080').output).toContain('Simplified ratio: 16:9');
+  });
+
   it('applies converter options', () => {
     const formatted = convert('jsonFormatter', '{"name":"Dana"}', { indent: '4' });
     expect(formatted.output).toContain('\n    "name"');
@@ -134,6 +143,8 @@ describe('converter functions', () => {
     expect(() => convert('jsonLinesToJson', '{"ok":true}\n{bad')).toThrow(/line 2/i);
     expect(() => convert('unicodeEscapeToText', '\\u12')).toThrow(/Invalid Unicode escape/i);
     expect(() => convert('uuidGenerator', '0')).toThrow(/Invalid UUID count/i);
+    expect(() => convert('percentageChange', '0, 25')).toThrow(/original value cannot be 0/i);
+    expect(() => convert('ratioSimplifier', '16, 0')).toThrow(/Invalid ratio/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
 });

@@ -1006,6 +1006,128 @@ export const converters: ConverterTool[] = [
     related: ['json-formatter', 'decimal-to-hex', 'regex-escape']
   },
   {
+    slug: 'percentage-calculator',
+    converterId: 'percentageOf',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'percentage',
+    popular: true,
+    title: { en: 'Percentage Calculator', he: 'מחשבון אחוזים' },
+    shortTitle: { en: 'Percentage Calculator', he: 'מחשבון אחוזים' },
+    description: { en: 'Calculate what percentage of a number equals, such as 20% of 150.', he: 'חשב כמה שווה אחוז מסוים מתוך מספר, למשל 20% מתוך 150.' },
+    metaDescription: { en: 'Free percentage calculator online. Calculate percent of a number locally in your browser with examples.', he: 'מחשבון אחוזים חינמי אונליין. חישוב אחוז מתוך מספר בדפדפן עם דוגמאות.' },
+    keywords: { en: ['percentage calculator', 'percent of number'], he: ['מחשבון אחוזים', 'חישוב אחוזים'] },
+    features: { en: ['Percent of number', 'Formula shown', 'Fast result'], he: ['אחוז מתוך מספר', 'נוסחה מוצגת', 'תוצאה מהירה'] },
+    guide: { en: ['Enter percent and value, for example 20, 150.', 'Convert to calculate.', 'Copy the result and formula.'], he: ['הזן אחוז וערך, למשל 20, 150.', 'לחץ המרה לחישוב.', 'העתק את התוצאה והנוסחה.'] },
+    examples: [
+      { label: { en: '20% of 150', he: '20% מתוך 150' }, input: '20, 150' },
+      { label: { en: '17% of 240', he: '17% מתוך 240' }, input: '17, 240' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['percentage-change-calculator', 'discount-calculator', 'vat-calculator']
+  },
+  {
+    slug: 'percentage-change-calculator',
+    converterId: 'percentageChange',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'percentage',
+    title: { en: 'Percentage Change Calculator', he: 'מחשבון שינוי באחוזים' },
+    shortTitle: { en: 'Percentage Change', he: 'שינוי באחוזים' },
+    description: { en: 'Calculate percentage increase or decrease between an old value and a new value.', he: 'חשב עלייה או ירידה באחוזים בין ערך ישן לערך חדש.' },
+    metaDescription: { en: 'Calculate percentage change online between two values, including difference and increase or decrease percent.', he: 'חישוב שינוי באחוזים אונליין בין שני ערכים, כולל הפרש ואחוז עלייה או ירידה.' },
+    keywords: { en: ['percentage change calculator', 'percent increase decrease'], he: ['מחשבון שינוי באחוזים', 'אחוז עליה ירידה'] },
+    features: { en: ['Increase or decrease', 'Difference shown', 'Two-number input'], he: ['עלייה או ירידה', 'הפרש מוצג', 'קלט של שני מספרים'] },
+    guide: { en: ['Enter old value and new value.', 'Convert to calculate the change.', 'Use the result for quick comparisons.'], he: ['הזן ערך ישן וערך חדש.', 'חשב את השינוי.', 'השתמש בתוצאה להשוואות מהירות.'] },
+    examples: [
+      { label: { en: 'Growth example', he: 'דוגמת גדילה' }, input: '100, 125' },
+      { label: { en: 'Decrease example', he: 'דוגמת ירידה' }, input: '250, 200' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['percentage-calculator', 'average-calculator', 'discount-calculator']
+  },
+  {
+    slug: 'discount-calculator',
+    converterId: 'discountCalculator',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'calculation',
+    popular: true,
+    title: { en: 'Discount Calculator', he: 'מחשבון הנחה' },
+    shortTitle: { en: 'Discount Calculator', he: 'מחשבון הנחה' },
+    description: { en: 'Calculate discount amount and final price from an original price and discount percentage.', he: 'חשב סכום הנחה ומחיר סופי לפי מחיר מקורי ואחוז הנחה.' },
+    metaDescription: { en: 'Free discount calculator online. Enter price and discount percent to get discount amount and final price.', he: 'מחשבון הנחה חינמי אונליין. הזן מחיר ואחוז הנחה לקבלת סכום ההנחה והמחיר הסופי.' },
+    keywords: { en: ['discount calculator', 'sale price calculator'], he: ['מחשבון הנחה', 'חישוב הנחה'] },
+    features: { en: ['Final price', 'Discount amount', 'Percent input'], he: ['מחיר סופי', 'סכום הנחה', 'קלט אחוזים'] },
+    guide: { en: ['Enter price and discount percent.', 'Convert to calculate final price.', 'Copy the breakdown.'], he: ['הזן מחיר ואחוז הנחה.', 'חשב מחיר סופי.', 'העתק את הפירוט.'] },
+    examples: [
+      { label: { en: '25% off 200', he: '25% הנחה מ־200' }, input: '200, 25' },
+      { label: { en: 'Sale price', he: 'מחיר מבצע' }, input: '349, 15' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['percentage-calculator', 'vat-calculator', 'percentage-change-calculator']
+  },
+  {
+    slug: 'vat-calculator',
+    converterId: 'vatCalculator',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'calculation',
+    title: { en: 'VAT Calculator', he: 'מחשבון מע״מ' },
+    shortTitle: { en: 'VAT Calculator', he: 'מחשבון מע״מ' },
+    description: { en: 'Calculate tax amount and total price from a base amount and tax percentage.', he: 'חשב סכום מס ומחיר כולל לפי סכום בסיס ואחוז מס.' },
+    metaDescription: { en: 'VAT calculator online for quick tax totals. Enter amount and tax percent to calculate tax and total.', he: 'מחשבון מע״מ אונליין לחישוב מהיר. הזן סכום ואחוז מס לקבלת סכום המס והסה״כ.' },
+    keywords: { en: ['vat calculator', 'tax calculator'], he: ['מחשבון מעמ', 'חישוב מעמ'] },
+    features: { en: ['Tax amount', 'Total with tax', 'Custom percent'], he: ['סכום מס', 'סה״כ כולל מס', 'אחוז מותאם'] },
+    guide: { en: ['Enter amount and tax percent.', 'Convert to calculate tax and total.', 'Verify important tax use separately.'], he: ['הזן סכום ואחוז מס.', 'חשב מס וסה״כ.', 'אמת שימושי מס חשובים בנפרד.'] },
+    examples: [
+      { label: { en: '17% tax', he: '17% מס' }, input: '100, 17' },
+      { label: { en: 'Custom tax', he: 'מס מותאם' }, input: '250, 8.5' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['discount-calculator', 'percentage-calculator', 'average-calculator']
+  },
+  {
+    slug: 'average-calculator',
+    converterId: 'averageCalculator',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'calculation',
+    title: { en: 'Average Calculator', he: 'מחשבון ממוצע' },
+    shortTitle: { en: 'Average Calculator', he: 'מחשבון ממוצע' },
+    description: { en: 'Calculate average, sum, median, minimum and maximum from a list of numbers.', he: 'חשב ממוצע, סכום, חציון, מינימום ומקסימום מרשימת מספרים.' },
+    metaDescription: { en: 'Average calculator online. Paste numbers to calculate count, sum, average, median, min and max.', he: 'מחשבון ממוצע אונליין. הדבק מספרים לקבלת כמות, סכום, ממוצע, חציון, מינימום ומקסימום.' },
+    keywords: { en: ['average calculator', 'mean calculator'], he: ['מחשבון ממוצע', 'חישוב ממוצע'] },
+    features: { en: ['Average', 'Median', 'Min and max'], he: ['ממוצע', 'חציון', 'מינימום ומקסימום'] },
+    guide: { en: ['Paste numbers separated by spaces, commas or lines.', 'Convert to calculate statistics.', 'Copy the summary.'], he: ['הדבק מספרים מופרדים ברווחים, פסיקים או שורות.', 'חשב סטטיסטיקה.', 'העתק את הסיכום.'] },
+    examples: [
+      { label: { en: 'Scores', he: 'ציונים' }, input: '82, 91, 77, 88, 95' },
+      { label: { en: 'Revenue list', he: 'רשימת הכנסות' }, input: '1200\n1450\n1320\n1680' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['percentage-change-calculator', 'percentage-calculator', 'ratio-simplifier']
+  },
+  {
+    slug: 'ratio-simplifier',
+    converterId: 'ratioSimplifier',
+    category: 'calculator',
+    inputType: 'ratio',
+    outputType: 'ratio',
+    title: { en: 'Ratio Simplifier', he: 'מצמצם יחס' },
+    shortTitle: { en: 'Ratio Simplifier', he: 'צמצום יחס' },
+    description: { en: 'Simplify ratios such as 1920:1080 into their smallest whole-number form.', he: 'צמצם יחסים כמו 1920:1080 לצורה השלמה הקטנה ביותר.' },
+    metaDescription: { en: 'Simplify ratios online. Convert large ratios into smaller whole-number ratios and decimal values.', he: 'צמצום יחסים אונליין. המרת יחסים גדולים ליחס שלם קטן וערך עשרוני.' },
+    keywords: { en: ['ratio simplifier', 'simplify ratio'], he: ['צמצום יחס', 'מחשבון יחס'] },
+    features: { en: ['Simplified ratio', 'Decimal value', 'Aspect-ratio friendly'], he: ['יחס מצומצם', 'ערך עשרוני', 'מתאים ליחסי מסך'] },
+    guide: { en: ['Enter two ratio numbers.', 'Convert to simplify.', 'Use the result for sizing, design or quick math.'], he: ['הזן שני מספרי יחס.', 'חשב צמצום.', 'השתמש בתוצאה למידות, עיצוב או חישוב מהיר.'] },
+    examples: [
+      { label: { en: 'HD aspect ratio', he: 'יחס מסך HD' }, input: '1920:1080' },
+      { label: { en: 'Simple ratio', he: 'יחס פשוט' }, input: '150, 100' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['average-calculator', 'percentage-calculator', 'text-to-kebab-case']
+  },
+  {
     slug: 'timestamp-to-date',
     converterId: 'timestampToDate',
     reverseSlug: 'date-to-timestamp',

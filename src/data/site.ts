@@ -14,7 +14,8 @@ export const categoryLabels: Record<ConverterCategory, Record<Locale, string>> =
   encoding: { en: 'Encoding', he: 'קידוד ופענוח' },
   time: { en: 'Date & time', he: 'תאריך וזמן' },
   developer: { en: 'Developer tools', he: 'כלי פיתוח' },
-  color: { en: 'Colors', he: 'צבעים' }
+  color: { en: 'Colors', he: 'צבעים' },
+  calculator: { en: 'Calculators', he: 'מחשבונים' }
 };
 
 export const categoryContent: Record<
@@ -230,6 +231,40 @@ export const categoryContent: Record<
         {
           question: 'אילו פורמטים נתמכים?',
           answer: 'הקטגוריה תומכת כרגע בהמרה בין HEX, RGB, HSL ו־CMYK.'
+        }
+      ]
+    }
+  },
+  calculator: {
+    en: {
+      title: 'Online Calculators',
+      description: 'Simple browser-based calculators for percentages, discounts, averages, ratios and everyday math.',
+      intro: 'Use these quick calculators for everyday numbers, simple checks, pricing work and content planning without opening a spreadsheet.',
+      useCases: ['Calculate percentages and changes', 'Check discounts and tax totals', 'Summarize number lists and ratios'],
+      faq: [
+        {
+          question: 'Are these calculators free?',
+          answer: 'Yes. The calculators are free and run in your browser.'
+        },
+        {
+          question: 'Should I treat calculator output as professional advice?',
+          answer: 'No. These tools are meant for quick everyday calculations. Verify important financial, tax or business decisions separately.'
+        }
+      ]
+    },
+    he: {
+      title: 'מחשבונים אונליין',
+      description: 'מחשבונים פשוטים בדפדפן עבור אחוזים, הנחות, ממוצעים, יחסים וחישובים יומיומיים.',
+      intro: 'השתמש במחשבונים מהירים לבדיקת מספרים יומיומיים, מחירים, תוכן וחישובים פשוטים בלי לפתוח גיליון.',
+      useCases: ['חישוב אחוזים ושינוי באחוזים', 'בדיקת הנחות וסכומים כולל מס', 'סיכום רשימות מספרים ויחסים'],
+      faq: [
+        {
+          question: 'האם המחשבונים חינמיים?',
+          answer: 'כן. המחשבונים חינמיים ורצים בדפדפן שלך.'
+        },
+        {
+          question: 'האם התוצאה היא ייעוץ מקצועי?',
+          answer: 'לא. הכלים מיועדים לחישובים יומיומיים מהירים. החלטות פיננסיות, מס או עסק חשובות כדאי לאמת בנפרד.'
         }
       ]
     }

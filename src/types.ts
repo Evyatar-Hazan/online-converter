@@ -6,7 +6,8 @@ export type ConverterCategory =
   | 'encoding'
   | 'time'
   | 'developer'
-  | 'color';
+  | 'color'
+  | 'calculator';
 
 export interface LocalizedText {
   en: string;

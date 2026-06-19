@@ -52,7 +52,11 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     regex: 'Regex',
     'unicode escape': 'Unicode escape',
     count: 'Count',
-    uuid: 'UUID'
+    uuid: 'UUID',
+    numbers: 'Numbers',
+    percentage: 'Percentage',
+    calculation: 'Calculation',
+    ratio: 'Ratio'
   },
   he: {
     json: 'JSON',
@@ -90,7 +94,11 @@ const formatLabels: Record<Locale, Record<string, string>> = {
     regex: 'Regex',
     'unicode escape': 'Unicode Escape',
     count: 'כמות',
-    uuid: 'UUID'
+    uuid: 'UUID',
+    numbers: 'מספרים',
+    percentage: 'אחוזים',
+    calculation: 'חישוב',
+    ratio: 'יחס'
   }
 };
 
@@ -130,7 +138,11 @@ const outputExtensions: Record<string, string> = {
   regex: 'txt',
   'unicode escape': 'txt',
   count: 'txt',
-  uuid: 'txt'
+  uuid: 'txt',
+  numbers: 'txt',
+  percentage: 'txt',
+  calculation: 'txt',
+  ratio: 'txt'
 };
 
 function previewEntries(preview: ConvertPreview) {

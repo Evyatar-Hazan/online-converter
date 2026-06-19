@@ -32,6 +32,10 @@ function contentIntro(tool: ConverterTool, locale: Locale) {
     color: {
       en: 'Use this color converter when moving between design tools, CSS values and frontend implementation details.',
       he: 'השתמש בממיר הצבעים הזה כשצריך לעבור בין כלי עיצוב, ערכי CSS ופרטי יישום בפרונטאנד.'
+    },
+    calculator: {
+      en: 'Use this calculator for quick everyday math, pricing checks, percentage work and simple number summaries.',
+      he: 'השתמש במחשבון הזה לחישובים יומיומיים מהירים, בדיקת מחירים, אחוזים וסיכום מספרים פשוט.'
     }
   };
 
@@ -73,6 +77,10 @@ function formatName(value: string) {
     'unicode escape': 'Unicode escape',
     count: 'count',
     uuid: 'UUID',
+    numbers: 'numbers',
+    percentage: 'percentage',
+    calculation: 'calculation',
+    ratio: 'ratio',
     'trimmed text': 'trimmed text',
     'compact lines': 'compact lines',
     'numbered lines': 'numbered lines',
@@ -144,6 +152,10 @@ function conversionTips(tool: ConverterTool, locale: Locale) {
     color: {
       en: 'For color tools, confirm that the final value matches the CSS or design system format you need.',
       he: 'בכלי צבעים, ודא שהערך הסופי מתאים לפורמט ה־CSS או מערכת העיצוב שאתה צריך.'
+    },
+    calculator: {
+      en: 'For calculators, check the input order, units and decimal separators before relying on the result.',
+      he: 'במחשבונים, בדוק את סדר הקלט, היחידות והמפרידים העשרוניים לפני הסתמכות על התוצאה.'
     }
   };
 
@@ -194,6 +206,10 @@ function commonIssues(tool: ConverterTool, locale: Locale) {
     color: {
       en: ['Color values outside the valid range cannot convert cleanly.', 'Short HEX and full HEX are both common but must be valid.', 'Copied RGB values should include three numeric channels.'],
       he: ['ערכי צבע מחוץ לטווח התקין לא יומרו בצורה נקייה.', 'HEX קצר ו־HEX מלא נפוצים, אבל חייבים להיות תקינים.', 'ערכי RGB מועתקים צריכים לכלול שלושה ערוצים מספריים.']
+    },
+    calculator: {
+      en: ['Missing numbers are the most common cause of calculator errors.', 'Percent inputs should usually be written as 17 for 17%.', 'Large or important decisions should be checked with a trusted source.'],
+      he: ['מספרים חסרים הם הגורם הנפוץ ביותר לשגיאות במחשבונים.', 'קלט אחוזים בדרך כלל צריך להיכתב כ־17 עבור 17%.', 'החלטות גדולות או חשובות כדאי לבדוק מול מקור אמין נוסף.']
     }
   };
 

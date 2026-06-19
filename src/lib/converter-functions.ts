@@ -32,6 +32,32 @@ function numberOption(options: ConverterOptions, key: string, fallback: number):
   return Number.isFinite(value) ? value : fallback;
 }
 
+function formatNumber(value: number, digits = 2): string {
+  if (!Number.isFinite(value)) return '0';
+  return value.toFixed(digits).replace(/\.?0+$/g, '');
+}
+
+function parseNumericValues(input: string, minimum: number, label: string): number[] {
+  const values = input.match(/-?\d+(?:\.\d+)?/g)?.map((value) => Number(value)) ?? [];
+  if (values.length < minimum || values.some((value) => !Number.isFinite(value))) {
+    throw new Error(`Invalid ${label}: enter at least ${minimum} numeric value${minimum === 1 ? '' : 's'}.`);
+  }
+  return values;
+}
+
+function calculatorOutput(lines: string[], metadata?: Record<string, string | number>): ConvertResult {
+  return result(lines.join('\n'), metadata);
+}
+
+function integerGcd(left: number, right: number): number {
+  let a = Math.abs(Math.round(left));
+  let b = Math.abs(Math.round(right));
+  while (b) {
+    [a, b] = [b, a % b];
+  }
+  return a || 1;
+}
+
 function countStats(input: string): Record<string, number> {
   const lines = input ? input.split(/\r\n|\r|\n/).length : 0;
   const words = input.trim() ? input.trim().split(/\s+/).filter(Boolean).length : 0;
@@ -884,6 +910,93 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const count = Math.min(rawCount, 100);
     const output = Array.from({ length: count }, randomUuid).join('\n');
     return result(output, { count }, rawCount > 100 ? ['Generated the first 100 UUIDs to keep the output manageable.'] : undefined);
+  },
+
+  percentageOf(input) {
+    const [percent, value] = parseNumericValues(input, 2, 'percentage calculation');
+    const resultValue = (percent / 100) * value;
+    return calculatorOutput([
+      `${formatNumber(percent)}% of ${formatNumber(value)} = ${formatNumber(resultValue)}`,
+      `Formula: ${formatNumber(value)} × ${formatNumber(percent)} / 100`
+    ], { percent, value, result: resultValue });
+  },
+
+  percentageChange(input) {
+    const [oldValue, newValue] = parseNumericValues(input, 2, 'percentage change');
+    if (oldValue === 0) {
+      throw new Error('Invalid percentage change: the original value cannot be 0.');
+    }
+    const difference = newValue - oldValue;
+    const percentChange = (difference / Math.abs(oldValue)) * 100;
+    return calculatorOutput([
+      `Change: ${formatNumber(percentChange)}%`,
+      `Difference: ${formatNumber(difference)}`,
+      `From ${formatNumber(oldValue)} to ${formatNumber(newValue)}`
+    ], { oldValue, newValue, difference, percentChange });
+  },
+
+  discountCalculator(input) {
+    const [price, discountPercent] = parseNumericValues(input, 2, 'discount calculation');
+    if (price < 0 || discountPercent < 0) {
+      throw new Error('Invalid discount calculation: price and discount must be positive numbers.');
+    }
+    const discount = (price * discountPercent) / 100;
+    const finalPrice = price - discount;
+    return calculatorOutput([
+      `Original price: ${formatNumber(price)}`,
+      `Discount: ${formatNumber(discount)} (${formatNumber(discountPercent)}%)`,
+      `Final price: ${formatNumber(finalPrice)}`
+    ], { price, discountPercent, discount, finalPrice });
+  },
+
+  vatCalculator(input) {
+    const [amount, taxPercent] = parseNumericValues(input, 2, 'tax calculation');
+    if (amount < 0 || taxPercent < 0) {
+      throw new Error('Invalid tax calculation: amount and tax percent must be positive numbers.');
+    }
+    const tax = (amount * taxPercent) / 100;
+    const total = amount + tax;
+    return calculatorOutput([
+      `Amount before tax: ${formatNumber(amount)}`,
+      `Tax: ${formatNumber(tax)} (${formatNumber(taxPercent)}%)`,
+      `Total: ${formatNumber(total)}`
+    ], { amount, taxPercent, tax, total });
+  },
+
+  averageCalculator(input) {
+    const values = parseNumericValues(input, 1, 'average calculation');
+    const sorted = [...values].sort((a, b) => a - b);
+    const sum = values.reduce((total, value) => total + value, 0);
+    const average = sum / values.length;
+    const middle = Math.floor(sorted.length / 2);
+    const median = sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+    return calculatorOutput([
+      `Count: ${values.length}`,
+      `Sum: ${formatNumber(sum)}`,
+      `Average: ${formatNumber(average)}`,
+      `Median: ${formatNumber(median)}`,
+      `Min: ${formatNumber(sorted[0])}`,
+      `Max: ${formatNumber(sorted[sorted.length - 1])}`
+    ], { count: values.length, sum, average, median, min: sorted[0], max: sorted[sorted.length - 1] });
+  },
+
+  ratioSimplifier(input) {
+    const [left, right] = parseNumericValues(input, 2, 'ratio');
+    if (left === 0 || right === 0) {
+      throw new Error('Invalid ratio: both values must be greater than 0.');
+    }
+    const scale = 1000000;
+    const scaledLeft = Math.round(Math.abs(left) * scale);
+    const scaledRight = Math.round(Math.abs(right) * scale);
+    const divisor = integerGcd(scaledLeft, scaledRight);
+    const simplifiedLeft = scaledLeft / divisor;
+    const simplifiedRight = scaledRight / divisor;
+    const decimal = left / right;
+    return calculatorOutput([
+      `Simplified ratio: ${simplifiedLeft}:${simplifiedRight}`,
+      `Decimal: ${formatNumber(decimal, 4)}`,
+      `Original ratio: ${formatNumber(left)}:${formatNumber(right)}`
+    ], { left, right, simplifiedLeft, simplifiedRight, decimal });
   },
 
   timestampToDate(input, options) {
