@@ -760,6 +760,39 @@ function rot13(input: string): string {
   });
 }
 
+function caesarShift(input: string, shift: number): string {
+  return input.replace(/[a-z]/gi, (char) => {
+    const base = char <= 'Z' ? 65 : 97;
+    const normalized = ((char.charCodeAt(0) - base + shift) % 26 + 26) % 26;
+    return String.fromCharCode(normalized + base);
+  });
+}
+
+function jsonPathGet(value: unknown, path: string): unknown {
+  const normalized = path.trim().replace(/^\$\.?/, '');
+  if (!normalized) return value;
+  const parts = normalized.replace(/\[(\d+)\]/g, '.$1').split('.').filter(Boolean);
+  return parts.reduce<unknown>((current, part) => {
+    if (current === undefined || current === null) return undefined;
+    if (Array.isArray(current)) return current[Number(part)];
+    if (typeof current === 'object') return (current as JsonObject)[part];
+    return undefined;
+  }, value);
+}
+
+function minutesFromTime(input: string): number {
+  const match = input.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) {
+    throw new Error('Invalid time: use HH:MM format, for example 09:30.');
+  }
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) {
+    throw new Error('Invalid time: hours must be 0-23 and minutes must be 0-59.');
+  }
+  return (hours * 60) + minutes;
+}
+
 export const converterFunctions: Record<string, ConverterFunction> = {
   jsonToCsv(input, options) {
     const delimiter = selectOption(options, 'delimiter', ',');
@@ -900,6 +933,22 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       .map((row) => `| ${row.map(escapeCell).join(' | ')} |`)
       .join('\n');
     return result(output, { rows: rows.length - 1, columns: headers.length });
+  },
+
+  markdownTableGenerator(input) {
+    const lines = input.split(/\r\n|\r|\n/).filter((line) => line.trim() !== '');
+    const rows = lines.map((line) => line.split(/\s*,\s*|\t/).map((cell) => cell.trim()));
+    if (rows.length < 2 || rows[0].length < 2) {
+      throw new Error('Markdown table generator expects at least two columns and two rows, using comma or tab separators.');
+    }
+    const width = Math.max(...rows.map((row) => row.length));
+    const normalizedRows = rows.map((row) => Array.from({ length: width }, (_item, index) => row[index] ?? ''));
+    const output = [
+      normalizedRows[0],
+      normalizedRows[0].map(() => '---'),
+      ...normalizedRows.slice(1)
+    ].map((row) => `| ${row.map((cell) => cell.replace(/\|/g, '\\|')).join(' | ')} |`).join('\n');
+    return result(output, { rows: normalizedRows.length - 1, columns: width });
   },
 
   jsonToXml(input) {
@@ -1173,6 +1222,16 @@ export const converterFunctions: Record<string, ConverterFunction> = {
   rot13Converter(input) {
     const output = rot13(input);
     return result(output, countStats(output));
+  },
+
+  caesarCipher(input) {
+    const [shiftLine = '', ...textLines] = input.split(/\r\n|\r|\n/);
+    const shift = Number(shiftLine.replace(/^shift=/i, '').trim());
+    if (!Number.isInteger(shift)) {
+      throw new Error('Caesar cipher expects shift=NUMBER on the first line, then text on the following lines.');
+    }
+    const output = caesarShift(textLines.join('\n'), shift);
+    return result(output, { shift });
   },
 
   textCase(input) {
@@ -1495,6 +1554,41 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ], { count: values.length, sum, average, median, min: sorted[0], max: sorted[sorted.length - 1] });
   },
 
+  salaryCalculator(input) {
+    const [gross, taxPercent] = parseNumericValues(input, 2, 'salary calculation');
+    if (gross < 0 || taxPercent < 0 || taxPercent > 100) {
+      throw new Error('Invalid salary calculation: gross salary must be positive and tax percent must be between 0 and 100.');
+    }
+    const tax = (gross * taxPercent) / 100;
+    const net = gross - tax;
+    return calculatorOutput([
+      `Gross salary: ${formatNumber(gross, 2)}`,
+      `Estimated tax: ${formatNumber(tax, 2)}`,
+      `Estimated net: ${formatNumber(net, 2)}`
+    ], { gross, taxPercent, net: formatNumber(net, 2) });
+  },
+
+  compoundInterestCalculator(input) {
+    const [principal, annualRate, years, contribution = 0] = parseNumericValues(input, 3, 'compound interest calculation');
+    if (principal < 0 || annualRate < 0 || years < 0 || contribution < 0) {
+      throw new Error('Invalid compound interest calculation: values must be positive numbers.');
+    }
+    const months = Math.round(years * 12);
+    const monthlyRate = annualRate / 100 / 12;
+    let balance = principal;
+    for (let month = 0; month < months; month += 1) {
+      balance = (balance + contribution) * (1 + monthlyRate);
+    }
+    const totalContributions = principal + (contribution * months);
+    const gain = balance - totalContributions;
+    return calculatorOutput([
+      `Final balance: ${formatNumber(balance, 2)}`,
+      `Total contributions: ${formatNumber(totalContributions, 2)}`,
+      `Estimated growth: ${formatNumber(gain, 2)}`,
+      `Months: ${months}`
+    ], { balance: formatNumber(balance, 2), gain: formatNumber(gain, 2), months });
+  },
+
   ratioSimplifier(input) {
     const [left, right] = parseNumericValues(input, 2, 'ratio');
     if (left === 0 || right === 0) {
@@ -1666,6 +1760,23 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Start: ${start.toISOString().slice(0, 10)}`,
       `Target: ${target.toISOString().slice(0, 10)}`
     ], { days, weeks: formatNumber(weeks, 2) });
+  },
+
+  timeDurationCalculator(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      throw new Error('Time duration calculator expects start and end time, one per line, using HH:MM.');
+    }
+    const start = minutesFromTime(lines[0]);
+    const end = minutesFromTime(lines[1]);
+    const duration = end >= start ? end - start : (24 * 60) - start + end;
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return calculatorOutput([
+      `Duration: ${hours} hours, ${minutes} minutes`,
+      `Total minutes: ${duration}`,
+      `Decimal hours: ${formatNumber(duration / 60, 2)}`
+    ], { minutes: duration, hours: formatNumber(duration / 60, 2) });
   },
 
   timestampToDate(input, options) {
@@ -1914,6 +2025,44 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(JSON.stringify(parsed, null, 2), { isBot: String(parsed.isBot), device: parsed.device }, undefined, jsonPreview(parsed));
   },
 
+  utmBuilder(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    const [urlLine = '', ...paramLines] = lines;
+    if (!urlLine) {
+      throw new Error('UTM builder expects a URL on the first line, then source=, medium= and campaign= lines.');
+    }
+    let url: URL;
+    try {
+      url = new URL(urlLine);
+    } catch {
+      throw new Error('Invalid URL: UTM builder expects a full URL including protocol.');
+    }
+    const params = new URLSearchParams(url.search);
+    paramLines.forEach((line) => {
+      const [key, ...valueParts] = line.split('=');
+      const normalizedKey = key.trim().replace(/^utm_/i, '');
+      const value = valueParts.join('=').trim();
+      if (normalizedKey && value) params.set(`utm_${normalizedKey}`, value);
+    });
+    url.search = params.toString();
+    return result(url.toString(), { parameters: params.size });
+  },
+
+  jsonPathExtractor(input) {
+    const [pathLine = '', ...jsonLines] = input.split(/\r\n|\r|\n/);
+    const path = pathLine.replace(/^path=/i, '').trim();
+    if (!path || !jsonLines.length) {
+      throw new Error('JSON path extractor expects path=$.field on the first line, then JSON on following lines.');
+    }
+    const data = parseJson(jsonLines.join('\n'));
+    const value = jsonPathGet(data, path);
+    if (value === undefined) {
+      throw new Error(`JSON path not found: ${path}.`);
+    }
+    const output = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    return result(output, { path }, undefined, typeof value === 'object' && value !== null ? jsonPreview(value) : undefined);
+  },
+
   httpStatusLookup(input) {
     const code = Number(input.trim());
     if (!Number.isInteger(code) || code < 100 || code > 599) {
@@ -1951,6 +2100,18 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     }
     const output = [...lines].sort((left, right) => left.localeCompare(right, undefined, { sensitivity: 'base', numeric: true })).join('\n');
     return result(output, { lines: lines.length });
+  },
+
+  wordFrequencyCounter(input) {
+    const words = textWords(input).map((word) => word.toLocaleLowerCase());
+    if (!words.length) {
+      throw new Error('Word frequency counter expects text with at least one word.');
+    }
+    const counts = new Map<string, number>();
+    words.forEach((word) => counts.set(word, (counts.get(word) ?? 0) + 1));
+    const rows = [...counts.entries()].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+    const output = rows.map(([word, count]) => `${word}: ${count}`).join('\n');
+    return result(output, { uniqueWords: rows.length, words: words.length });
   },
 
   jwtDecoder(input) {

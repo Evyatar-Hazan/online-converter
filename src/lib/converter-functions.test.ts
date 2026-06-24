@@ -43,6 +43,10 @@ describe('converter functions', () => {
 
     const markdown = convert('csvToMarkdownTable', 'feature,status\nSEO,done\nAds,ready');
     expect(markdown.output).toBe('| feature | status |\n| --- | --- |\n| SEO | done |\n| Ads | ready |');
+
+    const generated = convert('markdownTableGenerator', 'Task,Owner,Status\nSEO,Codex,Done\nAds,Google,Pending');
+    expect(generated.output).toContain('| Task | Owner | Status |');
+    expect(generated.metadata?.columns).toBe(3);
   });
 
   it('handles YAML and JSON conversion', () => {
@@ -177,6 +181,8 @@ describe('converter functions', () => {
     expect(convert('textToNatoPhonetic', 'OC 2026').output).toBe('Oscar Charlie / Two Zero Two Six');
     expect(convert('textAlphabetizer', 'zebra\nApple\nbanana\n10 tools\n2 tools').output).toBe('2 tools\n10 tools\nApple\nbanana\nzebra');
     expect(convert('rot13Converter', 'Hello online converter').output).toBe('Uryyb bayvar pbairegre');
+    expect(convert('caesarCipher', 'shift=3\nHello online converter').output).toBe('Khoor rqolqh frqyhuwhu');
+    expect(convert('wordFrequencyCounter', 'converter tools converter seo text tools converter').output).toContain('converter: 3');
   });
 
   it('compares text blocks and lists', () => {
@@ -208,6 +214,9 @@ describe('converter functions', () => {
     expect(convert('bmiCalculator', '72, 175').output).toContain('BMI: 23.5');
     expect(convert('tipCalculator', '240, 15, 4').output).toContain('Per person: 69');
     expect(convert('countdownCalculator', '2026-06-24\n2026-12-31').output).toContain('Days remaining: 190');
+    expect(convert('salaryCalculator', '18000, 25').output).toContain('Estimated net: 13500');
+    expect(convert('compoundInterestCalculator', '10000, 6, 10, 250').output).toContain('Months: 120');
+    expect(convert('timeDurationCalculator', '09:30\n17:45').output).toContain('Total minutes: 495');
     const random = convert('randomNumberGenerator', '3, 1, 6').output.split('\n').map(Number);
     expect(random).toHaveLength(3);
     expect(random.every((value) => value >= 1 && value <= 6)).toBe(true);
@@ -216,6 +225,8 @@ describe('converter functions', () => {
     expect(convert('hexOpacityConverter', '#4f46e5\n60').output).toContain('#4f46e599');
     expect(convert('colorPaletteGenerator', '#4f46e5').output).toContain('Base: #4f46e5');
     expect(convert('mimeTypeLookup', 'json').output).toContain('MIME type: application/json');
+    expect(convert('utmBuilder', 'https://example.com/product\nsource=newsletter\nmedium=email\ncampaign=summer').output).toBe('https://example.com/product?utm_source=newsletter&utm_medium=email&utm_campaign=summer');
+    expect(convert('jsonPathExtractor', 'path=$.user.address.city\n{"user":{"name":"Dana","address":{"city":"Jerusalem"}}}').output).toBe('Jerusalem');
   });
 
   it('parses user agent strings', () => {
@@ -279,6 +290,7 @@ describe('converter functions', () => {
     expect(() => convert('csvColumnExtractor', 'column=missing\nname\nAvi')).toThrow(/CSV column not found/i);
     expect(() => convert('csvListSorter', 'column=missing\nname\nAvi')).toThrow(/CSV sort column not found/i);
     expect(() => convert('csvToMarkdownTable', 'name')).toThrow(/Markdown table/i);
+    expect(() => convert('markdownTableGenerator', 'name')).toThrow(/Markdown table generator/i);
     expect(() => convert('jsonSchemaFormatter', '[]')).toThrow(/JSON Schema/i);
     expect(() => convert('jsonSchemaToTypescript', '[]')).toThrow(/JSON Schema/i);
     expect(() => convert('percentageChange', '0, 25')).toThrow(/original value cannot be 0/i);
@@ -289,10 +301,13 @@ describe('converter functions', () => {
     expect(() => convert('loanPaymentCalculator', '100, 5, 0')).toThrow(/loan payment/i);
     expect(() => convert('bmiCalculator', '72, 0')).toThrow(/BMI/i);
     expect(() => convert('tipCalculator', '100, 15, 0')).toThrow(/tip calculation/i);
+    expect(() => convert('salaryCalculator', '100, 120')).toThrow(/salary calculation/i);
+    expect(() => convert('compoundInterestCalculator', '100, -1, 5')).toThrow(/compound interest/i);
     expect(() => convert('businessDaysCalculator', '2026-06-01')).toThrow(/two dates/i);
     expect(() => convert('ageCalculator', '2026-06-24\n1995-04-12')).toThrow(/birth date/i);
     expect(() => convert('countdownCalculator', '2026-12-31\n2026-06-24')).toThrow(/countdown/i);
     expect(() => convert('httpStatusLookup', '99')).toThrow(/HTTP status code/i);
+    expect(() => convert('timeDurationCalculator', '25:00\n10:00')).toThrow(/Invalid time/i);
     expect(() => convert('sitemapUrlCounter', '<urlset>')).toThrow(/Invalid sitemap XML/i);
     expect(() => convert('colorContrastChecker', '#fff')).toThrow(/two colors/i);
     expect(() => convert('cssGradientGenerator', '#fff')).toThrow(/two colors/i);
@@ -300,6 +315,10 @@ describe('converter functions', () => {
     expect(() => convert('userAgentParser', '')).toThrow(/user-agent/i);
     expect(() => convert('mimeTypeLookup', 'unknownext')).toThrow(/Unknown MIME/i);
     expect(() => convert('textAlphabetizer', '')).toThrow(/alphabetizer/i);
+    expect(() => convert('caesarCipher', 'hello')).toThrow(/Caesar cipher/i);
+    expect(() => convert('wordFrequencyCounter', '')).toThrow(/Word frequency/i);
+    expect(() => convert('utmBuilder', 'example.com')).toThrow(/Invalid URL/i);
+    expect(() => convert('jsonPathExtractor', 'path=$.missing\n{"ok":true}')).toThrow(/JSON path not found/i);
     expect(() => convert('jwtExpirationChecker', 'abc.def')).toThrow(/Invalid JWT/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
