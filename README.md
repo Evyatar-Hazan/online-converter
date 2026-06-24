@@ -4,7 +4,7 @@ A bilingual SEO-first converter hub built with Astro and React islands. The site
 
 ## Features
 
-- 60 converter tools across data formats, text, encoding, dates, colors, calculators and developer utilities.
+- 66 converter tools across data formats, text, encoding, dates, colors, calculators and developer utilities.
 - Static SEO pages for every tool and category in English and Hebrew.
 - Browser-only conversion: pasted input is not uploaded to a server.
 - Canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap and robots.txt.
@@ -57,7 +57,7 @@ PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=1234567890
 PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=1234567890
 ```
 
-When `PUBLIC_GOOGLE_ADSENSE_CLIENT` is set, the AdSense script loads in the site layout and `/ads.txt` is generated from that client ID. Manual ad placements render only when both the client ID and the matching slot ID are configured. Google will serve real ads only after the domain is approved in AdSense.
+When `PUBLIC_GOOGLE_ADSENSE_CLIENT` is set, the AdSense script loads in the site layout and `/ads.txt` is generated from that client ID. Manual ad placements render only when both the client ID and the matching slot ID are configured. Google will serve real ads only after the domain is approved in AdSense. See `docs/adsense-setup.md` for the production checklist.
 
 ## Production Deployment
 

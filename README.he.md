@@ -4,7 +4,7 @@
 
 ## יכולות
 
-- 60 ממירים בקטגוריות נתונים, טקסט, קידוד, תאריכים, צבעים, מחשבונים וכלי פיתוח.
+- 66 ממירים בקטגוריות נתונים, טקסט, קידוד, תאריכים, צבעים, מחשבונים וכלי פיתוח.
 - דפי SEO סטטיים לכל כלי ולכל קטגוריה בעברית ובאנגלית.
 - המרה מקומית בדפדפן: הקלט לא נשלח לשרת.
 - canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap ו־robots.txt.
@@ -57,7 +57,7 @@ PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=1234567890
 PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=1234567890
 ```
 
-כאשר `PUBLIC_GOOGLE_ADSENSE_CLIENT` מוגדר, סקריפט AdSense נטען ב־layout ו־`/ads.txt` נוצר מתוך אותו Client ID. אזורי מודעות ידניים יוצגו רק כאשר מוגדרים גם Client ID וגם Slot ID מתאים. Google תציג מודעות אמיתיות רק אחרי שהדומיין יאושר ב־AdSense.
+כאשר `PUBLIC_GOOGLE_ADSENSE_CLIENT` מוגדר, סקריפט AdSense נטען ב־layout ו־`/ads.txt` נוצר מתוך אותו Client ID. אזורי מודעות ידניים יוצגו רק כאשר מוגדרים גם Client ID וגם Slot ID מתאים. Google תציג מודעות אמיתיות רק אחרי שהדומיין יאושר ב־AdSense. ראה `docs/adsense-setup.md` לצ׳קליסט פרודקשן.
 
 ## פריסה לפרודקשן
 
