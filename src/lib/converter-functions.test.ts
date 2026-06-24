@@ -16,6 +16,16 @@ describe('converter functions', () => {
     expect(json.preview?.rows).toHaveLength(2);
   });
 
+  it('converts CSV and TSV formats', () => {
+    const tsv = convert('csvToTsv', 'name,city\nAvi,Jerusalem\nMaya,Tel Aviv');
+    expect(tsv.output).toBe('name\tcity\nAvi\tJerusalem\nMaya\tTel Aviv');
+    expect(tsv.metadata?.rows).toBe(3);
+
+    const csv = convert('tsvToCsv', 'name\tcity\nAvi\tJerusalem\nMaya\tTel Aviv');
+    expect(csv.output).toBe('name,city\nAvi,Jerusalem\nMaya,Tel Aviv');
+    expect(csv.metadata?.columns).toBe(2);
+  });
+
   it('handles YAML and JSON conversion', () => {
     const yaml = convert('jsonToYaml', '{"app":"converter","enabled":true}');
     expect(yaml.output).toContain('app: converter');
@@ -70,6 +80,16 @@ describe('converter functions', () => {
     const query = convert('jsonToQueryString', '{"q":"online converter","tag":["json","csv"]}');
     expect(query.output).toBe('q=online+converter&tag=json&tag=csv');
     expect(query.metadata?.parameters).toBe(3);
+
+    const parsed = convert('urlParser', 'https://example.com/search?q=online+converter&tag=json&tag=csv#results');
+    expect(JSON.parse(parsed.output)).toMatchObject({
+      protocol: 'https',
+      hostname: 'example.com',
+      pathname: '/search',
+      query: { q: 'online converter', tag: ['json', 'csv'] },
+      hash: 'results'
+    });
+    expect(parsed.preview?.type).toBe('json');
   });
 
   it('converts JSON, JSONL and developer string helpers', () => {
@@ -96,8 +116,15 @@ describe('converter functions', () => {
     expect(convert('textToSnakeCase', 'Customer Account Number').output).toBe('customer_account_number');
     expect(convert('textToKebabCase', 'Best Online Converter Tools').output).toBe('best-online-converter-tools');
     expect(convert('removePunctuation', 'שלום, עולם! SEO tools & converters.').output).toBe('שלום עולם SEO tools converters');
+    expect(convert('removeCharacters', 'aeiou\nBeautiful converter text').output).toBe('Btfl cnvrtr txt');
+    expect(convert('prefixSuffixLines', 'prefix=<li>\nsuffix=</li>\nJSON\nCSV').output).toBe('<li>JSON</li>\n<li>CSV</li>');
+    const replaced = convert('findReplaceText', 'find=old\nreplace=new\nold converter, old tool');
+    expect(replaced.output).toBe('new converter, new tool');
+    expect(replaced.metadata?.replacements).toBe(2);
     expect(convert('addLineNumbers', 'Write draft\nReview copy').output).toBe('1. Write draft\n2. Review copy');
     expect(convert('removeLineNumbers', '01. Write draft\n02. Review copy').output).toBe('Write draft\nReview copy');
+    expect(convert('metaTitleLengthChecker', 'JSON to CSV Converter - Free Online Tool').output).toContain('Status: good');
+    expect(convert('metaDescriptionLengthChecker', 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.').output).toContain('Status: good');
   });
 
   it('calculates percentages, discounts, averages and ratios', () => {
@@ -107,6 +134,8 @@ describe('converter functions', () => {
     expect(convert('vatCalculator', '100, 17').output).toContain('Total: 117');
     expect(convert('averageCalculator', '82, 91, 77, 88, 95').output).toContain('Average: 86.6');
     expect(convert('ratioSimplifier', '1920:1080').output).toContain('Simplified ratio: 16:9');
+    expect(convert('aspectRatioCalculator', '1920, 1080').output).toContain('Aspect ratio: 16:9');
+    expect(convert('colorContrastChecker', '#111827\n#ffffff').output).toContain('WCAG AA normal text: Pass');
   });
 
   it('applies converter options', () => {
@@ -143,8 +172,14 @@ describe('converter functions', () => {
     expect(() => convert('jsonLinesToJson', '{"ok":true}\n{bad')).toThrow(/line 2/i);
     expect(() => convert('unicodeEscapeToText', '\\u12')).toThrow(/Invalid Unicode escape/i);
     expect(() => convert('uuidGenerator', '0')).toThrow(/Invalid UUID count/i);
+    expect(() => convert('urlParser', 'example.com/no-protocol')).toThrow(/Invalid URL/i);
+    expect(() => convert('removeCharacters', 'abc')).toThrow(/Character remover/i);
+    expect(() => convert('prefixSuffixLines', 'prefix=-')).toThrow(/Prefix\/suffix/i);
+    expect(() => convert('findReplaceText', 'find=\nreplace=x\ntext')).toThrow(/Find and replace/i);
     expect(() => convert('percentageChange', '0, 25')).toThrow(/original value cannot be 0/i);
     expect(() => convert('ratioSimplifier', '16, 0')).toThrow(/Invalid ratio/i);
+    expect(() => convert('aspectRatioCalculator', '16, 0')).toThrow(/Invalid aspect ratio/i);
+    expect(() => convert('colorContrastChecker', '#fff')).toThrow(/two colors/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
 });

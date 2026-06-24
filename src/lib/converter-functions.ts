@@ -191,6 +191,20 @@ function csvRows(input: string, delimiter = ','): string[][] {
   return rows;
 }
 
+function csvCell(value: string): string {
+  return /[",\n\r]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+}
+
+function tsvCell(value: string): string {
+  return value.replace(/\t/g, ' ').replace(/\r?\n|\r/g, ' ');
+}
+
+function parseTsvRows(input: string): string[][] {
+  const normalized = input.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  if (!normalized) return [];
+  return normalized.split('\n').map((line) => line.split('\t'));
+}
+
 function encodeBase64(input: string): string {
   return btoa(String.fromCharCode(...new TextEncoder().encode(input)));
 }
@@ -312,6 +326,32 @@ function parseHex(input: string): [number, number, number] {
     parseInt(normalized.slice(2, 4), 16),
     parseInt(normalized.slice(4, 6), 16)
   ];
+}
+
+function parseColorLine(input: string): [number, number, number] {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    throw new Error('Invalid color: enter a HEX or RGB color.');
+  }
+  return trimmed.startsWith('#') || /^[0-9a-f]{3}([0-9a-f]{3})?$/i.test(trimmed)
+    ? parseHex(trimmed)
+    : parseRgb(trimmed);
+}
+
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  const channels = [r, g, b].map((value) => {
+    const channel = value / 255;
+    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+  });
+  return (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2]);
+}
+
+function contrastRatio(left: [number, number, number], right: [number, number, number]): number {
+  const a = relativeLuminance(left);
+  const b = relativeLuminance(right);
+  const light = Math.max(a, b);
+  const dark = Math.min(a, b);
+  return (light + 0.05) / (dark + 0.05);
 }
 
 function parseIntegerInput(input: string, base: 10 | 16): bigint {
@@ -608,6 +648,19 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     });
   },
 
+  csvToTsv(input, options) {
+    const delimiter = selectOption(options, 'delimiter', ',');
+    const rows = csvRows(input, delimiter);
+    const output = rows.map((row) => row.map(tsvCell).join('\t')).join('\n');
+    return result(output, { rows: rows.length, columns: rows[0]?.length ?? 0 });
+  },
+
+  tsvToCsv(input) {
+    const rows = parseTsvRows(input);
+    const output = rows.map((row) => row.map(csvCell).join(',')).join('\n');
+    return result(output, { rows: rows.length, columns: rows[0]?.length ?? 0 });
+  },
+
   jsonToXml(input) {
     const data = parseJson(input);
     const body = jsonToXmlValue(data, 1);
@@ -718,6 +771,41 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(output));
   },
 
+  urlParser(input) {
+    let parsed: URL;
+    try {
+      parsed = new URL(input.trim());
+    } catch {
+      throw new Error('Invalid URL: paste a full URL including protocol, for example https://example.com/path?x=1.');
+    }
+
+    const query: Record<string, string | string[]> = {};
+    parsed.searchParams.forEach((value, key) => {
+      if (query[key] === undefined) {
+        query[key] = value;
+      } else if (Array.isArray(query[key])) {
+        (query[key] as string[]).push(value);
+      } else {
+        query[key] = [query[key] as string, value];
+      }
+    });
+
+    const output = {
+      protocol: parsed.protocol.replace(':', ''),
+      username: parsed.username,
+      passwordPresent: Boolean(parsed.password),
+      host: parsed.host,
+      hostname: parsed.hostname,
+      port: parsed.port,
+      pathname: parsed.pathname,
+      query,
+      hash: parsed.hash.replace(/^#/, ''),
+      origin: parsed.origin
+    };
+
+    return result(JSON.stringify(output, null, 2), { parameters: parsed.searchParams.size }, undefined, jsonPreview(output));
+  },
+
   queryStringToJson(input) {
     const output = queryStringToObject(input);
     const json = JSON.stringify(output, null, 2);
@@ -808,6 +896,47 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       .join('\n')
       .trim();
     return result(output, countStats(output));
+  },
+
+  removeCharacters(input) {
+    const [characters = '', ...textLines] = input.split(/\r\n|\r|\n/);
+    if (!characters || !textLines.length) {
+      throw new Error('Character remover expects the first line to list characters to remove, then the text on the next lines.');
+    }
+    const removeSet = new Set(Array.from(characters));
+    let removed = 0;
+    const output = Array.from(textLines.join('\n')).filter((char) => {
+      if (removeSet.has(char)) {
+        removed += 1;
+        return false;
+      }
+      return true;
+    }).join('');
+    return result(output, { ...countStats(output), removed });
+  },
+
+  prefixSuffixLines(input) {
+    const [prefixLine = '', suffixLine = '', ...contentLines] = input.split(/\r\n|\r|\n/);
+    const prefix = prefixLine.replace(/^prefix=/i, '');
+    const suffix = suffixLine.replace(/^suffix=/i, '');
+    if (!contentLines.length) {
+      throw new Error('Prefix/suffix lines expects prefix=... on line 1, suffix=... on line 2, then the text lines.');
+    }
+    const output = contentLines.map((line) => `${prefix}${line}${suffix}`).join('\n');
+    return result(output, { lines: contentLines.length, characters: output.length });
+  },
+
+  findReplaceText(input) {
+    const [findLine = '', replaceLine = '', ...contentLines] = input.split(/\r\n|\r|\n/);
+    const findValue = findLine.replace(/^find=/i, '');
+    const replaceValue = replaceLine.replace(/^replace=/i, '');
+    if (!findValue || !contentLines.length) {
+      throw new Error('Find and replace expects find=... on line 1, replace=... on line 2, then the text.');
+    }
+    const source = contentLines.join('\n');
+    const output = source.split(findValue).join(replaceValue);
+    const replacements = source.split(findValue).length - 1;
+    return result(output, { ...countStats(output), replacements });
   },
 
   wordCounter(input) {
@@ -999,6 +1128,22 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ], { left, right, simplifiedLeft, simplifiedRight, decimal });
   },
 
+  aspectRatioCalculator(input) {
+    const [width, height] = parseNumericValues(input, 2, 'aspect ratio');
+    if (width <= 0 || height <= 0) {
+      throw new Error('Invalid aspect ratio: width and height must be greater than 0.');
+    }
+    const divisor = integerGcd(width, height);
+    const ratioWidth = Math.round(width / divisor);
+    const ratioHeight = Math.round(height / divisor);
+    return calculatorOutput([
+      `Aspect ratio: ${ratioWidth}:${ratioHeight}`,
+      `Decimal: ${formatNumber(width / height, 4)}`,
+      `Orientation: ${width === height ? 'square' : width > height ? 'landscape' : 'portrait'}`,
+      `Size: ${formatNumber(width)} × ${formatNumber(height)}`
+    ], { width, height, ratioWidth, ratioHeight });
+  },
+
   timestampToDate(input, options) {
     const raw = Number(input.trim());
     if (!Number.isFinite(raw)) throw new Error('Invalid timestamp: paste a numeric Unix timestamp in seconds or milliseconds.');
@@ -1089,6 +1234,52 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const [r, g, b] = cmykToRgbValues(cmyk);
     const css = `rgb(${r}, ${g}, ${b})`;
     return result([css, `R: ${r}`, `G: ${g}`, `B: ${b}`].join('\n'), { r, g, b }, undefined, colorPreview('RGB color', css, { r, g, b }));
+  },
+
+  colorContrastChecker(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      throw new Error('Color contrast checker expects two colors, one per line, using HEX or RGB.');
+    }
+    const foreground = parseColorLine(lines[0]);
+    const background = parseColorLine(lines[1]);
+    const ratio = contrastRatio(foreground, background);
+    const ratioText = `${formatNumber(ratio, 2)}:1`;
+    const normalAa = ratio >= 4.5;
+    const largeAa = ratio >= 3;
+    const normalAaa = ratio >= 7;
+    const largeAaa = ratio >= 4.5;
+    return result([
+      `Contrast ratio: ${ratioText}`,
+      `WCAG AA normal text: ${normalAa ? 'Pass' : 'Fail'}`,
+      `WCAG AA large text: ${largeAa ? 'Pass' : 'Fail'}`,
+      `WCAG AAA normal text: ${normalAaa ? 'Pass' : 'Fail'}`,
+      `WCAG AAA large text: ${largeAaa ? 'Pass' : 'Fail'}`
+    ].join('\n'), { ratio: formatNumber(ratio, 2), normalAa: String(normalAa), largeAa: String(largeAa) });
+  },
+
+  metaTitleLengthChecker(input) {
+    const title = input.trim();
+    const length = Array.from(title).length;
+    const status = length < 30 ? 'too short' : length <= 60 ? 'good' : 'too long';
+    return result([
+      `Characters: ${length}`,
+      `Recommended range: 30-60 characters`,
+      `Remaining to 60: ${Math.max(0, 60 - length)}`,
+      `Status: ${status}`
+    ].join('\n'), { characters: length, remaining: Math.max(0, 60 - length), status });
+  },
+
+  metaDescriptionLengthChecker(input) {
+    const description = input.trim();
+    const length = Array.from(description).length;
+    const status = length < 120 ? 'too short' : length <= 160 ? 'good' : 'too long';
+    return result([
+      `Characters: ${length}`,
+      `Recommended range: 120-160 characters`,
+      `Remaining to 160: ${Math.max(0, 160 - length)}`,
+      `Status: ${status}`
+    ].join('\n'), { characters: length, remaining: Math.max(0, 160 - length), status });
   },
 
   jwtDecoder(input) {

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { converters } from '../../src/data/converters';
 
 test('English tool page converts JSON to CSV', async ({ page }) => {
   await page.goto('/en/json-to-csv/');
@@ -18,11 +19,13 @@ test('Hebrew home page supports RTL and search filtering', async ({ page }) => {
 });
 
 test('Hebrew category page lists matching tools', async ({ page }) => {
+  const textToolCount = converters.filter((tool) => tool.category === 'text').length;
+
   await page.goto('/he/text/');
   await expect(page.locator('h1')).toContainText('כלי טקסט');
   await expect(page.getByText('מה אפשר לעשות כאן')).toBeVisible();
   await expect(page.getByText('האם הכלים עובדים טוב עם עברית?')).toBeVisible();
-  await expect(page.locator('[data-tool-card]')).toHaveCount(13);
+  await expect(page.locator('[data-tool-card]')).toHaveCount(textToolCount);
   await expect(page.getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
 });
 
