@@ -793,6 +793,36 @@ function minutesFromTime(input: string): number {
   return (hours * 60) + minutes;
 }
 
+function parseKeyValuePayload(input: string): { values: Record<string, string>; body: string } {
+  const values: Record<string, string> = {};
+  const bodyLines: string[] = [];
+  input.split(/\r\n|\r|\n/).forEach((line) => {
+    const match = line.match(/^([a-z][\w-]*)\s*=\s*(.*)$/i);
+    if (match && !bodyLines.length) {
+      values[match[1].toLocaleLowerCase()] = match[2].trim();
+    } else {
+      bodyLines.push(line);
+    }
+  });
+  return { values, body: bodyLines.join('\n').trim() };
+}
+
+function flattenJsonValue(value: unknown, prefix = ''): Record<string, unknown> {
+  if (Array.isArray(value)) {
+    return value.reduce<Record<string, unknown>>((acc, item, index) => ({
+      ...acc,
+      ...flattenJsonValue(item, prefix ? `${prefix}.${index}` : String(index))
+    }), {});
+  }
+  if (value && typeof value === 'object') {
+    return Object.entries(value as JsonObject).reduce<Record<string, unknown>>((acc, [key, child]) => ({
+      ...acc,
+      ...flattenJsonValue(child, prefix ? `${prefix}.${key}` : key)
+    }), {});
+  }
+  return { [prefix || 'value']: value };
+}
+
 export const converterFunctions: Record<string, ConverterFunction> = {
   jsonToCsv(input, options) {
     const delimiter = selectOption(options, 'delimiter', ',');
@@ -2112,6 +2142,129 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const rows = [...counts.entries()].sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
     const output = rows.map(([word, count]) => `${word}: ${count}`).join('\n');
     return result(output, { uniqueWords: rows.length, words: words.length });
+  },
+
+  readingTimeCalculator(input) {
+    const words = textWords(input);
+    if (!words.length) {
+      throw new Error('Reading time calculator expects text with at least one word.');
+    }
+    const wordsPerMinute = 200;
+    const minutes = Math.max(1, Math.ceil(words.length / wordsPerMinute));
+    return result([
+      `Words: ${words.length}`,
+      `Estimated reading time: ${minutes} minute${minutes === 1 ? '' : 's'}`,
+      `Speed: ${wordsPerMinute} words per minute`
+    ].join('\n'), { words: words.length, minutes, wordsPerMinute });
+  },
+
+  sentenceCounter(input) {
+    const text = input.trim();
+    if (!text) {
+      throw new Error('Sentence counter expects text with at least one sentence.');
+    }
+    const sentences = text.match(/[^.!?\n]+[.!?]+|[^.!?\n]+$/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [];
+    return result([
+      `Sentences: ${sentences.length}`,
+      `Words: ${textWords(text).length}`,
+      `Characters: ${text.length}`
+    ].join('\n'), { sentences: sentences.length, words: textWords(text).length, characters: text.length });
+  },
+
+  uuidValidator(input) {
+    const values = input.split(/\r\n|\r|\n|,/).map((value) => value.trim()).filter(Boolean);
+    if (!values.length) {
+      throw new Error('UUID validator expects at least one UUID value.');
+    }
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-([1-8])[0-9a-f]{3}-([89ab])[0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const rows = values.map((value) => {
+      const match = value.match(uuidPattern);
+      return `${value}: ${match ? `valid v${match[1]}` : 'invalid'}`;
+    });
+    const valid = rows.filter((row) => row.includes(': valid')).length;
+    return result(rows.join('\n'), { checked: values.length, valid, invalid: values.length - valid });
+  },
+
+  jsonArrayFlattener(input) {
+    const data = parseJson(input);
+    if (!Array.isArray(data)) {
+      throw new Error('JSON array flattener expects a JSON array.');
+    }
+    const flattened = data.map((item) => flattenJsonValue(item));
+    return result(JSON.stringify(flattened, null, 2), { rows: flattened.length, keys: new Set(flattened.flatMap((row) => Object.keys(row))).size }, undefined, {
+      type: 'table',
+      title: 'Flattened JSON preview',
+      values: { rows: flattened.length },
+      rows: flattened.slice(0, 5) as Record<string, string | number | boolean>[]
+    });
+  },
+
+  csvRowFilter(input) {
+    const { values, body } = parseKeyValuePayload(input);
+    const column = values.column;
+    const contains = values.contains ?? values.value;
+    if (!column || !contains || !body) {
+      throw new Error('CSV row filter expects column=name and contains=value lines, then CSV data.');
+    }
+    const rows = csvRows(body, ',');
+    if (rows.length < 2) {
+      throw new Error('CSV row filter expects a header row and at least one data row.');
+    }
+    const headers = rows[0].map((header) => header.trim());
+    const numericIndex = /^\d+$/.test(column) ? Number(column) - 1 : -1;
+    const index = numericIndex >= 0 ? numericIndex : headers.findIndex((header) => header.toLocaleLowerCase() === column.toLocaleLowerCase());
+    if (index < 0 || index >= headers.length) {
+      throw new Error(`CSV filter column not found: ${column}. Use a header name or a 1-based column number.`);
+    }
+    const needle = contains.toLocaleLowerCase();
+    const filtered = rows.slice(1).filter((row) => String(row[index] ?? '').toLocaleLowerCase().includes(needle));
+    const output = [headers, ...filtered].map((row) => row.map(csvCell).join(',')).join('\n');
+    return result(output, { rows: filtered.length, column: headers[index] || String(index + 1) }, filtered.length ? undefined : ['No rows matched the filter.']);
+  },
+
+  rgbOpacityConverter(input) {
+    const numbers = parseNumericValues(input, 4, 'RGB opacity values');
+    const [red, green, blue, opacity] = numbers;
+    if ([red, green, blue].some((value) => value < 0 || value > 255) || opacity < 0 || opacity > 100) {
+      throw new Error('Invalid RGB opacity values: use red, green and blue from 0-255, then opacity from 0-100.');
+    }
+    const alpha = opacity / 100;
+    const output = `rgba(${Math.round(red)}, ${Math.round(green)}, ${Math.round(blue)}, ${formatNumber(alpha, 2)})`;
+    return result(output, { red: Math.round(red), green: Math.round(green), blue: Math.round(blue), opacity }, undefined, colorPreview('RGBA', output, { opacity: `${opacity}%` }));
+  },
+
+  paceCalculator(input) {
+    const [distanceKm, hours = 0, minutes = 0, seconds = 0] = parseNumericValues(input, 2, 'pace calculator values');
+    if (distanceKm <= 0) {
+      throw new Error('Invalid pace calculator values: distance must be greater than zero.');
+    }
+    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    if (totalSeconds <= 0) {
+      throw new Error('Invalid pace calculator values: total time must be greater than zero.');
+    }
+    const paceSeconds = totalSeconds / distanceKm;
+    const paceMinutes = Math.floor(paceSeconds / 60);
+    const paceRemainder = Math.round(paceSeconds % 60).toString().padStart(2, '0');
+    const speedKmh = distanceKm / (totalSeconds / 3600);
+    return result([
+      `Pace: ${paceMinutes}:${paceRemainder} min/km`,
+      `Speed: ${formatNumber(speedKmh, 2)} km/h`,
+      `Distance: ${formatNumber(distanceKm, 2)} km`
+    ].join('\n'), { distanceKm, paceSeconds: Math.round(paceSeconds), speedKmh: formatNumber(speedKmh, 2) });
+  },
+
+  fuelCostCalculator(input) {
+    const [distanceKm, consumptionPer100Km, pricePerLiter] = parseNumericValues(input, 3, 'fuel cost values');
+    if (distanceKm < 0 || consumptionPer100Km <= 0 || pricePerLiter < 0) {
+      throw new Error('Invalid fuel cost values: distance and price cannot be negative, and consumption must be greater than zero.');
+    }
+    const liters = (distanceKm / 100) * consumptionPer100Km;
+    const cost = liters * pricePerLiter;
+    return result([
+      `Fuel needed: ${formatNumber(liters, 2)} liters`,
+      `Estimated cost: ${formatNumber(cost, 2)}`,
+      `Distance: ${formatNumber(distanceKm, 2)} km`
+    ].join('\n'), { liters: formatNumber(liters, 2), cost: formatNumber(cost, 2), distanceKm });
   },
 
   jwtDecoder(input) {

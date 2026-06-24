@@ -5,15 +5,15 @@ Prioritize tools that combine clear search intent, simple browser-only logic, an
 | Priority | Category | Converter | Search intent | Notes |
 |---:|---|---|---|---|
 | 1 | Time | Timezone meeting planner | timezone converter meeting | Higher value but needs careful UX. |
-| 2 | Text | Reading time calculator | reading time calculator | Useful editorial/SEO query. |
-| 3 | Text | Sentence counter | sentence counter | Small text utility, easy win. |
-| 4 | Developer | UUID validator | uuid validator | Complements UUID generator. |
-| 5 | Developer | Cron expression explainer | cron expression explainer | Clear developer intent, careful parsing. |
-| 6 | Data | JSON array flattener | flatten json array | Useful data-cleanup search. |
-| 7 | Data | CSV row filter | filter csv rows online | Practical CSV utility. |
-| 8 | Color | RGB opacity converter | rgba opacity converter | Complements HEX opacity. |
-| 9 | Calculator | Pace calculator | pace calculator | Fitness search; simple math. |
-| 10 | Calculator | Fuel cost calculator | fuel cost calculator | Consumer utility. |
+| 2 | Developer | Cron expression explainer | cron expression explainer | Clear developer intent, careful parsing. |
+| 3 | Time | Date difference calculator | date difference calculator | Complements business days and countdown. |
+| 4 | Text | Text case detector | detect text case | Small text utility. |
+| 5 | Developer | HTTP header parser | parse HTTP headers | Developer utility with clear intent. |
+| 6 | Data | JSON key counter | count JSON keys | Simple JSON diagnostic. |
+| 7 | Data | CSV duplicate row finder | find duplicate csv rows | Complements CSV row filter and sorter. |
+| 8 | Color | RGB to HEX with alpha | rgb alpha to hex | Complements opacity tools. |
+| 9 | Calculator | Calorie macro calculator | macro calculator | High-search consumer utility, needs careful disclaimer. |
+| 10 | Calculator | Mortgage affordability calculator | mortgage affordability calculator | Valuable but needs clear assumptions. |
 
 Completed in the current expansion batch: character remover, prefix/suffix lines, find and replace, CSV to TSV, TSV to CSV, URL parser, aspect ratio calculator, meta title length checker, meta description length checker, and color contrast checker.
 
@@ -27,4 +27,6 @@ Completed in the fifth expansion batch: loan payment calculator, BMI calculator,
 
 Completed in the sixth expansion batch: Markdown table generator, salary calculator, compound interest calculator, time duration calculator, word frequency counter, Caesar cipher encoder/decoder, UTM builder, and JSON path extractor.
 
-Recommended next batch: timezone meeting planner, reading time calculator, sentence counter, UUID validator, cron expression explainer, JSON array flattener, CSV row filter, RGB opacity converter, pace calculator, and fuel cost calculator.
+Completed in the seventh expansion batch: reading time calculator, sentence counter, UUID validator, JSON array flattener, CSV row filter, RGB opacity converter, pace calculator, and fuel cost calculator.
+
+Recommended next batch: timezone meeting planner, cron expression explainer, date difference calculator, text case detector, HTTP header parser, JSON key counter, CSV duplicate row finder, RGB to HEX with alpha, calorie macro calculator, and mortgage affordability calculator.

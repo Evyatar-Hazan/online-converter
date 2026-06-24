@@ -47,6 +47,10 @@ describe('converter functions', () => {
     const generated = convert('markdownTableGenerator', 'Task,Owner,Status\nSEO,Codex,Done\nAds,Google,Pending');
     expect(generated.output).toContain('| Task | Owner | Status |');
     expect(generated.metadata?.columns).toBe(3);
+
+    const filtered = convert('csvRowFilter', 'column=city\ncontains=Tel\nname,city\nDana,Jerusalem\nMaya,Tel Aviv');
+    expect(filtered.output).toBe('name,city\nMaya,Tel Aviv');
+    expect(filtered.metadata?.rows).toBe(1);
   });
 
   it('handles YAML and JSON conversion', () => {
@@ -227,6 +231,24 @@ describe('converter functions', () => {
     expect(convert('mimeTypeLookup', 'json').output).toContain('MIME type: application/json');
     expect(convert('utmBuilder', 'https://example.com/product\nsource=newsletter\nmedium=email\ncampaign=summer').output).toBe('https://example.com/product?utm_source=newsletter&utm_medium=email&utm_campaign=summer');
     expect(convert('jsonPathExtractor', 'path=$.user.address.city\n{"user":{"name":"Dana","address":{"city":"Jerusalem"}}}').output).toBe('Jerusalem');
+    expect(convert('jsonArrayFlattener', '[{"name":"Dana","address":{"city":"Jerusalem"}}]').output).toContain('"address.city": "Jerusalem"');
+    expect(convert('rgbOpacityConverter', '79, 70, 229, 60').output).toBe('rgba(79, 70, 229, 0.6)');
+    expect(convert('paceCalculator', '10, 0, 52, 30').output).toContain('Pace: 5:15 min/km');
+    expect(convert('fuelCostCalculator', '120, 6.8, 7.45').output).toContain('Estimated cost: 60.79');
+  });
+
+  it('calculates reading, sentences and UUID validity', () => {
+    const reading = convert('readingTimeCalculator', 'שלום עולם. This converter estimates short reading time.');
+    expect(reading.output).toContain('Estimated reading time: 1 minute');
+    expect(reading.metadata?.words).toBe(8);
+
+    const sentences = convert('sentenceCounter', 'This is one sentence. This is another one! האם זה עובד?');
+    expect(sentences.output).toContain('Sentences: 3');
+
+    const uuids = convert('uuidValidator', '550e8400-e29b-41d4-a716-446655440000\nnot-a-uuid');
+    expect(uuids.output).toContain('valid v4');
+    expect(uuids.output).toContain('not-a-uuid: invalid');
+    expect(uuids.metadata?.invalid).toBe(1);
   });
 
   it('parses user agent strings', () => {
@@ -319,6 +341,8 @@ describe('converter functions', () => {
     expect(() => convert('wordFrequencyCounter', '')).toThrow(/Word frequency/i);
     expect(() => convert('utmBuilder', 'example.com')).toThrow(/Invalid URL/i);
     expect(() => convert('jsonPathExtractor', 'path=$.missing\n{"ok":true}')).toThrow(/JSON path not found/i);
+    expect(() => convert('csvRowFilter', 'name,city\nDana,Jerusalem')).toThrow(/CSV row filter/i);
+    expect(() => convert('uuidValidator', '')).toThrow(/UUID validator/i);
     expect(() => convert('jwtExpirationChecker', 'abc.def')).toThrow(/Invalid JWT/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
