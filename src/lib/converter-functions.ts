@@ -626,6 +626,30 @@ const httpStatusText: Record<number, string> = {
   504: 'Gateway Timeout'
 };
 
+const mimeTypes: Record<string, string> = {
+  html: 'text/html',
+  htm: 'text/html',
+  css: 'text/css',
+  js: 'text/javascript',
+  mjs: 'text/javascript',
+  json: 'application/json',
+  xml: 'application/xml',
+  csv: 'text/csv',
+  txt: 'text/plain',
+  md: 'text/markdown',
+  svg: 'image/svg+xml',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  pdf: 'application/pdf',
+  zip: 'application/zip',
+  mp3: 'audio/mpeg',
+  mp4: 'video/mp4',
+  wasm: 'application/wasm'
+};
+
 function parseBigIntAuto(input: string): bigint {
   const trimmed = input.trim().replace(/_/g, '');
   const sign = trimmed.startsWith('-') ? -1n : 1n;
@@ -719,6 +743,21 @@ function schemaTypeToTs(value: unknown): string {
     return schema.enum.map((item) => JSON.stringify(item)).join(' | ');
   }
   return 'unknown';
+}
+
+function rgbHex([r, g, b]: [number, number, number]): string {
+  return `#${[r, g, b].map((item) => item.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function mixRgb(left: [number, number, number], right: [number, number, number], amount: number): [number, number, number] {
+  return left.map((value, index) => Math.round(value + (right[index] - value) * amount)) as [number, number, number];
+}
+
+function rot13(input: string): string {
+  return input.replace(/[a-z]/gi, (char) => {
+    const base = char <= 'Z' ? 65 : 97;
+    return String.fromCharCode(((char.charCodeAt(0) - base + 13) % 26) + base);
+  });
 }
 
 export const converterFunctions: Record<string, ConverterFunction> = {
@@ -1131,6 +1170,11 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { characters: input.length }, unsupported.size ? [`Skipped unsupported characters: ${[...unsupported].join(' ')}`] : undefined);
   },
 
+  rot13Converter(input) {
+    const output = rot13(input);
+    return result(output, countStats(output));
+  },
+
   textCase(input) {
     const output = [
       `UPPERCASE: ${input.toUpperCase()}`,
@@ -1510,6 +1554,57 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ], { price, quantity, unitPrice: formatNumber(unitPrice, 4) });
   },
 
+  loanPaymentCalculator(input) {
+    const [principal, annualRate, years] = parseNumericValues(input, 3, 'loan payment calculation');
+    if (principal <= 0 || annualRate < 0 || years <= 0) {
+      throw new Error('Invalid loan payment calculation: principal and years must be greater than 0, and rate cannot be negative.');
+    }
+    const months = Math.round(years * 12);
+    const monthlyRate = annualRate / 100 / 12;
+    const monthlyPayment = monthlyRate === 0
+      ? principal / months
+      : (principal * monthlyRate) / (1 - (1 + monthlyRate) ** -months);
+    const totalPaid = monthlyPayment * months;
+    const interest = totalPaid - principal;
+    return calculatorOutput([
+      `Monthly payment: ${formatNumber(monthlyPayment, 2)}`,
+      `Total paid: ${formatNumber(totalPaid, 2)}`,
+      `Total interest: ${formatNumber(interest, 2)}`,
+      `Payments: ${months}`
+    ], { principal, annualRate, years, monthlyPayment: formatNumber(monthlyPayment, 2) });
+  },
+
+  bmiCalculator(input) {
+    const [weightKg, rawHeight] = parseNumericValues(input, 2, 'BMI calculation');
+    const heightMeters = rawHeight > 3 ? rawHeight / 100 : rawHeight;
+    if (weightKg <= 0 || heightMeters <= 0) {
+      throw new Error('Invalid BMI calculation: weight and height must be greater than 0.');
+    }
+    const bmi = weightKg / (heightMeters ** 2);
+    const status = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'normal' : bmi < 30 ? 'overweight' : 'obese';
+    return calculatorOutput([
+      `BMI: ${formatNumber(bmi, 1)}`,
+      `Category: ${status}`,
+      `Weight: ${formatNumber(weightKg)} kg`,
+      `Height: ${formatNumber(heightMeters, 2)} m`
+    ], { bmi: formatNumber(bmi, 1), status });
+  },
+
+  tipCalculator(input) {
+    const [bill, tipPercent, people = 1] = parseNumericValues(input, 2, 'tip calculation');
+    if (bill < 0 || tipPercent < 0 || people <= 0) {
+      throw new Error('Invalid tip calculation: bill, tip percent and people must be positive numbers.');
+    }
+    const tip = (bill * tipPercent) / 100;
+    const total = bill + tip;
+    const perPerson = total / people;
+    return calculatorOutput([
+      `Tip: ${formatNumber(tip, 2)}`,
+      `Total: ${formatNumber(total, 2)}`,
+      `Per person: ${formatNumber(perPerson, 2)}`
+    ], { bill, tipPercent, people, total: formatNumber(total, 2) });
+  },
+
   businessDaysCalculator(input) {
     let [start, end] = dateLines(input, 'Business days calculator');
     if (start > end) {
@@ -1555,6 +1650,22 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Months after last birthday: ${months}`,
       `Days after last month: ${days}`
     ], { years, months, days });
+  },
+
+  countdownCalculator(input) {
+    const [start, target] = dateLines(input, 'Countdown calculator');
+    const milliseconds = target.getTime() - start.getTime();
+    if (milliseconds < 0) {
+      throw new Error('Invalid countdown: target date must be after the start date.');
+    }
+    const days = Math.ceil(milliseconds / 86400000);
+    const weeks = days / 7;
+    return calculatorOutput([
+      `Days remaining: ${days}`,
+      `Weeks remaining: ${formatNumber(weeks, 2)}`,
+      `Start: ${start.toISOString().slice(0, 10)}`,
+      `Target: ${target.toISOString().slice(0, 10)}`
+    ], { days, weeks: formatNumber(weeks, 2) });
   },
 
   timestampToDate(input, options) {
@@ -1707,6 +1818,20 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ].join('\n'), { opacity, alpha }, undefined, colorPreview('RGBA color', rgba, { opacity, alpha }));
   },
 
+  colorPaletteGenerator(input) {
+    const base = parseColorLine(input);
+    const tones = [
+      ['Light', mixRgb(base, [255, 255, 255], 0.55)],
+      ['Soft', mixRgb(base, [255, 255, 255], 0.28)],
+      ['Base', base],
+      ['Deep', mixRgb(base, [0, 0, 0], 0.22)],
+      ['Dark', mixRgb(base, [0, 0, 0], 0.45)]
+    ] as const;
+    const output = tones.map(([label, rgb]) => `${label}: ${rgbHex(rgb)} rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`).join('\n');
+    const css = `rgb(${base[0]}, ${base[1]}, ${base[2]})`;
+    return result(output, { colors: tones.length }, undefined, colorPreview('Color palette', css, { colors: tones.length }));
+  },
+
   metaTitleLengthChecker(input) {
     const title = input.trim();
     const length = Array.from(title).length;
@@ -1801,6 +1926,31 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Name: ${text}`,
       `Family: ${family}`
     ].join('\n'), { code, family });
+  },
+
+  mimeTypeLookup(input) {
+    const raw = input.trim().toLocaleLowerCase().replace(/^\./, '');
+    if (!raw) {
+      throw new Error('MIME type lookup expects a file extension like json or png.');
+    }
+    const extension = raw.includes('/') ? Object.entries(mimeTypes).find(([, type]) => type === raw)?.[0] : raw;
+    const mime = raw.includes('/') ? raw : mimeTypes[raw];
+    if (!mime || !extension) {
+      throw new Error(`Unknown MIME type or extension: ${input.trim()}. Try common values like json, png, pdf or text/html.`);
+    }
+    return result([
+      `Extension: .${extension}`,
+      `MIME type: ${mime}`
+    ].join('\n'), { extension, mime });
+  },
+
+  textAlphabetizer(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (!lines.length) {
+      throw new Error('Text alphabetizer expects at least one line to sort.');
+    }
+    const output = [...lines].sort((left, right) => left.localeCompare(right, undefined, { sensitivity: 'base', numeric: true })).join('\n');
+    return result(output, { lines: lines.length });
   },
 
   jwtDecoder(input) {

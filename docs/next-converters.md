@@ -5,15 +5,15 @@ Prioritize tools that combine clear search intent, simple browser-only logic, an
 | Priority | Category | Converter | Search intent | Notes |
 |---:|---|---|---|---|
 | 1 | Time | Timezone meeting planner | timezone converter meeting | Higher value but needs careful UX. |
-| 2 | Color | Palette generator | color palette generator | More UX work, useful for retention. |
-| 3 | Calculator | Loan payment calculator | loan calculator | High volume but requires careful copy. |
-| 4 | Calculator | BMI calculator | bmi calculator | High volume but requires health disclaimer. |
-| 5 | Time | Countdown calculator | date countdown calculator | Simple and useful. |
-| 6 | Developer | Markdown table generator | markdown table generator | Useful content and docs query. |
-| 7 | Text | Text alphabetizer | alphabetize list online | Close to sort-lines but can target different query phrasing. |
-| 8 | Encoding | ROT13 encoder/decoder | rot13 decoder | Simple evergreen encoding search. |
-| 9 | Developer | MIME type lookup | mime type lookup | Useful reference page with simple logic. |
-| 10 | Calculator | Tip calculator | tip calculator | High-volume consumer query. |
+| 2 | Developer | Markdown table generator | markdown table generator | Dedicated table builder beyond CSV conversion. |
+| 3 | Calculator | Salary calculator | salary calculator | High-volume, needs careful country-neutral copy. |
+| 4 | Calculator | Compound interest calculator | compound interest calculator | Evergreen finance search. |
+| 5 | Time | Time duration calculator | time duration calculator | Useful simple time math. |
+| 6 | Text | Word frequency counter | word frequency counter | Strong text/SEO utility. |
+| 7 | Encoding | Caesar cipher encoder/decoder | caesar cipher decoder | Simple evergreen encoding search. |
+| 8 | Developer | UTM builder | utm builder | Marketing/dev utility with clear intent. |
+| 9 | Developer | JSON path extractor | json path extractor | Useful developer utility, needs safe parser. |
+| 10 | Color | Color palette from HEX | color palette generator | Already has simple palette; future version can add richer UX. |
 
 Completed in the current expansion batch: character remover, prefix/suffix lines, find and replace, CSV to TSV, TSV to CSV, URL parser, aspect ratio calculator, meta title length checker, meta description length checker, and color contrast checker.
 
@@ -23,4 +23,6 @@ Completed in the third expansion batch: text diff checker, list difference, CSV 
 
 Completed in the fourth expansion batch: JSON schema formatter, JSON schema to TypeScript, business days calculator, age calculator, NATO phonetic alphabet converter, HTTP status code lookup, CSV list sorter, and CSV to Markdown table.
 
-Recommended next batch: timezone meeting planner, palette generator, loan payment calculator, BMI calculator, countdown calculator, Markdown table generator, text alphabetizer, ROT13 encoder/decoder, MIME type lookup, and tip calculator.
+Completed in the fifth expansion batch: loan payment calculator, BMI calculator, countdown calculator, text alphabetizer, ROT13 encoder/decoder, MIME type lookup, tip calculator, and color palette generator.
+
+Recommended next batch: timezone meeting planner, Markdown table generator, salary calculator, compound interest calculator, time duration calculator, word frequency counter, Caesar cipher encoder/decoder, UTM builder, JSON path extractor, and richer color palette UX.

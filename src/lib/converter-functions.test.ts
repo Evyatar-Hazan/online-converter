@@ -175,6 +175,8 @@ describe('converter functions', () => {
     expect(convert('metaTitleLengthChecker', 'JSON to CSV Converter - Free Online Tool').output).toContain('Status: good');
     expect(convert('metaDescriptionLengthChecker', 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.').output).toContain('Status: good');
     expect(convert('textToNatoPhonetic', 'OC 2026').output).toBe('Oscar Charlie / Two Zero Two Six');
+    expect(convert('textAlphabetizer', 'zebra\nApple\nbanana\n10 tools\n2 tools').output).toBe('2 tools\n10 tools\nApple\nbanana\nzebra');
+    expect(convert('rot13Converter', 'Hello online converter').output).toBe('Uryyb bayvar pbairegre');
   });
 
   it('compares text blocks and lists', () => {
@@ -202,12 +204,18 @@ describe('converter functions', () => {
     expect(convert('businessDaysCalculator', '2026-06-01\n2026-06-10').output).toContain('Business days: 8');
     expect(convert('ageCalculator', '1995-04-12\n2026-06-24').output).toContain('Age: 31 years, 2 months, 12 days');
     expect(convert('httpStatusLookup', '404').output).toContain('Name: Not Found');
+    expect(convert('loanPaymentCalculator', '100000, 5.5, 10').output).toContain('Payments: 120');
+    expect(convert('bmiCalculator', '72, 175').output).toContain('BMI: 23.5');
+    expect(convert('tipCalculator', '240, 15, 4').output).toContain('Per person: 69');
+    expect(convert('countdownCalculator', '2026-06-24\n2026-12-31').output).toContain('Days remaining: 190');
     const random = convert('randomNumberGenerator', '3, 1, 6').output.split('\n').map(Number);
     expect(random).toHaveLength(3);
     expect(random.every((value) => value >= 1 && value <= 6)).toBe(true);
     expect(convert('colorContrastChecker', '#111827\n#ffffff').output).toContain('WCAG AA normal text: Pass');
     expect(convert('cssGradientGenerator', '#4f46e5\n#14b8a6\n135deg').output).toContain('linear-gradient(135deg');
     expect(convert('hexOpacityConverter', '#4f46e5\n60').output).toContain('#4f46e599');
+    expect(convert('colorPaletteGenerator', '#4f46e5').output).toContain('Base: #4f46e5');
+    expect(convert('mimeTypeLookup', 'json').output).toContain('MIME type: application/json');
   });
 
   it('parses user agent strings', () => {
@@ -278,14 +286,20 @@ describe('converter functions', () => {
     expect(() => convert('aspectRatioCalculator', '16, 0')).toThrow(/Invalid aspect ratio/i);
     expect(() => convert('ruleOfThreeCalculator', '0, 10, 5')).toThrow(/first value cannot be 0/i);
     expect(() => convert('unitPriceCalculator', '10, 0')).toThrow(/quantity must be greater than 0/i);
+    expect(() => convert('loanPaymentCalculator', '100, 5, 0')).toThrow(/loan payment/i);
+    expect(() => convert('bmiCalculator', '72, 0')).toThrow(/BMI/i);
+    expect(() => convert('tipCalculator', '100, 15, 0')).toThrow(/tip calculation/i);
     expect(() => convert('businessDaysCalculator', '2026-06-01')).toThrow(/two dates/i);
     expect(() => convert('ageCalculator', '2026-06-24\n1995-04-12')).toThrow(/birth date/i);
+    expect(() => convert('countdownCalculator', '2026-12-31\n2026-06-24')).toThrow(/countdown/i);
     expect(() => convert('httpStatusLookup', '99')).toThrow(/HTTP status code/i);
     expect(() => convert('sitemapUrlCounter', '<urlset>')).toThrow(/Invalid sitemap XML/i);
     expect(() => convert('colorContrastChecker', '#fff')).toThrow(/two colors/i);
     expect(() => convert('cssGradientGenerator', '#fff')).toThrow(/two colors/i);
     expect(() => convert('hexOpacityConverter', '#4f46e5\n120')).toThrow(/Invalid opacity/i);
     expect(() => convert('userAgentParser', '')).toThrow(/user-agent/i);
+    expect(() => convert('mimeTypeLookup', 'unknownext')).toThrow(/Unknown MIME/i);
+    expect(() => convert('textAlphabetizer', '')).toThrow(/alphabetizer/i);
     expect(() => convert('jwtExpirationChecker', 'abc.def')).toThrow(/Invalid JWT/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
