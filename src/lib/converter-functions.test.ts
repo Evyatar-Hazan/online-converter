@@ -50,9 +50,17 @@ describe('converter functions', () => {
     expect(text.output).toBe('Hi');
   });
 
+  it('converts text and Morse code', () => {
+    expect(convert('textToMorse', 'SOS 2026').output).toBe('... --- ... / ..--- ----- ..--- -....');
+    expect(convert('morseToText', '.... . .-.. .-.. --- / ..--- ----- ..--- -....').output).toBe('hello 2026');
+  });
+
   it('converts decimal and hexadecimal whole numbers', () => {
     expect(convert('decimalToHex', '255').output).toBe('0xFF');
     expect(convert('hexToDecimal', '0xFF').output).toBe('255');
+    const bases = convert('numberBaseConverter', '0b11111111');
+    expect(bases.output).toContain('Decimal: 255');
+    expect(bases.output).toContain('Hex: 0xFF');
   });
 
   it('converts dates, colors and text helpers', () => {
@@ -90,6 +98,16 @@ describe('converter functions', () => {
       hash: 'results'
     });
     expect(parsed.preview?.type).toBe('json');
+  });
+
+  it('checks robots.txt and sitemap XML', () => {
+    const robots = convert('robotsTxtTester', 'User-agent: *\nDisallow: /private\nSitemap: https://example.com/sitemap.xml');
+    expect(robots.output).toContain('User-agent directives: 1');
+    expect(robots.metadata?.sitemaps).toBe(1);
+
+    const sitemap = convert('sitemapUrlCounter', '<urlset><url><loc>https://example.com/</loc></url><url><loc>https://example.com/tools/</loc></url></urlset>');
+    expect(sitemap.output).toContain('URLs: 2');
+    expect(sitemap.metadata?.uniqueUrls).toBe(2);
   });
 
   it('converts JSON, JSONL and developer string helpers', () => {
@@ -135,7 +153,17 @@ describe('converter functions', () => {
     expect(convert('averageCalculator', '82, 91, 77, 88, 95').output).toContain('Average: 86.6');
     expect(convert('ratioSimplifier', '1920:1080').output).toContain('Simplified ratio: 16:9');
     expect(convert('aspectRatioCalculator', '1920, 1080').output).toContain('Aspect ratio: 16:9');
+    expect(convert('ruleOfThreeCalculator', '2, 10, 5').output).toContain('X = 25');
+    const random = convert('randomNumberGenerator', '3, 1, 6').output.split('\n').map(Number);
+    expect(random).toHaveLength(3);
+    expect(random.every((value) => value >= 1 && value <= 6)).toBe(true);
     expect(convert('colorContrastChecker', '#111827\n#ffffff').output).toContain('WCAG AA normal text: Pass');
+  });
+
+  it('checks JWT expiration without verifying signatures', () => {
+    const checked = convert('jwtExpirationChecker', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGFuYSIsImV4cCI6MTg5MzQ1NjAwMH0.signature');
+    expect(checked.output).toContain('Unix exp: 1893456000');
+    expect(checked.warnings?.[0]).toMatch(/does not verify/i);
   });
 
   it('applies converter options', () => {
@@ -172,6 +200,8 @@ describe('converter functions', () => {
     expect(() => convert('jsonLinesToJson', '{"ok":true}\n{bad')).toThrow(/line 2/i);
     expect(() => convert('unicodeEscapeToText', '\\u12')).toThrow(/Invalid Unicode escape/i);
     expect(() => convert('uuidGenerator', '0')).toThrow(/Invalid UUID count/i);
+    expect(() => convert('numberBaseConverter', '12.5')).toThrow(/Invalid number/i);
+    expect(() => convert('morseToText', '')).toThrow(/Invalid Morse/i);
     expect(() => convert('urlParser', 'example.com/no-protocol')).toThrow(/Invalid URL/i);
     expect(() => convert('removeCharacters', 'abc')).toThrow(/Character remover/i);
     expect(() => convert('prefixSuffixLines', 'prefix=-')).toThrow(/Prefix\/suffix/i);
@@ -179,7 +209,10 @@ describe('converter functions', () => {
     expect(() => convert('percentageChange', '0, 25')).toThrow(/original value cannot be 0/i);
     expect(() => convert('ratioSimplifier', '16, 0')).toThrow(/Invalid ratio/i);
     expect(() => convert('aspectRatioCalculator', '16, 0')).toThrow(/Invalid aspect ratio/i);
+    expect(() => convert('ruleOfThreeCalculator', '0, 10, 5')).toThrow(/first value cannot be 0/i);
+    expect(() => convert('sitemapUrlCounter', '<urlset>')).toThrow(/Invalid sitemap XML/i);
     expect(() => convert('colorContrastChecker', '#fff')).toThrow(/two colors/i);
+    expect(() => convert('jwtExpirationChecker', 'abc.def')).toThrow(/Invalid JWT/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });
 });

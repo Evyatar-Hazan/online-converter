@@ -1534,6 +1534,167 @@ export const converters: ConverterTool[] = [
     related: ['meta-title-length-checker', 'word-counter', 'slug-generator']
   },
   {
+    slug: 'jwt-expiration-checker',
+    converterId: 'jwtExpirationChecker',
+    category: 'developer',
+    inputType: 'jwt',
+    outputType: 'calculation',
+    new: true,
+    title: { en: 'JWT Expiration Checker', he: 'בודק תפוגת JWT' },
+    shortTitle: { en: 'JWT Exp Checker', he: 'תפוגת JWT' },
+    description: { en: 'Decode the exp claim in a JWT and check whether the token is expired.', he: 'פענח את שדה exp בתוך JWT ובדוק אם הטוקן פג תוקף.' },
+    metaDescription: { en: 'Check JWT expiration online in your browser. Decode exp, UTC expiry time and remaining seconds without upload.', he: 'בדיקת תפוגת JWT אונליין בדפדפן. פענוח exp, זמן UTC ושניות שנותרו בלי העלאה.' },
+    keywords: { en: ['jwt expiration checker', 'jwt exp checker'], he: ['בדיקת תפוגת JWT', 'JWT exp'] },
+    features: { en: ['exp claim', 'Expiry status', 'Local decode'], he: ['שדה exp', 'סטטוס תפוגה', 'פענוח מקומי'] },
+    guide: { en: ['Paste a JWT.', 'Convert to decode the exp claim.', 'Use the result for debugging only, not signature verification.'], he: ['הדבק JWT.', 'המר לפענוח שדה exp.', 'השתמש בתוצאה לדיבוג בלבד, לא לאימות חתימה.'] },
+    examples: [{ label: { en: 'JWT with exp', he: 'JWT עם exp' }, input: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGFuYSIsImV4cCI6MTg5MzQ1NjAwMH0.signature' }],
+    faq: [faq.private, faq.free],
+    related: ['jwt-decoder', 'base64-decode', 'json-formatter']
+  },
+  {
+    slug: 'text-to-morse-code',
+    converterId: 'textToMorse',
+    reverseSlug: 'morse-code-to-text',
+    category: 'encoding',
+    inputType: 'text',
+    outputType: 'morse',
+    new: true,
+    title: { en: 'Text to Morse Code Converter', he: 'ממיר טקסט לקוד מורס' },
+    shortTitle: { en: 'Text to Morse', he: 'טקסט למורס' },
+    description: { en: 'Convert English letters, numbers and common symbols into Morse code.', he: 'המר אותיות באנגלית, מספרים וסימנים נפוצים לקוד מורס.' },
+    metaDescription: { en: 'Convert text to Morse code online with dots, dashes and word separators.', he: 'המרת טקסט לקוד מורס אונליין עם נקודות, קווים ומפרידי מילים.' },
+    keywords: { en: ['text to morse code', 'morse code encoder'], he: ['טקסט לקוד מורס', 'ממיר מורס'] },
+    features: { en: ['Letters and numbers', 'Word separators', 'Instant output'], he: ['אותיות ומספרים', 'מפרידי מילים', 'פלט מידי'] },
+    guide: { en: ['Paste English text.', 'Convert to Morse.', 'Copy the dots and dashes.'], he: ['הדבק טקסט באנגלית.', 'המר למורס.', 'העתק את הנקודות והקווים.'] },
+    examples: [
+      { label: { en: 'SOS', he: 'SOS' }, input: 'SOS' },
+      { label: { en: 'Greeting', he: 'ברכה' }, input: 'Hello 2026' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['morse-code-to-text', 'text-to-binary', 'text-to-unicode-escape']
+  },
+  {
+    slug: 'morse-code-to-text',
+    converterId: 'morseToText',
+    reverseSlug: 'text-to-morse-code',
+    category: 'encoding',
+    inputType: 'morse',
+    outputType: 'text',
+    new: true,
+    title: { en: 'Morse Code to Text Converter', he: 'ממיר קוד מורס לטקסט' },
+    shortTitle: { en: 'Morse to Text', he: 'מורס לטקסט' },
+    description: { en: 'Decode Morse code into readable text using spaces between letters and / between words.', he: 'פענח קוד מורס לטקסט קריא עם רווחים בין אותיות ו־/ בין מילים.' },
+    metaDescription: { en: 'Decode Morse code to text online. Convert dots and dashes into readable letters in your browser.', he: 'פענוח קוד מורס לטקסט אונליין. המרת נקודות וקווים לאותיות בדפדפן.' },
+    keywords: { en: ['morse code to text', 'morse code decoder'], he: ['קוד מורס לטקסט', 'מפענח מורס'] },
+    features: { en: ['Dots and dashes', 'Word separators', 'Unknown symbol warnings'], he: ['נקודות וקווים', 'מפרידי מילים', 'אזהרות לסימנים לא מוכרים'] },
+    guide: { en: ['Paste Morse code.', 'Use spaces between letters and / between words.', 'Convert to text.'], he: ['הדבק קוד מורס.', 'השתמש ברווח בין אותיות ו־/ בין מילים.', 'המר לטקסט.'] },
+    examples: [
+      { label: { en: 'SOS', he: 'SOS' }, input: '... --- ...' },
+      { label: { en: 'Greeting', he: 'ברכה' }, input: '.... . .-.. .-.. --- / ..--- ----- ..--- -....' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['text-to-morse-code', 'binary-to-text', 'unicode-escape-to-text']
+  },
+  {
+    slug: 'rule-of-three-calculator',
+    converterId: 'ruleOfThreeCalculator',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'calculation',
+    new: true,
+    title: { en: 'Rule of Three Calculator', he: 'מחשבון ערך משולש' },
+    shortTitle: { en: 'Rule of Three', he: 'ערך משולש' },
+    description: { en: 'Solve direct proportions with three known values and one unknown value.', he: 'פתור יחס ישר עם שלושה ערכים ידועים וערך חסר אחד.' },
+    metaDescription: { en: 'Rule of three calculator online. Enter A, B and C to solve X using direct proportion.', he: 'מחשבון ערך משולש אונליין. הזן A, B ו־C למציאת X לפי יחס ישר.' },
+    keywords: { en: ['rule of three calculator', 'proportion calculator'], he: ['מחשבון ערך משולש', 'חישוב יחס ישר'] },
+    features: { en: ['Direct proportion', 'Formula shown', 'Fast result'], he: ['יחס ישר', 'נוסחה מוצגת', 'תוצאה מהירה'] },
+    guide: { en: ['Enter A, B and C.', 'Convert to calculate X.', 'Use it for quick proportion problems.'], he: ['הזן A, B ו־C.', 'המר לחישוב X.', 'השתמש לבעיות יחס מהירות.'] },
+    examples: [
+      { label: { en: 'Simple proportion', he: 'יחס פשוט' }, input: '2, 10, 5' },
+      { label: { en: 'Recipe scale', he: 'הגדלת מתכון' }, input: '4, 250, 10' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['ratio-simplifier', 'percentage-calculator', 'average-calculator']
+  },
+  {
+    slug: 'robots-txt-tester',
+    converterId: 'robotsTxtTester',
+    category: 'developer',
+    inputType: 'robots',
+    outputType: 'stats',
+    new: true,
+    title: { en: 'Robots.txt Tester', he: 'בודק robots.txt' },
+    shortTitle: { en: 'Robots Tester', he: 'בדיקת Robots' },
+    description: { en: 'Inspect robots.txt directives, count allow/disallow rules and spot common crawl blockers.', he: 'בדוק הנחיות robots.txt, ספר allow/disallow וזהה חסימות זחילה נפוצות.' },
+    metaDescription: { en: 'Robots.txt tester for quick local checks of user-agent, allow, disallow and sitemap directives.', he: 'בודק robots.txt לבדיקות מקומיות של user-agent, allow, disallow ו־sitemap.' },
+    keywords: { en: ['robots txt tester', 'robots.txt checker'], he: ['בודק robots.txt', 'בדיקת robots'] },
+    features: { en: ['Directive counts', 'Block-all warning', 'Local only'], he: ['ספירת הנחיות', 'אזהרת חסימה מלאה', 'מקומי בלבד'] },
+    guide: { en: ['Paste robots.txt content.', 'Convert to inspect directives.', 'Review warnings before publishing.'], he: ['הדבק תוכן robots.txt.', 'המר לבדיקת ההנחיות.', 'בדוק אזהרות לפני פרסום.'] },
+    examples: [{ label: { en: 'Basic robots.txt', he: 'robots.txt בסיסי' }, input: 'User-agent: *\nAllow: /\nSitemap: https://example.com/sitemap.xml' }],
+    faq: [faq.private, faq.free],
+    related: ['sitemap-url-counter', 'meta-title-length-checker', 'url-parser']
+  },
+  {
+    slug: 'sitemap-url-counter',
+    converterId: 'sitemapUrlCounter',
+    category: 'developer',
+    inputType: 'sitemap',
+    outputType: 'stats',
+    new: true,
+    title: { en: 'Sitemap URL Counter', he: 'סופר כתובות Sitemap' },
+    shortTitle: { en: 'Sitemap Counter', he: 'ספירת Sitemap' },
+    description: { en: 'Count URLs, duplicates and hosts in a pasted XML sitemap.', he: 'ספור כתובות, כפילויות ודומיינים בתוך sitemap XML שהודבק.' },
+    metaDescription: { en: 'Count URLs in XML sitemap content locally in your browser, including duplicates and hosts.', he: 'ספירת כתובות בתוך sitemap XML בדפדפן, כולל כפילויות ודומיינים.' },
+    keywords: { en: ['sitemap url counter', 'sitemap checker online'], he: ['ספירת sitemap', 'בודק sitemap'] },
+    features: { en: ['URL count', 'Duplicate count', 'Host summary'], he: ['ספירת URL', 'ספירת כפילויות', 'סיכום דומיינים'] },
+    guide: { en: ['Paste sitemap XML.', 'Convert to count URLs.', 'Use the summary for SEO checks.'], he: ['הדבק sitemap XML.', 'המר לספירת כתובות.', 'השתמש בסיכום לבדיקות SEO.'] },
+    examples: [{ label: { en: 'Small sitemap', he: 'Sitemap קטן' }, input: '<?xml version="1.0"?>\n<urlset>\n  <url><loc>https://example.com/</loc></url>\n  <url><loc>https://example.com/tools/</loc></url>\n</urlset>' }],
+    faq: [faq.private, faq.free],
+    related: ['robots-txt-tester', 'url-parser', 'meta-description-length-checker']
+  },
+  {
+    slug: 'number-base-converter',
+    converterId: 'numberBaseConverter',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'calculation',
+    new: true,
+    title: { en: 'Number Base Converter', he: 'ממיר בסיסי מספרים' },
+    shortTitle: { en: 'Number Bases', he: 'בסיסי מספרים' },
+    description: { en: 'Convert whole numbers between decimal, binary, octal and hexadecimal.', he: 'המר מספרים שלמים בין Decimal, Binary, Octal ו־Hexadecimal.' },
+    metaDescription: { en: 'Convert number bases online between decimal, binary, octal and hexadecimal.', he: 'המרת בסיסי מספרים אונליין בין Decimal, Binary, Octal ו־Hexadecimal.' },
+    keywords: { en: ['number base converter', 'binary decimal hex converter'], he: ['ממיר בסיסי מספרים', 'בינארי דצימלי הקס'] },
+    features: { en: ['Decimal', 'Binary', 'Octal and HEX'], he: ['Decimal', 'Binary', 'Octal ו־HEX'] },
+    guide: { en: ['Enter a whole number.', 'Use 0b, 0o or 0x prefixes when needed.', 'Convert to see all bases.'], he: ['הזן מספר שלם.', 'השתמש ב־0b, 0o או 0x לפי הצורך.', 'המר כדי לראות את כל הבסיסים.'] },
+    examples: [
+      { label: { en: 'Decimal', he: 'Decimal' }, input: '255' },
+      { label: { en: 'Binary', he: 'Binary' }, input: '0b11111111' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['decimal-to-hex', 'hex-to-decimal', 'text-to-binary']
+  },
+  {
+    slug: 'random-number-generator',
+    converterId: 'randomNumberGenerator',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'numbers',
+    new: true,
+    title: { en: 'Random Number Generator', he: 'מחולל מספרים אקראיים' },
+    shortTitle: { en: 'Random Numbers', he: 'מספרים אקראיים' },
+    description: { en: 'Generate random whole numbers from a count, minimum and maximum range.', he: 'צור מספרים שלמים אקראיים לפי כמות, מינימום ומקסימום.' },
+    metaDescription: { en: 'Random number generator online. Enter count, min and max to generate numbers locally.', he: 'מחולל מספרים אקראיים אונליין. הזן כמות, מינימום ומקסימום ליצירה מקומית.' },
+    keywords: { en: ['random number generator', 'random number picker'], he: ['מחולל מספרים אקראיים', 'מספר רנדומלי'] },
+    features: { en: ['Custom range', 'Multiple numbers', 'Local generation'], he: ['טווח מותאם', 'כמה מספרים', 'יצירה מקומית'] },
+    guide: { en: ['Enter count, minimum and maximum.', 'Convert to generate numbers.', 'Copy the list.'], he: ['הזן כמות, מינימום ומקסימום.', 'המר ליצירת מספרים.', 'העתק את הרשימה.'] },
+    examples: [
+      { label: { en: 'Ten numbers 1-100', he: 'עשרה מספרים 1-100' }, input: '10, 1, 100' },
+      { label: { en: 'One dice roll', he: 'הטלת קובייה אחת' }, input: '1, 1, 6' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['uuid-generator', 'average-calculator', 'number-base-converter']
+  },
+  {
     slug: 'jwt-decoder',
     converterId: 'jwtDecoder',
     category: 'developer',
@@ -1548,7 +1709,7 @@ export const converters: ConverterTool[] = [
     guide: { en: ['Paste a JWT.', 'Decode header and payload.', 'Do not treat this as signature verification.'], he: ['הדבק JWT.', 'פענח header ו־payload.', 'אל תתייחס לזה כאימות חתימה.'] },
     examples: [{ label: { en: 'Sample JWT', he: 'JWT לדוגמה' }, input: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGFuYSIsImFkbWluIjpmYWxzZX0.signature' }],
     faq: [faq.private, faq.free],
-    related: ['base64-decode', 'json-formatter']
+    related: ['jwt-expiration-checker', 'base64-decode', 'json-formatter']
   }
 ];
 

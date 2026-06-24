@@ -588,6 +588,31 @@ function decodeJwtPart(part: string): unknown {
   }
 }
 
+const morseMap: Record<string, string> = {
+  a: '.-', b: '-...', c: '-.-.', d: '-..', e: '.', f: '..-.', g: '--.', h: '....', i: '..',
+  j: '.---', k: '-.-', l: '.-..', m: '--', n: '-.', o: '---', p: '.--.', q: '--.-', r: '.-.',
+  s: '...', t: '-', u: '..-', v: '...-', w: '.--', x: '-..-', y: '-.--', z: '--..',
+  '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....',
+  '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+  '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.', '!': '-.-.--', '/': '-..-.',
+  '(': '-.--.', ')': '-.--.-', '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-',
+  '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.'
+};
+
+const reverseMorseMap = Object.fromEntries(Object.entries(morseMap).map(([letter, code]) => [code, letter]));
+
+function parseBigIntAuto(input: string): bigint {
+  const trimmed = input.trim().replace(/_/g, '');
+  const sign = trimmed.startsWith('-') ? -1n : 1n;
+  const unsigned = trimmed.replace(/^[+-]/, '');
+  if (/^0b[01]+$/i.test(unsigned)) return sign * BigInt(unsigned);
+  if (/^0o[0-7]+$/i.test(unsigned)) return sign * BigInt(unsigned);
+  if (/^0x[0-9a-f]+$/i.test(unsigned)) return sign * BigInt(unsigned);
+  if (/^[+-]?[0-9]+$/i.test(trimmed)) return BigInt(trimmed);
+  if (/^[0-9a-f]+$/i.test(unsigned) && /[a-f]/i.test(unsigned)) return sign * BigInt(`0x${unsigned}`);
+  throw new Error('Invalid number: enter a whole decimal, binary, octal or hexadecimal number.');
+}
+
 export const converterFunctions: Record<string, ConverterFunction> = {
   jsonToCsv(input, options) {
     const delimiter = selectOption(options, 'delimiter', ',');
@@ -856,6 +881,39 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, countStats(output));
   },
 
+  textToMorse(input) {
+    const unsupported = new Set<string>();
+    const words = input.toLowerCase().split(/\s+/).filter(Boolean);
+    const output = words.map((word) =>
+      Array.from(word).map((char) => {
+        const code = morseMap[char];
+        if (!code) {
+          unsupported.add(char);
+          return '';
+        }
+        return code;
+      }).filter(Boolean).join(' ')
+    ).join(' / ');
+    return result(output, { characters: input.length, words: words.length }, unsupported.size ? [`Skipped unsupported characters: ${[...unsupported].join(' ')}`] : undefined);
+  },
+
+  morseToText(input) {
+    const trimmed = input.trim();
+    if (!trimmed) throw new Error('Invalid Morse code: paste dots and dashes separated by spaces.');
+    const unknown = new Set<string>();
+    const output = trimmed.split(/\s*\/\s*/).map((word) =>
+      word.trim().split(/\s+/).filter(Boolean).map((code) => {
+        const letter = reverseMorseMap[code];
+        if (!letter) {
+          unknown.add(code);
+          return '?';
+        }
+        return letter;
+      }).join('')
+    ).join(' ');
+    return result(output, countStats(output), unknown.size ? [`Unknown Morse symbols were replaced with ?: ${[...unknown].join(' ')}`] : undefined);
+  },
+
   textCase(input) {
     const output = [
       `UPPERCASE: ${input.toUpperCase()}`,
@@ -1031,6 +1089,19 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { digits: output.length });
   },
 
+  numberBaseConverter(input) {
+    const value = parseBigIntAuto(input);
+    const sign = value < 0n ? '-' : '';
+    const absolute = value < 0n ? -value : value;
+    const output = [
+      `Decimal: ${value.toString(10)}`,
+      `Binary: ${sign}0b${absolute.toString(2)}`,
+      `Octal: ${sign}0o${absolute.toString(8)}`,
+      `Hex: ${sign}0x${absolute.toString(16).toUpperCase()}`
+    ].join('\n');
+    return result(output, { digits: absolute.toString(10).length });
+  },
+
   uuidGenerator(input) {
     const rawCount = Number(input.trim());
     if (!Number.isInteger(rawCount) || rawCount < 1) {
@@ -1039,6 +1110,17 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const count = Math.min(rawCount, 100);
     const output = Array.from({ length: count }, randomUuid).join('\n');
     return result(output, { count }, rawCount > 100 ? ['Generated the first 100 UUIDs to keep the output manageable.'] : undefined);
+  },
+
+  randomNumberGenerator(input) {
+    const [rawCount = 1, rawMin = 1, rawMax = 100] = parseNumericValues(input, 1, 'random number generation');
+    const count = Math.min(Math.max(Math.round(rawCount), 1), 100);
+    const min = Math.ceil(Math.min(rawMin, rawMax));
+    const max = Math.floor(Math.max(rawMin, rawMax));
+    if (min > max) throw new Error('Invalid random number range: minimum must be lower than or equal to maximum.');
+    const span = max - min + 1;
+    const numbers = Array.from({ length: count }, () => String(Math.floor(Math.random() * span) + min));
+    return result(numbers.join('\n'), { count, min, max }, rawCount > 100 ? ['Generated the first 100 numbers to keep the output manageable.'] : undefined);
   },
 
   percentageOf(input) {
@@ -1142,6 +1224,17 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Orientation: ${width === height ? 'square' : width > height ? 'landscape' : 'portrait'}`,
       `Size: ${formatNumber(width)} × ${formatNumber(height)}`
     ], { width, height, ratioWidth, ratioHeight });
+  },
+
+  ruleOfThreeCalculator(input) {
+    const [a, b, c] = parseNumericValues(input, 3, 'rule of three calculation');
+    if (a === 0) throw new Error('Invalid rule of three calculation: the first value cannot be 0.');
+    const x = (b * c) / a;
+    return calculatorOutput([
+      `${formatNumber(a)} is to ${formatNumber(b)} as ${formatNumber(c)} is to ${formatNumber(x)}`,
+      `X = ${formatNumber(x)}`,
+      `Formula: ${formatNumber(b)} × ${formatNumber(c)} / ${formatNumber(a)}`
+    ], { a, b, c, x });
   },
 
   timestampToDate(input, options) {
@@ -1282,6 +1375,49 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ].join('\n'), { characters: length, remaining: Math.max(0, 160 - length), status });
   },
 
+  robotsTxtTester(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim());
+    const directives = lines.filter((line) => line && !line.startsWith('#'));
+    const userAgents = directives.filter((line) => /^user-agent\s*:/i.test(line));
+    const disallow = directives.filter((line) => /^disallow\s*:/i.test(line));
+    const allow = directives.filter((line) => /^allow\s*:/i.test(line));
+    const sitemaps = directives.filter((line) => /^sitemap\s*:/i.test(line));
+    const warnings = [
+      userAgents.length ? '' : 'No User-agent directive found.',
+      directives.some((line) => /^disallow\s*:\s*\/\s*$/i.test(line)) ? 'Disallow: / blocks all crawlers for that user-agent.' : ''
+    ].filter(Boolean);
+    return result([
+      `User-agent directives: ${userAgents.length}`,
+      `Allow directives: ${allow.length}`,
+      `Disallow directives: ${disallow.length}`,
+      `Sitemap directives: ${sitemaps.length}`,
+      `Non-comment directives: ${directives.length}`
+    ].join('\n'), { userAgents: userAgents.length, allow: allow.length, disallow: disallow.length, sitemaps: sitemaps.length }, warnings.length ? warnings : undefined);
+  },
+
+  sitemapUrlCounter(input) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(input, 'application/xml');
+    if (xml.getElementsByTagName('parsererror').length) {
+      throw new Error('Invalid sitemap XML: check that the XML is well formed.');
+    }
+    const urls = Array.from(xml.getElementsByTagName('loc')).map((node) => node.textContent?.trim()).filter(Boolean);
+    const uniqueUrls = new Set(urls);
+    const hosts = new Set(urls.map((url) => {
+      try {
+        return new URL(url).hostname;
+      } catch {
+        return 'invalid-url';
+      }
+    }));
+    return result([
+      `URLs: ${urls.length}`,
+      `Unique URLs: ${uniqueUrls.size}`,
+      `Duplicate URLs: ${urls.length - uniqueUrls.size}`,
+      `Hosts: ${[...hosts].join(', ') || 'none'}`
+    ].join('\n'), { urls: urls.length, uniqueUrls: uniqueUrls.size, duplicates: urls.length - uniqueUrls.size });
+  },
+
   jwtDecoder(input) {
     const parts = input.trim().split('.');
     if (parts.length < 2) throw new Error('Invalid JWT: paste a token with at least header and payload separated by dots.');
@@ -1302,6 +1438,29 @@ export const converterFunctions: Record<string, ConverterFunction> = {
         }
       }
     );
+  },
+
+  jwtExpirationChecker(input) {
+    const parts = input.trim().split('.');
+    if (parts.length < 2) throw new Error('Invalid JWT: paste a token with at least header and payload separated by dots.');
+    const payload = decodeJwtPart(parts[1]);
+    if (!payload || typeof payload !== 'object') {
+      throw new Error('Invalid JWT: payload must be a JSON object.');
+    }
+    const exp = (payload as JsonObject).exp;
+    if (typeof exp !== 'number') {
+      throw new Error('JWT payload does not include a numeric exp claim.');
+    }
+    const expiresAt = new Date(exp * 1000);
+    const now = Date.now();
+    const secondsRemaining = Math.floor((expiresAt.getTime() - now) / 1000);
+    const status = secondsRemaining > 0 ? 'valid' : 'expired';
+    return result([
+      `Status: ${status}`,
+      `Expires at UTC: ${expiresAt.toISOString()}`,
+      `Unix exp: ${exp}`,
+      `Seconds remaining: ${secondsRemaining}`
+    ].join('\n'), { exp, secondsRemaining, status }, ['This tool decodes JWT content only. It does not verify the signature.']);
   }
 };
 
