@@ -7,7 +7,7 @@ import type { Locale } from '../types';
 import '../styles/global.css';
 
 interface AnalyticsContext {
-  pageType: 'home' | 'category' | 'tool';
+  pageType: 'home' | 'category' | 'tool' | 'dashboard';
   locale: Locale;
   category?: string;
   tool?: string;
@@ -20,11 +20,23 @@ interface Props {
   description: string;
   canonicalPath: string;
   alternateSlug?: string;
+  indexable?: boolean;
+  includeAlternates?: boolean;
   jsonLd?: Record<string, unknown>[];
   analyticsContext?: AnalyticsContext;
 }
 
-const { locale, title, description, canonicalPath, alternateSlug = '', jsonLd = [], analyticsContext } = Astro.props;
+const {
+  locale,
+  title,
+  description,
+  canonicalPath,
+  alternateSlug = '',
+  indexable = true,
+  includeAlternates = true,
+  jsonLd = [],
+  analyticsContext
+} = Astro.props;
 const labels = ui[locale];
 const otherLocale = locale === 'he' ? 'en' : 'he';
 const alternatePath = alternateSlug ? `/${otherLocale}/${alternateSlug}/` : `/${otherLocale}/`;
@@ -39,10 +51,10 @@ const pageContext = analyticsContext ?? { pageType: 'home', locale };
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="robots" content={indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'} />
     <link rel="canonical" href={canonicalUrl} />
-    {locales.map((lang) => <link rel="alternate" hreflang={lang} href={`${siteUrl}/${lang}/${alternateSlug ? `${alternateSlug}/` : ''}`} />)}
-    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/en/${alternateSlug ? `${alternateSlug}/` : ''}`} />
+    {includeAlternates && locales.map((lang) => <link rel="alternate" hreflang={lang} href={`${siteUrl}/${lang}/${alternateSlug ? `${alternateSlug}/` : ''}`} />)}
+    {includeAlternates && <link rel="alternate" hreflang="x-default" href={`${siteUrl}/en/${alternateSlug ? `${alternateSlug}/` : ''}`} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName[locale]} />
     <meta property="og:title" content={title} />

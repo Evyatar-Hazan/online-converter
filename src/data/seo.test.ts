@@ -35,6 +35,8 @@ describe('SEO surfaces', () => {
     for (const path of urls) {
       expect(`${siteUrl}${path}`).toMatch(/^https:\/\/online-converter\.evyatarhazan\.com\/(en|he)\//);
     }
+
+    expect(urls).not.toContain('/analytics/');
   });
 
   it('keeps robots.txt open for indexing and points to the sitemap', () => {

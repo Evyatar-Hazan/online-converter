@@ -2,7 +2,7 @@
 import type { Locale } from '../types';
 
 interface AnalyticsContext {
-  pageType: 'home' | 'category' | 'tool';
+  pageType: 'home' | 'category' | 'tool' | 'dashboard';
   locale: Locale;
   category?: string;
   tool?: string;
@@ -17,7 +17,13 @@ const cloudflareToken = import.meta.env.PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN;
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
 const { context } = Astro.props;
 const initialEvent =
-  context.pageType === 'tool' ? 'view_tool' : context.pageType === 'category' ? 'view_category' : 'view_home';
+  context.pageType === 'tool'
+    ? 'view_tool'
+    : context.pageType === 'category'
+      ? 'view_category'
+      : context.pageType === 'dashboard'
+        ? 'view_dashboard'
+        : 'view_home';
 ---
 
 {cloudflareToken && (
@@ -54,6 +60,11 @@ const initialEvent =
   }
 
   window.onlineConverterTrack = track;
+  window.onlineConverterAnalytics = {
+    provider: plausibleDomain ? 'plausible' : 'dataLayer',
+    hasCloudflareBeacon: Boolean(document.currentScript?.previousElementSibling?.getAttribute?.('data-cf-beacon')),
+    context
+  };
 
   window.addEventListener('online-converter:event', (event) => {
     const detail = event.detail || {};

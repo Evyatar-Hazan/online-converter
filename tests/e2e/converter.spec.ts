@@ -168,6 +168,18 @@ test('home search and category filters emit analytics without raw query text', a
     .toBe(true);
 });
 
+test('analytics dashboard is internal and summarizes tracking readiness', async ({ page }) => {
+  await page.goto('/analytics/');
+  await expect(page).toHaveTitle(/Analytics Dashboard/);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  await expect(page.locator('h1')).toContainText('Analytics readiness');
+  await expect(page.getByText('Public SEO pages')).toBeVisible();
+  await expect(page.getByText('244')).toBeVisible();
+  await expect(page.getByText('view_tool')).toBeVisible();
+  await expect(page.getByText('convert_tool')).toBeVisible();
+  await expect(page.getByText('Cloudflare Web Analytics')).toBeVisible();
+});
+
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');

@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { analyticsCategoryRows, analyticsEvents, analyticsProviders, analyticsSummary } from '../data/analytics-dashboard';
+import { siteName } from '../data/site';
+
+const title = `Analytics Dashboard | ${siteName.en}`;
+const description = 'Internal analytics readiness dashboard for Online Converter traffic, tool usage, SEO coverage and ad visibility instrumentation.';
+const readyProviders = analyticsProviders.filter((provider) => provider.status === 'ready').length;
+---
+
+<BaseLayout
+  locale="en"
+  title={title}
+  description={description}
+  canonicalPath="/analytics/"
+  indexable={false}
+  includeAlternates={false}
+  analyticsContext={{ pageType: 'dashboard', locale: 'en' }}
+>
+  <section class="analytics-hero">
+    <div>
+      <p class="eyebrow">Internal dashboard</p>
+      <h1>Analytics readiness</h1>
+      <p>
+        Operational view for tracking SEO coverage, converter usage, ad-slot visibility and provider readiness without exposing personal data or raw user input.
+      </p>
+    </div>
+    <div class="analytics-status-panel" aria-label="Analytics status">
+      <span>Providers ready</span>
+      <strong>{readyProviders}/{analyticsProviders.length}</strong>
+      <small>{analyticsSummary.trackedEvents} tracked events mapped</small>
+    </div>
+  </section>
+
+  <section class="analytics-kpi-grid" aria-label="Analytics KPIs">
+    <article>
+      <span>Public SEO pages</span>
+      <strong>{analyticsSummary.publicSeoPages}</strong>
+      <small>Home, category and converter pages</small>
+    </article>
+    <article>
+      <span>Localized tool pages</span>
+      <strong>{analyticsSummary.localizedToolPages}</strong>
+      <small>Hebrew and English converter URLs</small>
+    </article>
+    <article>
+      <span>Converters</span>
+      <strong>{analyticsSummary.totalConverters}</strong>
+      <small>{analyticsSummary.categories} categories</small>
+    </article>
+    <article>
+      <span>Ad placements</span>
+      <strong>{analyticsSummary.adPlacements}</strong>
+      <small>Top, inline, sidebar and bottom</small>
+    </article>
+  </section>
+
+  <section class="analytics-grid">
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Provider status</p>
+        <h2>Data sources</h2>
+      </div>
+      <div class="analytics-provider-list">
+        {analyticsProviders.map((provider) => (
+          <div class="analytics-provider-row">
+            <div>
+              <strong>{provider.name}</strong>
+              <span>{provider.role}</span>
+            </div>
+            <code>{provider.env}</code>
+            <mark data-status={provider.status}>{provider.status}</mark>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Event map</p>
+        <h2>Tracked product signals</h2>
+      </div>
+      <div class="analytics-event-list">
+        {analyticsEvents.map((event) => (
+          <div class="analytics-event-row">
+            <code>{event.name}</code>
+            <span>{event.purpose}</span>
+            <small>{event.owner} · {event.priority}</small>
+          </div>
+        ))}
+      </div>
+    </article>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading">
+      <p class="eyebrow">SEO inventory</p>
+      <h2>Coverage by category</h2>
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Tools</th>
+            <th>Localized pages</th>
+            <th>Popular</th>
+            <th>New</th>
+          </tr>
+        </thead>
+        <tbody>
+          {analyticsCategoryRows.map((row) => (
+            <tr>
+              <td>{row.label}</td>
+              <td>{row.tools}</td>
+              <td>{row.localizedPages}</td>
+              <td>{row.popular}</td>
+              <td>{row.newTools}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</BaseLayout>
