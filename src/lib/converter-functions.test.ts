@@ -36,6 +36,15 @@ describe('converter functions', () => {
     expect(changed.metadata?.to).toBe(';');
   });
 
+  it('sorts CSV rows and generates Markdown tables', () => {
+    const sorted = convert('csvListSorter', 'column=city\nname,city\nMaya,Tel Aviv\nAvi,Jerusalem\nNoa,Haifa');
+    expect(sorted.output).toBe('name,city\nNoa,Haifa\nAvi,Jerusalem\nMaya,Tel Aviv');
+    expect(sorted.metadata?.sortColumn).toBe('city');
+
+    const markdown = convert('csvToMarkdownTable', 'feature,status\nSEO,done\nAds,ready');
+    expect(markdown.output).toBe('| feature | status |\n| --- | --- |\n| SEO | done |\n| Ads | ready |');
+  });
+
   it('handles YAML and JSON conversion', () => {
     const yaml = convert('jsonToYaml', '{"app":"converter","enabled":true}');
     expect(yaml.output).toContain('app: converter');
@@ -139,6 +148,18 @@ describe('converter functions', () => {
     expect(uuids[0]).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 
+  it('formats JSON Schema and generates basic TypeScript', () => {
+    const schema = '{"title":"User","type":"object","required":["name"],"properties":{"name":{"type":"string"},"age":{"type":"integer"},"active":{"type":"boolean"}}}';
+    const formatted = convert('jsonSchemaFormatter', schema);
+    expect(formatted.output).toContain('"properties"');
+    expect(formatted.metadata?.properties).toBe(3);
+
+    const ts = convert('jsonSchemaToTypescript', schema);
+    expect(ts.output).toContain('export interface User');
+    expect(ts.output).toContain('name: string;');
+    expect(ts.output).toContain('age?: number;');
+  });
+
   it('converts text into SEO and editor helper formats', () => {
     expect(convert('textToCamelCase', 'user profile image').output).toBe('userProfileImage');
     expect(convert('textToSnakeCase', 'Customer Account Number').output).toBe('customer_account_number');
@@ -153,6 +174,7 @@ describe('converter functions', () => {
     expect(convert('removeLineNumbers', '01. Write draft\n02. Review copy').output).toBe('Write draft\nReview copy');
     expect(convert('metaTitleLengthChecker', 'JSON to CSV Converter - Free Online Tool').output).toContain('Status: good');
     expect(convert('metaDescriptionLengthChecker', 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.').output).toContain('Status: good');
+    expect(convert('textToNatoPhonetic', 'OC 2026').output).toBe('Oscar Charlie / Two Zero Two Six');
   });
 
   it('compares text blocks and lists', () => {
@@ -177,6 +199,9 @@ describe('converter functions', () => {
     expect(convert('aspectRatioCalculator', '1920, 1080').output).toContain('Aspect ratio: 16:9');
     expect(convert('ruleOfThreeCalculator', '2, 10, 5').output).toContain('X = 25');
     expect(convert('unitPriceCalculator', '24.90, 6').output).toContain('Unit price: 4.15');
+    expect(convert('businessDaysCalculator', '2026-06-01\n2026-06-10').output).toContain('Business days: 8');
+    expect(convert('ageCalculator', '1995-04-12\n2026-06-24').output).toContain('Age: 31 years, 2 months, 12 days');
+    expect(convert('httpStatusLookup', '404').output).toContain('Name: Not Found');
     const random = convert('randomNumberGenerator', '3, 1, 6').output.split('\n').map(Number);
     expect(random).toHaveLength(3);
     expect(random.every((value) => value >= 1 && value <= 6)).toBe(true);
@@ -244,11 +269,18 @@ describe('converter functions', () => {
     expect(() => convert('textDiffChecker', 'one\ntwo')).toThrow(/two text blocks/i);
     expect(() => convert('listDifference', 'one\ntwo')).toThrow(/two text blocks/i);
     expect(() => convert('csvColumnExtractor', 'column=missing\nname\nAvi')).toThrow(/CSV column not found/i);
+    expect(() => convert('csvListSorter', 'column=missing\nname\nAvi')).toThrow(/CSV sort column not found/i);
+    expect(() => convert('csvToMarkdownTable', 'name')).toThrow(/Markdown table/i);
+    expect(() => convert('jsonSchemaFormatter', '[]')).toThrow(/JSON Schema/i);
+    expect(() => convert('jsonSchemaToTypescript', '[]')).toThrow(/JSON Schema/i);
     expect(() => convert('percentageChange', '0, 25')).toThrow(/original value cannot be 0/i);
     expect(() => convert('ratioSimplifier', '16, 0')).toThrow(/Invalid ratio/i);
     expect(() => convert('aspectRatioCalculator', '16, 0')).toThrow(/Invalid aspect ratio/i);
     expect(() => convert('ruleOfThreeCalculator', '0, 10, 5')).toThrow(/first value cannot be 0/i);
     expect(() => convert('unitPriceCalculator', '10, 0')).toThrow(/quantity must be greater than 0/i);
+    expect(() => convert('businessDaysCalculator', '2026-06-01')).toThrow(/two dates/i);
+    expect(() => convert('ageCalculator', '2026-06-24\n1995-04-12')).toThrow(/birth date/i);
+    expect(() => convert('httpStatusLookup', '99')).toThrow(/HTTP status code/i);
     expect(() => convert('sitemapUrlCounter', '<urlset>')).toThrow(/Invalid sitemap XML/i);
     expect(() => convert('colorContrastChecker', '#fff')).toThrow(/two colors/i);
     expect(() => convert('cssGradientGenerator', '#fff')).toThrow(/two colors/i);

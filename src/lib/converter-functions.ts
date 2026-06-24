@@ -607,6 +607,25 @@ const morseMap: Record<string, string> = {
 
 const reverseMorseMap = Object.fromEntries(Object.entries(morseMap).map(([letter, code]) => [code, letter]));
 
+const natoMap: Record<string, string> = {
+  a: 'Alpha', b: 'Bravo', c: 'Charlie', d: 'Delta', e: 'Echo', f: 'Foxtrot', g: 'Golf', h: 'Hotel',
+  i: 'India', j: 'Juliett', k: 'Kilo', l: 'Lima', m: 'Mike', n: 'November', o: 'Oscar', p: 'Papa',
+  q: 'Quebec', r: 'Romeo', s: 'Sierra', t: 'Tango', u: 'Uniform', v: 'Victor', w: 'Whiskey',
+  x: 'X-ray', y: 'Yankee', z: 'Zulu',
+  '0': 'Zero', '1': 'One', '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five', '6': 'Six',
+  '7': 'Seven', '8': 'Eight', '9': 'Nine'
+};
+
+const httpStatusText: Record<number, string> = {
+  100: 'Continue', 101: 'Switching Protocols', 102: 'Processing', 200: 'OK', 201: 'Created',
+  202: 'Accepted', 204: 'No Content', 301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified',
+  307: 'Temporary Redirect', 308: 'Permanent Redirect', 400: 'Bad Request', 401: 'Unauthorized',
+  403: 'Forbidden', 404: 'Not Found', 405: 'Method Not Allowed', 409: 'Conflict',
+  410: 'Gone', 418: "I'm a teapot", 422: 'Unprocessable Content', 429: 'Too Many Requests',
+  500: 'Internal Server Error', 501: 'Not Implemented', 502: 'Bad Gateway', 503: 'Service Unavailable',
+  504: 'Gateway Timeout'
+};
+
 function parseBigIntAuto(input: string): bigint {
   const trimmed = input.trim().replace(/_/g, '');
   const sign = trimmed.startsWith('-') ? -1n : 1n;
@@ -660,6 +679,46 @@ function detectDevice(userAgent: string): string {
   if (/iPad|Tablet/i.test(userAgent)) return 'tablet';
   if (/Mobile|iPhone|Android/i.test(userAgent)) return 'mobile';
   return 'desktop';
+}
+
+function parseIsoDate(input: string, label: string): Date {
+  const value = new Date(`${input.trim()}T00:00:00Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input.trim()) || Number.isNaN(value.getTime())) {
+    throw new Error(`Invalid ${label}: use YYYY-MM-DD.`);
+  }
+  return value;
+}
+
+function dateLines(input: string, label: string): [Date, Date] {
+  const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+  if (lines.length < 2) {
+    throw new Error(`${label} expects two dates, one per line, using YYYY-MM-DD.`);
+  }
+  return [parseIsoDate(lines[0], 'start date'), parseIsoDate(lines[1], 'end date')];
+}
+
+function schemaTypeToTs(value: unknown): string {
+  if (!value || typeof value !== 'object') return 'unknown';
+  const schema = value as JsonObject;
+  const type = schema.type;
+  if (Array.isArray(type)) {
+    return type.map((item) => schemaTypeToTs({ ...schema, type: item })).join(' | ');
+  }
+  if (type === 'string') return 'string';
+  if (type === 'integer' || type === 'number') return 'number';
+  if (type === 'boolean') return 'boolean';
+  if (type === 'null') return 'null';
+  if (type === 'array') return `${schemaTypeToTs(schema.items)}[]`;
+  if (type === 'object' || schema.properties) {
+    const properties = schema.properties && typeof schema.properties === 'object' ? schema.properties as JsonObject : {};
+    const required = new Set(Array.isArray(schema.required) ? schema.required.map(String) : []);
+    const lines = Object.entries(properties).map(([key, property]) => `  ${key}${required.has(key) ? '' : '?'}: ${schemaTypeToTs(property)};`);
+    return lines.length ? `{\n${lines.join('\n')}\n}` : 'Record<string, unknown>';
+  }
+  if (Array.isArray(schema.enum)) {
+    return schema.enum.map((item) => JSON.stringify(item)).join(' | ');
+  }
+  return 'unknown';
 }
 
 export const converterFunctions: Record<string, ConverterFunction> = {
@@ -769,6 +828,41 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     });
   },
 
+  csvListSorter(input) {
+    const [columnLine = '', ...csvLines] = input.split(/\r\n|\r|\n/);
+    const target = columnLine.replace(/^column=/i, '').trim();
+    if (!target || !csvLines.length) {
+      throw new Error('CSV list sorter expects column=name or column=2 on the first line, then CSV data.');
+    }
+    const rows = csvRows(csvLines.join('\n'), ',');
+    if (rows.length < 2) {
+      throw new Error('CSV list sorter expects a header row and at least one data row.');
+    }
+    const headers = rows[0].map((header) => header.trim());
+    const numericIndex = /^\d+$/.test(target) ? Number(target) - 1 : -1;
+    const index = numericIndex >= 0 ? numericIndex : headers.findIndex((header) => header.toLocaleLowerCase() === target.toLocaleLowerCase());
+    if (index < 0 || index >= headers.length) {
+      throw new Error(`CSV sort column not found: ${target}. Use a header name or a 1-based column number.`);
+    }
+    const sorted = rows.slice(1).sort((left, right) => (left[index] ?? '').localeCompare(right[index] ?? '', undefined, { numeric: true }));
+    const output = [headers, ...sorted].map((row) => row.map(csvCell).join(',')).join('\n');
+    return result(output, { rows: sorted.length, columns: headers.length, sortColumn: headers[index] || String(index + 1) });
+  },
+
+  csvToMarkdownTable(input) {
+    const rows = csvRows(input, ',');
+    if (rows.length < 2) {
+      throw new Error('CSV to Markdown table expects a header row and at least one data row.');
+    }
+    const headers = rows[0].map((cell) => cell.trim());
+    const separator = headers.map(() => '---');
+    const escapeCell = (cell: string) => cell.replace(/\|/g, '\\|').replace(/\r?\n|\r/g, ' ').trim();
+    const output = [headers, separator, ...rows.slice(1)]
+      .map((row) => `| ${row.map(escapeCell).join(' | ')} |`)
+      .join('\n');
+    return result(output, { rows: rows.length - 1, columns: headers.length });
+  },
+
   jsonToXml(input) {
     const data = parseJson(input);
     const body = jsonToXmlValue(data, 1);
@@ -826,6 +920,32 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const data = parseJson(input);
     const output = JSON.stringify(data, null, indent);
     return result(output, { ...countStats(output), indent }, undefined, jsonPreview(data));
+  },
+
+  jsonSchemaFormatter(input, options) {
+    const indent = Math.min(8, Math.max(2, numberOption(options, 'indent', 2)));
+    const schema = parseJson(input);
+    if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
+      throw new Error('Invalid JSON Schema: paste a JSON schema object.');
+    }
+    const output = JSON.stringify(schema, null, indent);
+    const object = schema as JsonObject;
+    const properties = object.properties && typeof object.properties === 'object' ? Object.keys(object.properties as JsonObject).length : 0;
+    const required = Array.isArray(object.required) ? object.required.length : 0;
+    return result(output, { properties, required, indent }, undefined, jsonPreview(schema));
+  },
+
+  jsonSchemaToTypescript(input) {
+    const schema = parseJson(input);
+    if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
+      throw new Error('Invalid JSON Schema: paste a JSON schema object.');
+    }
+    const title = typeof (schema as JsonObject).title === 'string' ? String((schema as JsonObject).title).replace(/[^\p{L}\p{N}_]/gu, '') : 'GeneratedType';
+    const body = schemaTypeToTs(schema);
+    const output = body.startsWith('{')
+      ? `export interface ${title || 'GeneratedType'} ${body}`
+      : `export type ${title || 'GeneratedType'} = ${body};`;
+    return result(output, { characters: output.length });
   },
 
   jsonMinifier(input) {
@@ -995,6 +1115,20 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       }).join('')
     ).join(' ');
     return result(output, countStats(output), unknown.size ? [`Unknown Morse symbols were replaced with ?: ${[...unknown].join(' ')}`] : undefined);
+  },
+
+  textToNatoPhonetic(input) {
+    const unsupported = new Set<string>();
+    const output = Array.from(input.toLocaleLowerCase()).map((char) => {
+      if (char === ' ' || char === '\n' || char === '\t') return '/';
+      const word = natoMap[char];
+      if (!word) {
+        unsupported.add(char);
+        return '';
+      }
+      return word;
+    }).filter(Boolean).join(' ');
+    return result(output, { characters: input.length }, unsupported.size ? [`Skipped unsupported characters: ${[...unsupported].join(' ')}`] : undefined);
   },
 
   textCase(input) {
@@ -1376,6 +1510,53 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ], { price, quantity, unitPrice: formatNumber(unitPrice, 4) });
   },
 
+  businessDaysCalculator(input) {
+    let [start, end] = dateLines(input, 'Business days calculator');
+    if (start > end) {
+      [start, end] = [end, start];
+    }
+    let days = 0;
+    let businessDays = 0;
+    const cursor = new Date(start);
+    while (cursor <= end) {
+      days += 1;
+      const weekday = cursor.getUTCDay();
+      if (weekday !== 0 && weekday !== 6) businessDays += 1;
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+    return calculatorOutput([
+      `Business days: ${businessDays}`,
+      `Calendar days: ${days}`,
+      `Start: ${start.toISOString().slice(0, 10)}`,
+      `End: ${end.toISOString().slice(0, 10)}`
+    ], { businessDays, calendarDays: days });
+  },
+
+  ageCalculator(input) {
+    const [birthDate, rawEndDate] = dateLines(input, 'Age calculator');
+    const endDate = rawEndDate ?? new Date();
+    if (birthDate > endDate) {
+      throw new Error('Invalid age calculation: birth date must be before the target date.');
+    }
+    let years = endDate.getUTCFullYear() - birthDate.getUTCFullYear();
+    let months = endDate.getUTCMonth() - birthDate.getUTCMonth();
+    let days = endDate.getUTCDate() - birthDate.getUTCDate();
+    if (days < 0) {
+      months -= 1;
+      days += new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), 0)).getUTCDate();
+    }
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+    return calculatorOutput([
+      `Age: ${years} years, ${months} months, ${days} days`,
+      `Years: ${years}`,
+      `Months after last birthday: ${months}`,
+      `Days after last month: ${days}`
+    ], { years, months, days });
+  },
+
   timestampToDate(input, options) {
     const raw = Number(input.trim());
     if (!Number.isFinite(raw)) throw new Error('Invalid timestamp: paste a numeric Unix timestamp in seconds or milliseconds.');
@@ -1606,6 +1787,20 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       raw: userAgent
     };
     return result(JSON.stringify(parsed, null, 2), { isBot: String(parsed.isBot), device: parsed.device }, undefined, jsonPreview(parsed));
+  },
+
+  httpStatusLookup(input) {
+    const code = Number(input.trim());
+    if (!Number.isInteger(code) || code < 100 || code > 599) {
+      throw new Error('Invalid HTTP status code: enter a whole number between 100 and 599.');
+    }
+    const text = httpStatusText[code] ?? 'Unknown status code';
+    const family = `${Math.floor(code / 100)}xx`;
+    return result([
+      `Code: ${code}`,
+      `Name: ${text}`,
+      `Family: ${family}`
+    ].join('\n'), { code, family });
   },
 
   jwtDecoder(input) {
