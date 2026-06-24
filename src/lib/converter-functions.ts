@@ -195,6 +195,12 @@ function csvCell(value: string): string {
   return /[",\n\r]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }
 
+function delimitedCell(value: string, delimiter: string): string {
+  return value.includes('"') || value.includes('\n') || value.includes('\r') || value.includes(delimiter)
+    ? `"${value.replace(/"/g, '""')}"`
+    : value;
+}
+
 function tsvCell(value: string): string {
   return value.replace(/\t/g, ' ').replace(/\r?\n|\r/g, ' ');
 }
@@ -613,6 +619,49 @@ function parseBigIntAuto(input: string): bigint {
   throw new Error('Invalid number: enter a whole decimal, binary, octal or hexadecimal number.');
 }
 
+function splitTwoBlocks(input: string, label: string): [string[], string[]] {
+  const lines = input.split(/\r\n|\r|\n/);
+  const separatorIndex = lines.findIndex((line) => line.trim() === '---');
+  if (separatorIndex < 0) {
+    throw new Error(`${label} expects two text blocks separated by a line containing ---.`);
+  }
+  return [lines.slice(0, separatorIndex), lines.slice(separatorIndex + 1)];
+}
+
+function colorToCss(input: string): string {
+  const [r, g, b] = parseColorLine(input);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function detectBrowser(userAgent: string): string {
+  const checks: Array<[RegExp, string]> = [
+    [/Edg\/([\d.]+)/, 'Microsoft Edge'],
+    [/OPR\/([\d.]+)/, 'Opera'],
+    [/Chrome\/([\d.]+)/, 'Chrome'],
+    [/Firefox\/([\d.]+)/, 'Firefox'],
+    [/Version\/([\d.]+).*Safari\//, 'Safari'],
+    [/Safari\/([\d.]+)/, 'Safari']
+  ];
+  const match = checks.find(([pattern]) => pattern.test(userAgent));
+  return match ? match[1] : 'Unknown';
+}
+
+function detectOs(userAgent: string): string {
+  if (/Windows NT/i.test(userAgent)) return 'Windows';
+  if (/Android/i.test(userAgent)) return 'Android';
+  if (/(iPhone|iPad|iPod)/i.test(userAgent)) return 'iOS';
+  if (/Mac OS X/i.test(userAgent)) return 'macOS';
+  if (/Linux/i.test(userAgent)) return 'Linux';
+  return 'Unknown';
+}
+
+function detectDevice(userAgent: string): string {
+  if (/bot|crawler|spider|crawling/i.test(userAgent)) return 'bot';
+  if (/iPad|Tablet/i.test(userAgent)) return 'tablet';
+  if (/Mobile|iPhone|Android/i.test(userAgent)) return 'mobile';
+  return 'desktop';
+}
+
 export const converterFunctions: Record<string, ConverterFunction> = {
   jsonToCsv(input, options) {
     const delimiter = selectOption(options, 'delimiter', ',');
@@ -684,6 +733,40 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     const rows = parseTsvRows(input);
     const output = rows.map((row) => row.map(csvCell).join(',')).join('\n');
     return result(output, { rows: rows.length, columns: rows[0]?.length ?? 0 });
+  },
+
+  csvColumnExtractor(input, options) {
+    const [columnLine = '', ...csvLines] = input.split(/\r\n|\r|\n/);
+    const target = columnLine.replace(/^column=/i, '').trim();
+    if (!target || !csvLines.length) {
+      throw new Error('CSV column extractor expects column=name or column=2 on the first line, then CSV data.');
+    }
+    const delimiter = selectOption(options, 'delimiter', ',');
+    const rows = csvRows(csvLines.join('\n'), delimiter);
+    if (!rows.length) {
+      throw new Error('CSV column extractor expects CSV headers and at least one data row.');
+    }
+    const headers = rows[0].map((header) => header.trim());
+    const numericIndex = /^\d+$/.test(target) ? Number(target) - 1 : -1;
+    const index = numericIndex >= 0 ? numericIndex : headers.findIndex((header) => header.toLocaleLowerCase() === target.toLocaleLowerCase());
+    if (index < 0 || index >= headers.length) {
+      throw new Error(`CSV column not found: ${target}. Use a header name or a 1-based column number.`);
+    }
+    const values = rows.slice(1).map((row) => row[index] ?? '');
+    return result(values.join('\n'), { rows: values.length, column: headers[index] || String(index + 1) });
+  },
+
+  csvDelimiterChanger(input, options) {
+    const fromDelimiter = selectOption(options, 'fromDelimiter', ',');
+    const toDelimiter = selectOption(options, 'toDelimiter', ';');
+    const rows = csvRows(input, fromDelimiter);
+    const output = rows.map((row) => row.map((cell) => delimitedCell(cell, toDelimiter)).join(toDelimiter)).join('\n');
+    return result(output, {
+      rows: rows.length,
+      columns: rows[0]?.length ?? 0,
+      from: fromDelimiter === '\t' ? 'tab' : fromDelimiter,
+      to: toDelimiter === '\t' ? 'tab' : toDelimiter
+    });
   },
 
   jsonToXml(input) {
@@ -1077,6 +1160,49 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(lines.join('\n'), { lines: lines.length, removed: originalLines.length - lines.length });
   },
 
+  textDiffChecker(input) {
+    const [left, right] = splitTwoBlocks(input, 'Text diff checker');
+    const rightSet = new Set(right);
+    const leftSet = new Set(left);
+    const added = right.filter((line) => !leftSet.has(line));
+    const removed = left.filter((line) => !rightSet.has(line));
+    const unchanged = left.filter((line) => rightSet.has(line));
+    const output = [
+      `Added lines: ${added.length}`,
+      `Removed lines: ${removed.length}`,
+      `Unchanged lines: ${unchanged.length}`,
+      '',
+      'Added:',
+      ...(added.length ? added.map((line) => `+ ${line}`) : ['none']),
+      '',
+      'Removed:',
+      ...(removed.length ? removed.map((line) => `- ${line}`) : ['none'])
+    ].join('\n');
+    return result(output, { added: added.length, removed: removed.length, unchanged: unchanged.length });
+  },
+
+  listDifference(input) {
+    const [left, right] = splitTwoBlocks(input, 'List difference');
+    const first = left.map((line) => line.trim()).filter(Boolean);
+    const second = right.map((line) => line.trim()).filter(Boolean);
+    const firstSet = new Set(first);
+    const secondSet = new Set(second);
+    const onlyFirst = [...firstSet].filter((item) => !secondSet.has(item));
+    const onlySecond = [...secondSet].filter((item) => !firstSet.has(item));
+    const both = [...firstSet].filter((item) => secondSet.has(item));
+    const output = [
+      'Only in first list:',
+      ...(onlyFirst.length ? onlyFirst : ['none']),
+      '',
+      'Only in second list:',
+      ...(onlySecond.length ? onlySecond : ['none']),
+      '',
+      'In both lists:',
+      ...(both.length ? both : ['none'])
+    ].join('\n');
+    return result(output, { onlyFirst: onlyFirst.length, onlySecond: onlySecond.length, common: both.length });
+  },
+
   decimalToHex(input) {
     const value = parseIntegerInput(input, 10);
     const output = `0x${value.toString(16).toUpperCase()}`;
@@ -1237,6 +1363,19 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ], { a, b, c, x });
   },
 
+  unitPriceCalculator(input) {
+    const [price, quantity] = parseNumericValues(input, 2, 'unit price calculation');
+    if (price < 0 || quantity <= 0) {
+      throw new Error('Invalid unit price calculation: price must be positive and quantity must be greater than 0.');
+    }
+    const unitPrice = price / quantity;
+    return calculatorOutput([
+      `Unit price: ${formatNumber(unitPrice, 4)}`,
+      `Total price: ${formatNumber(price)}`,
+      `Quantity: ${formatNumber(quantity)}`
+    ], { price, quantity, unitPrice: formatNumber(unitPrice, 4) });
+  },
+
   timestampToDate(input, options) {
     const raw = Number(input.trim());
     if (!Number.isFinite(raw)) throw new Error('Invalid timestamp: paste a numeric Unix timestamp in seconds or milliseconds.');
@@ -1351,6 +1490,42 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     ].join('\n'), { ratio: formatNumber(ratio, 2), normalAa: String(normalAa), largeAa: String(largeAa) });
   },
 
+  cssGradientGenerator(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      throw new Error('CSS gradient generator expects two colors and an optional angle, one per line.');
+    }
+    const start = colorToCss(lines[0]);
+    const end = colorToCss(lines[1]);
+    const rawAngle = lines[2] ?? '90deg';
+    const angle = /^\d+(?:deg|turn|rad|grad)?$/i.test(rawAngle) ? rawAngle.replace(/^(\d+)$/i, '$1deg') : '90deg';
+    const gradient = `linear-gradient(${angle}, ${start}, ${end})`;
+    return result([
+      `background: ${gradient};`,
+      `background-image: ${gradient};`
+    ].join('\n'), { angle, colors: 2 }, undefined, colorPreview('CSS gradient', gradient, { angle }));
+  },
+
+  hexOpacityConverter(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      throw new Error('HEX opacity converter expects a HEX color on line 1 and opacity percent on line 2.');
+    }
+    const [r, g, b] = parseHex(lines[0]);
+    const opacity = Number(lines[1].replace('%', ''));
+    if (!Number.isFinite(opacity) || opacity < 0 || opacity > 100) {
+      throw new Error('Invalid opacity: enter a number between 0 and 100.');
+    }
+    const alpha = Math.round((opacity / 100) * 255);
+    const hex = `#${[r, g, b, alpha].map((item) => item.toString(16).padStart(2, '0')).join('')}`;
+    const rgba = `rgba(${r}, ${g}, ${b}, ${formatNumber(opacity / 100, 2)})`;
+    return result([
+      `HEX with alpha: ${hex}`,
+      `RGBA: ${rgba}`,
+      `Alpha channel: ${alpha}`
+    ].join('\n'), { opacity, alpha }, undefined, colorPreview('RGBA color', rgba, { opacity, alpha }));
+  },
+
   metaTitleLengthChecker(input) {
     const title = input.trim();
     const length = Array.from(title).length;
@@ -1416,6 +1591,21 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Duplicate URLs: ${urls.length - uniqueUrls.size}`,
       `Hosts: ${[...hosts].join(', ') || 'none'}`
     ].join('\n'), { urls: urls.length, uniqueUrls: uniqueUrls.size, duplicates: urls.length - uniqueUrls.size });
+  },
+
+  userAgentParser(input) {
+    const userAgent = input.trim();
+    if (!userAgent) {
+      throw new Error('User agent parser expects a browser, crawler or app user-agent string.');
+    }
+    const parsed = {
+      browser: detectBrowser(userAgent),
+      os: detectOs(userAgent),
+      device: detectDevice(userAgent),
+      isBot: /bot|crawler|spider|crawling/i.test(userAgent),
+      raw: userAgent
+    };
+    return result(JSON.stringify(parsed, null, 2), { isBot: String(parsed.isBot), device: parsed.device }, undefined, jsonPreview(parsed));
   },
 
   jwtDecoder(input) {

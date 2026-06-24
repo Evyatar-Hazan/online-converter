@@ -26,6 +26,16 @@ describe('converter functions', () => {
     expect(csv.metadata?.columns).toBe(2);
   });
 
+  it('extracts CSV columns and changes delimiters', () => {
+    const extracted = convert('csvColumnExtractor', 'column=city\nname,city,email\nAvi,Jerusalem,avi@example.com\nMaya,Tel Aviv,maya@example.com');
+    expect(extracted.output).toBe('Jerusalem\nTel Aviv');
+    expect(extracted.metadata?.column).toBe('city');
+
+    const changed = convert('csvDelimiterChanger', 'name,city,note\nAvi,Jerusalem,"one, two"', { fromDelimiter: ',', toDelimiter: ';' });
+    expect(changed.output).toBe('name;city;note\nAvi;Jerusalem;one, two');
+    expect(changed.metadata?.to).toBe(';');
+  });
+
   it('handles YAML and JSON conversion', () => {
     const yaml = convert('jsonToYaml', '{"app":"converter","enabled":true}');
     expect(yaml.output).toContain('app: converter');
@@ -145,6 +155,18 @@ describe('converter functions', () => {
     expect(convert('metaDescriptionLengthChecker', 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.').output).toContain('Status: good');
   });
 
+  it('compares text blocks and lists', () => {
+    const diff = convert('textDiffChecker', 'one\ntwo\nthree\n---\none\nthree\nfour');
+    expect(diff.output).toContain('Added lines: 1');
+    expect(diff.output).toContain('+ four');
+    expect(diff.output).toContain('- two');
+
+    const list = convert('listDifference', 'json\ncsv\ntext\n---\njson\nimage\ntext');
+    expect(list.output).toContain('Only in first list:\ncsv');
+    expect(list.output).toContain('Only in second list:\nimage');
+    expect(list.metadata?.common).toBe(2);
+  });
+
   it('calculates percentages, discounts, averages and ratios', () => {
     expect(convert('percentageOf', '20, 150').output).toContain('20% of 150 = 30');
     expect(convert('percentageChange', '100, 125').output).toContain('Change: 25%');
@@ -154,10 +176,23 @@ describe('converter functions', () => {
     expect(convert('ratioSimplifier', '1920:1080').output).toContain('Simplified ratio: 16:9');
     expect(convert('aspectRatioCalculator', '1920, 1080').output).toContain('Aspect ratio: 16:9');
     expect(convert('ruleOfThreeCalculator', '2, 10, 5').output).toContain('X = 25');
+    expect(convert('unitPriceCalculator', '24.90, 6').output).toContain('Unit price: 4.15');
     const random = convert('randomNumberGenerator', '3, 1, 6').output.split('\n').map(Number);
     expect(random).toHaveLength(3);
     expect(random.every((value) => value >= 1 && value <= 6)).toBe(true);
     expect(convert('colorContrastChecker', '#111827\n#ffffff').output).toContain('WCAG AA normal text: Pass');
+    expect(convert('cssGradientGenerator', '#4f46e5\n#14b8a6\n135deg').output).toContain('linear-gradient(135deg');
+    expect(convert('hexOpacityConverter', '#4f46e5\n60').output).toContain('#4f46e599');
+  });
+
+  it('parses user agent strings', () => {
+    const parsed = JSON.parse(convert('userAgentParser', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36').output);
+    expect(parsed).toMatchObject({
+      browser: 'Chrome',
+      os: 'macOS',
+      device: 'desktop',
+      isBot: false
+    });
   });
 
   it('checks JWT expiration without verifying signatures', () => {
@@ -206,12 +241,19 @@ describe('converter functions', () => {
     expect(() => convert('removeCharacters', 'abc')).toThrow(/Character remover/i);
     expect(() => convert('prefixSuffixLines', 'prefix=-')).toThrow(/Prefix\/suffix/i);
     expect(() => convert('findReplaceText', 'find=\nreplace=x\ntext')).toThrow(/Find and replace/i);
+    expect(() => convert('textDiffChecker', 'one\ntwo')).toThrow(/two text blocks/i);
+    expect(() => convert('listDifference', 'one\ntwo')).toThrow(/two text blocks/i);
+    expect(() => convert('csvColumnExtractor', 'column=missing\nname\nAvi')).toThrow(/CSV column not found/i);
     expect(() => convert('percentageChange', '0, 25')).toThrow(/original value cannot be 0/i);
     expect(() => convert('ratioSimplifier', '16, 0')).toThrow(/Invalid ratio/i);
     expect(() => convert('aspectRatioCalculator', '16, 0')).toThrow(/Invalid aspect ratio/i);
     expect(() => convert('ruleOfThreeCalculator', '0, 10, 5')).toThrow(/first value cannot be 0/i);
+    expect(() => convert('unitPriceCalculator', '10, 0')).toThrow(/quantity must be greater than 0/i);
     expect(() => convert('sitemapUrlCounter', '<urlset>')).toThrow(/Invalid sitemap XML/i);
     expect(() => convert('colorContrastChecker', '#fff')).toThrow(/two colors/i);
+    expect(() => convert('cssGradientGenerator', '#fff')).toThrow(/two colors/i);
+    expect(() => convert('hexOpacityConverter', '#4f46e5\n120')).toThrow(/Invalid opacity/i);
+    expect(() => convert('userAgentParser', '')).toThrow(/user-agent/i);
     expect(() => convert('jwtExpirationChecker', 'abc.def')).toThrow(/Invalid JWT/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
   });

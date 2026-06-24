@@ -50,6 +50,31 @@ const csvOutputOptions = [
   }
 ];
 
+const csvDelimiterChangeOptions = [
+  {
+    id: 'fromDelimiter',
+    type: 'select' as const,
+    defaultValue: ',',
+    label: { en: 'From delimiter', he: 'ממפריד' },
+    choices: [
+      { value: ',', label: { en: 'Comma', he: 'פסיק' } },
+      { value: ';', label: { en: 'Semicolon', he: 'נקודה-פסיק' } },
+      { value: '\t', label: { en: 'Tab', he: 'טאב' } }
+    ]
+  },
+  {
+    id: 'toDelimiter',
+    type: 'select' as const,
+    defaultValue: ';',
+    label: { en: 'To delimiter', he: 'למפריד' },
+    choices: [
+      { value: ',', label: { en: 'Comma', he: 'פסיק' } },
+      { value: ';', label: { en: 'Semicolon', he: 'נקודה-פסיק' } },
+      { value: '\t', label: { en: 'Tab', he: 'טאב' } }
+    ]
+  }
+];
+
 const csvInputOptions = [
   ...csvOutputOptions,
   {
@@ -1693,6 +1718,152 @@ export const converters: ConverterTool[] = [
     ],
     faq: [faq.private, faq.free],
     related: ['uuid-generator', 'average-calculator', 'number-base-converter']
+  },
+  {
+    slug: 'text-diff-checker',
+    converterId: 'textDiffChecker',
+    category: 'text',
+    inputType: 'text',
+    outputType: 'diff',
+    new: true,
+    title: { en: 'Text Diff Checker', he: 'בודק הבדלים בטקסט' },
+    shortTitle: { en: 'Text Diff', he: 'הבדלי טקסט' },
+    description: { en: 'Compare two text blocks and see added, removed and unchanged lines.', he: 'השווה שני קטעי טקסט וראה שורות שנוספו, הוסרו או נשארו ללא שינוי.' },
+    metaDescription: { en: 'Free text diff checker. Compare two text blocks online and find added or removed lines in your browser.', he: 'בודק הבדלים בטקסט בחינם. השווה שני קטעי טקסט ומצא שורות שנוספו או הוסרו בדפדפן.' },
+    keywords: { en: ['text diff checker', 'compare text online', 'text compare'], he: ['השוואת טקסט', 'בודק הבדלים בטקסט', 'השוואת שורות'] },
+    features: { en: ['Added lines', 'Removed lines', 'Line comparison'], he: ['שורות שנוספו', 'שורות שהוסרו', 'השוואת שורות'] },
+    guide: { en: ['Paste the first text block.', 'Add a line with --- as the separator.', 'Paste the second text block and compare.'], he: ['הדבק את קטע הטקסט הראשון.', 'הוסף שורה עם --- כמפריד.', 'הדבק את הקטע השני והשווה.'] },
+    examples: [{ label: { en: 'Release notes', he: 'הערות גרסה' }, input: 'Add JSON tools\nFix mobile layout\nUpdate ads\n---\nAdd JSON tools\nImprove mobile layout\nUpdate ads\nAdd CSV tools' }],
+    faq: [faq.private, faq.free],
+    related: ['list-difference', 'find-replace', 'word-counter']
+  },
+  {
+    slug: 'list-difference',
+    converterId: 'listDifference',
+    category: 'text',
+    inputType: 'list',
+    outputType: 'list',
+    new: true,
+    title: { en: 'List Difference Tool', he: 'כלי השוואת רשימות' },
+    shortTitle: { en: 'List Difference', he: 'השוואת רשימות' },
+    description: { en: 'Compare two lists and find items that appear only in one list or in both.', he: 'השווה שתי רשימות ומצא פריטים שמופיעים רק ברשימה אחת או בשתיהן.' },
+    metaDescription: { en: 'Compare two lists online. Find only-left, only-right and shared items locally in your browser.', he: 'השוואת שתי רשימות אונליין. מצא פריטים ייחודיים ומשותפים ישירות בדפדפן.' },
+    keywords: { en: ['list difference', 'compare lists online', 'list compare'], he: ['השוואת רשימות', 'הבדלים בין רשימות', 'רשימות משותפות'] },
+    features: { en: ['Only in first', 'Only in second', 'Shared items'], he: ['רק בראשונה', 'רק בשנייה', 'פריטים משותפים'] },
+    guide: { en: ['Paste the first list.', 'Add a separator line containing ---.', 'Paste the second list and compare.'], he: ['הדבק את הרשימה הראשונה.', 'הוסף שורת הפרדה עם ---.', 'הדבק את הרשימה השנייה והשווה.'] },
+    examples: [{ label: { en: 'Keywords', he: 'מילות מפתח' }, input: 'json converter\ncsv converter\ntext tools\n---\njson converter\nimage converter\ntext tools' }],
+    faq: [faq.private, faq.free],
+    related: ['text-diff-checker', 'remove-duplicate-lines', 'sort-lines']
+  },
+  {
+    slug: 'csv-column-extractor',
+    converterId: 'csvColumnExtractor',
+    category: 'data',
+    inputType: 'csv',
+    outputType: 'lines',
+    new: true,
+    title: { en: 'CSV Column Extractor', he: 'חילוץ עמודה מ־CSV' },
+    shortTitle: { en: 'CSV Column', he: 'עמודת CSV' },
+    description: { en: 'Extract one column from a CSV file by header name or column number.', he: 'חלץ עמודה אחת מקובץ CSV לפי שם כותרת או מספר עמודה.' },
+    metaDescription: { en: 'Extract a CSV column online by header name or number. Browser-only CSV utility with copy and download.', he: 'חילוץ עמודה מ־CSV אונליין לפי שם או מספר. כלי CSV מקומי עם העתקה והורדה.' },
+    keywords: { en: ['csv column extractor', 'extract column from csv'], he: ['חילוץ עמודה מ CSV', 'עמודה CSV'] },
+    features: { en: ['Header names', 'Column numbers', 'Quoted CSV support'], he: ['שמות כותרות', 'מספרי עמודות', 'תמיכה במרכאות CSV'] },
+    guide: { en: ['Write column=name or column=2 on the first line.', 'Paste CSV below it.', 'Convert to get one value per line.'], he: ['כתוב column=name או column=2 בשורה הראשונה.', 'הדבק CSV מתחת.', 'המר לקבלת ערך אחד בכל שורה.'] },
+    examples: [{ label: { en: 'City column', he: 'עמודת עיר' }, input: 'column=city\nname,city,email\nAvi,Jerusalem,avi@example.com\nMaya,Tel Aviv,maya@example.com' }],
+    options: csvOutputOptions,
+    faq: [faq.private, faq.free],
+    related: ['csv-delimiter-changer', 'csv-to-json', 'csv-to-tsv']
+  },
+  {
+    slug: 'csv-delimiter-changer',
+    converterId: 'csvDelimiterChanger',
+    category: 'data',
+    inputType: 'csv',
+    outputType: 'csv',
+    new: true,
+    title: { en: 'CSV Delimiter Changer', he: 'החלפת מפריד CSV' },
+    shortTitle: { en: 'CSV Delimiter', he: 'מפריד CSV' },
+    description: { en: 'Change CSV delimiter between comma, semicolon and tab while preserving quoted values.', he: 'החלף מפריד CSV בין פסיק, נקודה-פסיק וטאב תוך שמירה על ערכים במרכאות.' },
+    metaDescription: { en: 'Change CSV delimiter online from comma to semicolon, tab or back. Runs locally in your browser.', he: 'החלפת מפריד CSV אונליין מפסיק לנקודה-פסיק, טאב או חזרה. פועל בדפדפן.' },
+    keywords: { en: ['csv delimiter changer', 'change csv delimiter', 'comma to semicolon csv'], he: ['החלפת מפריד CSV', 'פסיק לנקודה פסיק CSV'] },
+    features: { en: ['Comma', 'Semicolon', 'Tab'], he: ['פסיק', 'נקודה-פסיק', 'טאב'] },
+    guide: { en: ['Paste CSV.', 'Choose source and target delimiters.', 'Convert and download the changed CSV.'], he: ['הדבק CSV.', 'בחר מפריד מקור ויעד.', 'המר והורד את ה־CSV המעודכן.'] },
+    examples: [{ label: { en: 'Comma CSV', he: 'CSV עם פסיקים' }, input: 'name,city,note\nAvi,Jerusalem,"one, two"\nMaya,Tel Aviv,ready' }],
+    options: csvDelimiterChangeOptions,
+    faq: [faq.private, faq.free],
+    related: ['csv-column-extractor', 'csv-to-tsv', 'tsv-to-csv']
+  },
+  {
+    slug: 'user-agent-parser',
+    converterId: 'userAgentParser',
+    category: 'developer',
+    inputType: 'user agent',
+    outputType: 'json',
+    new: true,
+    title: { en: 'User Agent Parser', he: 'מפענח User Agent' },
+    shortTitle: { en: 'User Agent', he: 'User Agent' },
+    description: { en: 'Parse a user-agent string into browser, operating system, device type and bot status.', he: 'פענח מחרוזת User Agent לדפדפן, מערכת הפעלה, סוג מכשיר וסטטוס בוט.' },
+    metaDescription: { en: 'Parse user-agent strings online into browser, OS, device and bot details as JSON.', he: 'פענוח User Agent אונליין לדפדפן, מערכת הפעלה, מכשיר ובוט בפלט JSON.' },
+    keywords: { en: ['user agent parser', 'parse user agent', 'useragent checker'], he: ['פענוח user agent', 'בודק user agent'] },
+    features: { en: ['Browser detection', 'OS detection', 'Bot flag'], he: ['זיהוי דפדפן', 'זיהוי מערכת הפעלה', 'סימון בוט'] },
+    guide: { en: ['Paste a user-agent string.', 'Convert to parse it.', 'Use the JSON output for debugging logs.'], he: ['הדבק מחרוזת User Agent.', 'המר כדי לפענח.', 'השתמש בפלט JSON לדיבוג לוגים.'] },
+    examples: [{ label: { en: 'Chrome desktop', he: 'Chrome דסקטופ' }, input: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' }],
+    faq: [faq.private, faq.free],
+    related: ['url-parser', 'json-formatter', 'query-string-to-json']
+  },
+  {
+    slug: 'unit-price-calculator',
+    converterId: 'unitPriceCalculator',
+    category: 'calculator',
+    inputType: 'numbers',
+    outputType: 'calculation',
+    new: true,
+    title: { en: 'Unit Price Calculator', he: 'מחשבון מחיר ליחידה' },
+    shortTitle: { en: 'Unit Price', he: 'מחיר ליחידה' },
+    description: { en: 'Calculate price per unit from total price and quantity.', he: 'חשב מחיר ליחידה לפי מחיר כולל וכמות.' },
+    metaDescription: { en: 'Unit price calculator online. Enter total price and quantity to compare prices per item.', he: 'מחשבון מחיר ליחידה אונליין. הזן מחיר כולל וכמות להשוואת מחיר לפריט.' },
+    keywords: { en: ['unit price calculator', 'price per unit calculator'], he: ['מחשבון מחיר ליחידה', 'מחיר לפריט'] },
+    features: { en: ['Price per item', 'Bulk comparison', 'Simple formula'], he: ['מחיר לפריט', 'השוואת כמויות', 'נוסחה פשוטה'] },
+    guide: { en: ['Enter total price first.', 'Enter quantity second.', 'Convert to calculate unit price.'], he: ['הזן מחיר כולל ראשון.', 'הזן כמות שנייה.', 'המר לחישוב מחיר ליחידה.'] },
+    examples: [{ label: { en: 'Grocery pack', he: 'חבילה בסופר' }, input: '24.90, 6' }],
+    faq: [faq.private, faq.free],
+    related: ['discount-calculator', 'percentage-calculator', 'average-calculator']
+  },
+  {
+    slug: 'css-gradient-generator',
+    converterId: 'cssGradientGenerator',
+    category: 'color',
+    inputType: 'text',
+    outputType: 'css',
+    new: true,
+    title: { en: 'CSS Gradient Generator', he: 'מחולל גרדיאנט CSS' },
+    shortTitle: { en: 'CSS Gradient', he: 'גרדיאנט CSS' },
+    description: { en: 'Generate a CSS linear-gradient from two HEX or RGB colors and an optional angle.', he: 'צור CSS linear-gradient משני צבעי HEX או RGB וזווית אופציונלית.' },
+    metaDescription: { en: 'CSS gradient generator online. Create linear-gradient CSS from two colors in your browser.', he: 'מחולל גרדיאנט CSS אונליין. צור linear-gradient משני צבעים בדפדפן.' },
+    keywords: { en: ['css gradient generator', 'linear gradient css'], he: ['מחולל גרדיאנט CSS', 'linear gradient CSS'] },
+    features: { en: ['HEX or RGB', 'Optional angle', 'CSS output'], he: ['HEX או RGB', 'זווית אופציונלית', 'פלט CSS'] },
+    guide: { en: ['Enter the first color.', 'Enter the second color.', 'Optionally add an angle such as 135deg.'], he: ['הזן את הצבע הראשון.', 'הזן את הצבע השני.', 'אפשר להוסיף זווית כמו 135deg.'] },
+    examples: [{ label: { en: 'Indigo gradient', he: 'גרדיאנט אינדיגו' }, input: '#4f46e5\n#14b8a6\n135deg' }],
+    faq: [faq.private, faq.free],
+    related: ['hex-opacity-converter', 'color-contrast-checker', 'hex-to-rgb']
+  },
+  {
+    slug: 'hex-opacity-converter',
+    converterId: 'hexOpacityConverter',
+    category: 'color',
+    inputType: 'hex',
+    outputType: 'hex',
+    new: true,
+    title: { en: 'HEX Opacity Converter', he: 'ממיר שקיפות HEX' },
+    shortTitle: { en: 'HEX Opacity', he: 'שקיפות HEX' },
+    description: { en: 'Convert a HEX color and opacity percent into HEX alpha and RGBA values.', he: 'המר צבע HEX ואחוז שקיפות לערך HEX עם alpha ול־RGBA.' },
+    metaDescription: { en: 'HEX opacity converter online. Create 8-digit HEX alpha and RGBA values from a color and opacity percent.', he: 'ממיר שקיפות HEX אונליין. צור HEX בן 8 ספרות ו־RGBA מצבע ואחוז שקיפות.' },
+    keywords: { en: ['hex opacity converter', 'hex alpha converter', 'rgba to hex opacity'], he: ['ממיר שקיפות HEX', 'HEX alpha', 'RGBA שקיפות'] },
+    features: { en: ['8-digit HEX', 'RGBA output', 'Opacity percent'], he: ['HEX בן 8 ספרות', 'פלט RGBA', 'אחוז שקיפות'] },
+    guide: { en: ['Enter a HEX color on line 1.', 'Enter opacity percent on line 2.', 'Convert to get HEX alpha and RGBA.'], he: ['הזן צבע HEX בשורה 1.', 'הזן אחוז שקיפות בשורה 2.', 'המר לקבלת HEX alpha ו־RGBA.'] },
+    examples: [{ label: { en: 'Brand color 60%', he: 'צבע מותג 60%' }, input: '#4f46e5\n60' }],
+    faq: [faq.private, faq.free],
+    related: ['css-gradient-generator', 'hex-to-rgb', 'rgb-to-hex']
   },
   {
     slug: 'jwt-decoder',
