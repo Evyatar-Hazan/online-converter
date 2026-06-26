@@ -29,6 +29,7 @@ const searchIntents = ['convert', 'calculate', 'validate', 'format', 'decode', '
 
 type SearchIntent = (typeof searchIntents)[number];
 type OpportunityBand = 'high' | 'medium' | 'watch';
+type PriorityTier = 'tier-1' | 'tier-2' | 'tier-3';
 
 const getSearchIntent = (tool: (typeof converters)[number]): SearchIntent => {
   const slug = tool.slug.toLowerCase();
@@ -487,6 +488,52 @@ export const englishLongTailSummary = {
 
 export const priorityEnglishLongTailRows = [...englishLongTailRows]
   .sort((left, right) => right.score - left.score || Number(right.popular) - Number(left.popular) || left.slug.localeCompare(right.slug))
+  .slice(0, 24);
+
+const highValueIntents: SearchIntent[] = ['convert', 'calculate', 'validate', 'clean', 'decode'];
+
+export const searchDemandProxyRows = keywordIntentRows.map((row) => {
+  const hebrewRow = hebrewOpportunityRows.find((item) => item.slug === row.slug)!;
+  const englishRow = englishLongTailRows.find((item) => item.slug === row.slug)!;
+  let proxyScore = hebrewRow.score + englishRow.score;
+  const reasons = [...hebrewRow.reasons, ...englishRow.reasons];
+
+  if (highValueIntents.includes(row.intent)) {
+    proxyScore += 2;
+    reasons.push('intent maps directly to common utility demand');
+  }
+
+  if (row.popular) {
+    proxyScore += 2;
+    reasons.push('already marked as a business priority tool');
+  }
+
+  if (row.new) {
+    proxyScore += 1;
+    reasons.push('new page can gain traction early if improved fast');
+  }
+
+  const tier: PriorityTier = proxyScore >= 15 ? 'tier-1' : proxyScore >= 11 ? 'tier-2' : 'tier-3';
+
+  return {
+    ...row,
+    hebrewScore: hebrewRow.score,
+    englishScore: englishRow.score,
+    proxyScore,
+    tier,
+    reasons: [...new Set(reasons)]
+  };
+});
+
+export const searchDemandProxySummary = {
+  trackedConverters: searchDemandProxyRows.length,
+  tier1: searchDemandProxyRows.filter((row) => row.tier === 'tier-1').length,
+  tier2: searchDemandProxyRows.filter((row) => row.tier === 'tier-2').length,
+  tier3: searchDemandProxyRows.filter((row) => row.tier === 'tier-3').length
+};
+
+export const prioritySearchDemandProxyRows = [...searchDemandProxyRows]
+  .sort((left, right) => right.proxyScore - left.proxyScore || Number(right.popular) - Number(left.popular) || left.slug.localeCompare(right.slug))
   .slice(0, 24);
 
 export const indexingChecklistSummary = {

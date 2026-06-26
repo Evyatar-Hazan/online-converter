@@ -13,6 +13,8 @@ import {
   keywordMapSummary,
   rankingMonitorRows,
   rankingMonitorSummary,
+  searchDemandProxyRows,
+  searchDemandProxySummary,
   searchConsoleBaseline
 } from './analytics-dashboard';
 import { converters } from './converters';
@@ -108,6 +110,21 @@ describe('analytics dashboard ranking monitor', () => {
     for (const row of englishLongTailRows) {
       expect(row.score).toBeGreaterThan(0);
       expect(['high', 'medium', 'watch']).toContain(row.band);
+      expect(row.reasons.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('builds a proxy search-demand ranking for every converter', () => {
+    expect(searchDemandProxyRows).toHaveLength(converters.length);
+    expect(searchDemandProxySummary.trackedConverters).toBe(converters.length);
+    expect(searchDemandProxySummary.tier1 + searchDemandProxySummary.tier2 + searchDemandProxySummary.tier3).toBe(converters.length);
+    expect(searchDemandProxySummary.tier1).toBeGreaterThan(0);
+
+    for (const row of searchDemandProxyRows) {
+      expect(row.proxyScore).toBeGreaterThan(0);
+      expect(row.proxyScore).toBeGreaterThanOrEqual(row.hebrewScore);
+      expect(row.proxyScore).toBeGreaterThanOrEqual(row.englishScore);
+      expect(['tier-1', 'tier-2', 'tier-3']).toContain(row.tier);
       expect(row.reasons.length).toBeGreaterThan(0);
     }
   });
