@@ -28,6 +28,7 @@ const getKeywordMap = (tool: (typeof converters)[number], locale: 'en' | 'he') =
 const searchIntents = ['convert', 'calculate', 'validate', 'format', 'decode', 'clean', 'generate', 'explain'] as const;
 
 type SearchIntent = (typeof searchIntents)[number];
+type OpportunityBand = 'high' | 'medium' | 'watch';
 
 const getSearchIntent = (tool: (typeof converters)[number]): SearchIntent => {
   const slug = tool.slug.toLowerCase();
@@ -338,6 +339,64 @@ export const keywordIntentSummary = searchIntents.map((intent) => ({
 
 export const priorityIntentRows = keywordIntentRows
   .filter((row) => row.popular || row.new)
+  .slice(0, 24);
+
+const hebrewAdvantageIntents: SearchIntent[] = ['calculate', 'validate', 'clean', 'explain'];
+const hebrewAdvantageCategories = new Set(['text', 'calculator', 'developer', 'time']);
+
+const getHebrewOpportunity = (row: (typeof keywordIntentRows)[number]) => {
+  let score = 0;
+  const reasons: string[] = [];
+
+  if (row.primaryHebrewQuery.length >= 10) {
+    score += 2;
+    reasons.push('clear Hebrew exact-match query');
+  }
+
+  if (row.secondaryHebrewQueries.length >= 2) {
+    score += 1;
+    reasons.push('multiple Hebrew variants');
+  }
+
+  if (hebrewAdvantageIntents.includes(row.intent)) {
+    score += 2;
+    reasons.push('intent often underserved in Hebrew');
+  }
+
+  if (hebrewAdvantageCategories.has(row.category)) {
+    score += 1;
+    reasons.push('category fits Hebrew utility searches');
+  }
+
+  if (row.popular) {
+    score += 1;
+    reasons.push('already a priority converter');
+  }
+
+  if (row.new) {
+    score += 1;
+    reasons.push('new page with room to shape positioning early');
+  }
+
+  const band: OpportunityBand = score >= 6 ? 'high' : score >= 4 ? 'medium' : 'watch';
+
+  return { score, band, reasons };
+};
+
+export const hebrewOpportunityRows = keywordIntentRows.map((row) => ({
+  ...row,
+  ...getHebrewOpportunity(row)
+}));
+
+export const hebrewOpportunitySummary = {
+  trackedConverters: hebrewOpportunityRows.length,
+  high: hebrewOpportunityRows.filter((row) => row.band === 'high').length,
+  medium: hebrewOpportunityRows.filter((row) => row.band === 'medium').length,
+  watch: hebrewOpportunityRows.filter((row) => row.band === 'watch').length
+};
+
+export const priorityHebrewOpportunityRows = [...hebrewOpportunityRows]
+  .sort((left, right) => right.score - left.score || Number(right.popular) - Number(left.popular) || left.slug.localeCompare(right.slug))
   .slice(0, 24);
 
 export const indexingChecklistSummary = {

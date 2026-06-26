@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   analyticsSummary,
+  hebrewOpportunityRows,
+  hebrewOpportunitySummary,
   indexingChecklistSteps,
   indexingChecklistSummary,
   keywordIntentRows,
@@ -79,6 +81,19 @@ describe('analytics dashboard ranking monitor', () => {
         'generate',
         'explain'
       ]).toContain(row.intent);
+    }
+  });
+
+  it('prioritizes Hebrew opportunities for every converter', () => {
+    expect(hebrewOpportunityRows).toHaveLength(converters.length);
+    expect(hebrewOpportunitySummary.trackedConverters).toBe(converters.length);
+    expect(hebrewOpportunitySummary.high + hebrewOpportunitySummary.medium + hebrewOpportunitySummary.watch).toBe(converters.length);
+    expect(hebrewOpportunitySummary.high).toBeGreaterThan(0);
+
+    for (const row of hebrewOpportunityRows) {
+      expect(row.score).toBeGreaterThan(0);
+      expect(['high', 'medium', 'watch']).toContain(row.band);
+      expect(row.reasons.length).toBeGreaterThan(0);
     }
   });
 });

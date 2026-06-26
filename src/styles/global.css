@@ -1265,6 +1265,14 @@ summary {
   min-width: 1260px;
 }
 
+.intent-map-table {
+  min-width: 980px;
+}
+
+.opportunity-table {
+  min-width: 1240px;
+}
+
 .ranking-table a {
   color: var(--brand-strong);
   font-weight: 900;

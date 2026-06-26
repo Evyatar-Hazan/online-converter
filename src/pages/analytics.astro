@@ -5,10 +5,12 @@ import {
   analyticsEvents,
   analyticsProviders,
   analyticsSummary,
+  hebrewOpportunitySummary,
   indexingChecklistSteps,
   indexingChecklistSummary,
   keywordIntentSummary,
   keywordMapSummary,
+  priorityHebrewOpportunityRows,
   priorityIntentRows,
   priorityKeywordRows,
   priorityRankingRows,
@@ -344,6 +346,63 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
               <td><strong>{row.intent}</strong></td>
               <td>{row.primaryEnglishQuery}</td>
               <td dir="rtl">{row.primaryHebrewQuery}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Hebrew opportunity</p>
+        <h2>Priority Hebrew opportunities</h2>
+      </div>
+      <span class="analytics-date">Heuristic scoring</span>
+    </div>
+    <div class="ranking-summary-list">
+      <div>
+        <span>Tracked</span>
+        <strong>{hebrewOpportunitySummary.trackedConverters}</strong>
+      </div>
+      <div>
+        <span>High</span>
+        <strong>{hebrewOpportunitySummary.high}</strong>
+      </div>
+      <div>
+        <span>Medium</span>
+        <strong>{hebrewOpportunitySummary.medium}</strong>
+      </div>
+      <div>
+        <span>Watch</span>
+        <strong>{hebrewOpportunitySummary.watch}</strong>
+      </div>
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table opportunity-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Intent</th>
+            <th>Primary HE</th>
+            <th>Score</th>
+            <th>Band</th>
+            <th>Why now</th>
+          </tr>
+        </thead>
+        <tbody>
+          {priorityHebrewOpportunityRows.map((row) => (
+            <tr>
+              <td>
+                <a href={row.englishUrl}>{row.slug}</a>
+                <small>{row.hebrewUrl}</small>
+              </td>
+              <td><strong>{row.intent}</strong></td>
+              <td dir="rtl">{row.primaryHebrewQuery}</td>
+              <td>{row.score}</td>
+              <td>{row.band}</td>
+              <td>{row.reasons.join(' • ')}</td>
             </tr>
           ))}
         </tbody>
