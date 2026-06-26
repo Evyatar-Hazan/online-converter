@@ -26,5 +26,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: SEO build check
+        run: npm run seo:check
+
       - name: Lint
         run: npm run lint
