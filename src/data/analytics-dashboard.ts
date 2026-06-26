@@ -196,6 +196,65 @@ export const priorityRankingRows = rankingMonitorRows
   .filter((row) => row.priority !== 'P3')
   .slice(0, 24);
 
+export const indexingChecklistSummary = {
+  cadence: 'Weekly',
+  sitemapUrls: analyticsSummary.publicSeoPages,
+  priorityQueue: 20,
+  blockedByGoogle: true
+} as const;
+
+export const indexingChecklistSteps = [
+  {
+    step: '1',
+    label: 'Recheck Pages report',
+    owner: 'Search Console',
+    status: 'waiting',
+    detail: 'Open the Pages report and confirm whether Google still shows processing or has exposed indexed and excluded buckets.'
+  },
+  {
+    step: '2',
+    label: 'Compare sitemap count',
+    owner: 'Local + Search Console',
+    status: 'ready',
+    detail: `Confirm that ${analyticsSummary.publicSeoPages} public URLs still match the live sitemap before trusting indexing deltas.`
+  },
+  {
+    step: '3',
+    label: 'Review homepage and category hubs',
+    owner: 'Search Console',
+    status: 'ready',
+    detail: 'Check the homepage plus top category pages first because they feed internal links to every converter cluster.'
+  },
+  {
+    step: '4',
+    label: 'Inspect top 20 converters',
+    owner: 'Search Console',
+    status: 'ready',
+    detail: 'Run URL Inspection for the first 20 priority converter pages and record indexed, discovered, crawled or duplicate outcomes.'
+  },
+  {
+    step: '5',
+    label: 'Request indexing only for gaps',
+    owner: 'Search Console',
+    status: 'ready',
+    detail: 'Submit indexing requests only for high-value pages that are missing from Google or stuck without a clear exclusion reason.'
+  },
+  {
+    step: '6',
+    label: 'Watch technical blockers',
+    owner: 'Local',
+    status: 'automated',
+    detail: 'Keep canonical, hreflang, robots, sitemap and internal noindex checks green via the automated SEO build check.'
+  },
+  {
+    step: '7',
+    label: 'Promote pages with impressions',
+    owner: 'Search Console + Content',
+    status: 'waiting',
+    detail: 'When impressions appear, move those URLs into the ranking watchlist and improve copy, snippets and related links first.'
+  }
+] as const;
+
 export const analyticsCategoryRows = categoryKeys.map((category) => {
   const tools = converters.filter((tool) => tool.category === category);
   return {

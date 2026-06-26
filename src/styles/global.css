@@ -1220,6 +1220,14 @@ summary {
   align-items: center;
 }
 
+.analytics-checklist-row {
+  grid-template-columns: 72px minmax(0, 1fr) minmax(180px, auto);
+}
+
+.analytics-checklist-row code {
+  text-align: center;
+}
+
 .analytics-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);

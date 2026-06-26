@@ -5,6 +5,8 @@ import {
   analyticsEvents,
   analyticsProviders,
   analyticsSummary,
+  indexingChecklistSteps,
+  indexingChecklistSummary,
   priorityRankingRows,
   rankingMonitorSummary,
   rankingWorkflowSteps,
@@ -204,6 +206,43 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
         </div>
       </div>
     </article>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Indexing operations</p>
+        <h2>Weekly indexing checklist</h2>
+      </div>
+      <span class="analytics-date">{indexingChecklistSummary.cadence} review</span>
+    </div>
+    <div class="ranking-summary-list">
+      <div>
+        <span>Sitemap URLs</span>
+        <strong>{indexingChecklistSummary.sitemapUrls}</strong>
+      </div>
+      <div>
+        <span>Priority queue</span>
+        <strong>{indexingChecklistSummary.priorityQueue}</strong>
+      </div>
+      <div>
+        <span>Google block</span>
+        <strong>{indexingChecklistSummary.blockedByGoogle ? 'Yes' : 'No'}</strong>
+      </div>
+      <div>
+        <span>Automation</span>
+        <strong>SEO gate</strong>
+      </div>
+    </div>
+    <div class="analytics-event-list">
+      {indexingChecklistSteps.map((item) => (
+        <div class="analytics-event-row analytics-checklist-row">
+          <code>{item.step}</code>
+          <span>{item.detail}</span>
+          <small>{item.owner} · {item.status}</small>
+        </div>
+      ))}
+    </div>
   </section>
 
   <section class="analytics-panel analytics-panel-wide">

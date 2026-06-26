@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { analyticsSummary, rankingMonitorRows, rankingMonitorSummary, searchConsoleBaseline } from './analytics-dashboard';
+import {
+  analyticsSummary,
+  indexingChecklistSteps,
+  indexingChecklistSummary,
+  rankingMonitorRows,
+  rankingMonitorSummary,
+  searchConsoleBaseline
+} from './analytics-dashboard';
 import { converters } from './converters';
 
 describe('analytics dashboard ranking monitor', () => {
@@ -27,5 +34,14 @@ describe('analytics dashboard ranking monitor', () => {
   it('keeps SEO page totals aligned with the ranking monitor', () => {
     expect(analyticsSummary.localizedToolPages).toBe(rankingMonitorSummary.trackedLocalizedPages);
     expect(analyticsSummary.totalConverters).toBe(rankingMonitorSummary.trackedConverters);
+  });
+
+  it('keeps the weekly indexing checklist aligned with the public SEO surface', () => {
+    expect(indexingChecklistSummary.cadence).toBe('Weekly');
+    expect(indexingChecklistSummary.sitemapUrls).toBe(analyticsSummary.publicSeoPages);
+    expect(indexingChecklistSummary.priorityQueue).toBe(20);
+    expect(indexingChecklistSteps).toHaveLength(7);
+    expect(indexingChecklistSteps.some((step) => step.status === 'automated')).toBe(true);
+    expect(indexingChecklistSteps.some((step) => step.label === 'Inspect top 20 converters')).toBe(true);
   });
 });
