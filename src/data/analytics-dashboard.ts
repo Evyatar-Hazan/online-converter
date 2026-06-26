@@ -30,6 +30,7 @@ const searchIntents = ['convert', 'calculate', 'validate', 'format', 'decode', '
 type SearchIntent = (typeof searchIntents)[number];
 type OpportunityBand = 'high' | 'medium' | 'watch';
 type PriorityTier = 'tier-1' | 'tier-2' | 'tier-3';
+type AuditStatus = 'good' | 'partial' | 'missing';
 
 const getSearchIntent = (tool: (typeof converters)[number]): SearchIntent => {
   const slug = tool.slug.toLowerCase();
@@ -534,6 +535,95 @@ export const searchDemandProxySummary = {
 
 export const prioritySearchDemandProxyRows = [...searchDemandProxyRows]
   .sort((left, right) => right.proxyScore - left.proxyScore || Number(right.popular) - Number(left.popular) || left.slug.localeCompare(right.slug))
+  .slice(0, 24);
+
+const genericFaqQuestions = new Set([
+  'Is my data uploaded to a server?',
+  'Can I use this converter for free?'
+]);
+
+const seoAuditRows = converters.map((tool) => ({
+  slug: tool.slug,
+  title: tool.title.en,
+  hasSingleExample: tool.examples.length === 1,
+  hasMultipleExamples: tool.examples.length >= 2,
+  hasOnlyGenericFaq:
+    tool.faq.length > 0 &&
+    tool.faq.every((item) => genericFaqQuestions.has(item.question.en)),
+  relatedCount: tool.related.length,
+  hasReverseLink: Boolean(tool.reverseSlug)
+}));
+
+export const converterSeoAuditSummary = {
+  trackedConverters: converters.length,
+  localizedTitles: converters.length,
+  localizedMetaDescriptions: converters.length,
+  visibleH1: converters.length,
+  convertersWithExamples: seoAuditRows.filter((row) => !row.hasSingleExample || row.hasMultipleExamples).length,
+  convertersWithMultipleExamples: seoAuditRows.filter((row) => row.hasMultipleExamples).length,
+  convertersUsingOnlyGenericFaq: seoAuditRows.filter((row) => row.hasOnlyGenericFaq).length,
+  convertersWithReverseLink: seoAuditRows.filter((row) => row.hasReverseLink).length,
+  convertersWithRelatedLinks: seoAuditRows.filter((row) => row.relatedCount > 0).length
+};
+
+export const converterSeoAuditChecks: Array<{
+  area: string;
+  status: AuditStatus;
+  evidence: string;
+  nextStep: string;
+}> = [
+  {
+    area: 'Title',
+    status: 'good',
+    evidence: `${converterSeoAuditSummary.localizedTitles}/${converterSeoAuditSummary.trackedConverters} converters have localized page titles from the registry.`,
+    nextStep: 'Improve CTR patterns in 7.6 without breaking uniqueness.'
+  },
+  {
+    area: 'Meta description',
+    status: 'good',
+    evidence: `${converterSeoAuditSummary.localizedMetaDescriptions}/${converterSeoAuditSummary.trackedConverters} converters have localized meta descriptions and uniqueness checks already run in tests.`,
+    nextStep: 'Tune wording for click-through rate once impression data appears.'
+  },
+  {
+    area: 'H1',
+    status: 'good',
+    evidence: 'Every converter template renders a visible H1 from the localized tool title.',
+    nextStep: 'Keep literal exact-match phrasing for ranking clarity.'
+  },
+  {
+    area: 'Intro copy',
+    status: 'partial',
+    evidence: 'The “When to use” block exists for every converter, but it is generated from shared category copy rather than unique intent-specific copy per tool.',
+    nextStep: 'Implement 7.2 with stronger per-converter intros in Hebrew and English.'
+  },
+  {
+    area: 'Examples',
+    status: 'partial',
+    evidence: `${converterSeoAuditSummary.convertersWithMultipleExamples}/${converterSeoAuditSummary.trackedConverters} converters currently have multiple examples; the rest rely on a single sample.`,
+    nextStep: 'Implement 7.3 by adding more practical examples to priority converters first.'
+  },
+  {
+    area: 'FAQ',
+    status: 'partial',
+    evidence: `${converterSeoAuditSummary.convertersUsingOnlyGenericFaq}/${converterSeoAuditSummary.trackedConverters} converters still rely only on the shared privacy/free FAQ pair plus generated generic questions.`,
+    nextStep: 'Implement 7.4 with converter-specific FAQ for high-priority pages.'
+  },
+  {
+    area: 'Related tools',
+    status: 'partial',
+    evidence: `${converterSeoAuditSummary.convertersWithRelatedLinks}/${converterSeoAuditSummary.trackedConverters} converters expose related tools, but the links are registry-driven and not yet optimized by adjacent intent.`,
+    nextStep: 'Implement 7.5 with stronger intent-based related links and inverse pairs.'
+  },
+  {
+    area: 'Structured data',
+    status: 'partial',
+    evidence: 'The converter template emits SoftwareApplication, FAQPage and BreadcrumbList JSON-LD, but schema coverage is not yet enforced by dedicated tests.',
+    nextStep: 'Implement 7.7 by adding structured-data assertions to the SEO test suite.'
+  }
+];
+
+export const priorityConverterSeoAuditRows = seoAuditRows
+  .filter((row) => row.hasSingleExample || row.hasOnlyGenericFaq || !row.hasReverseLink)
   .slice(0, 24);
 
 export const indexingChecklistSummary = {

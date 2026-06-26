@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   analyticsSummary,
+  converterSeoAuditChecks,
+  converterSeoAuditSummary,
   englishLongTailRows,
   englishLongTailSummary,
   hebrewOpportunityRows,
@@ -127,5 +129,17 @@ describe('analytics dashboard ranking monitor', () => {
       expect(['tier-1', 'tier-2', 'tier-3']).toContain(row.tier);
       expect(row.reasons.length).toBeGreaterThan(0);
     }
+  });
+
+  it('audits converter page SEO template coverage', () => {
+    expect(converterSeoAuditSummary.trackedConverters).toBe(converters.length);
+    expect(converterSeoAuditSummary.localizedTitles).toBe(converters.length);
+    expect(converterSeoAuditSummary.localizedMetaDescriptions).toBe(converters.length);
+    expect(converterSeoAuditSummary.visibleH1).toBe(converters.length);
+    expect(converterSeoAuditSummary.convertersWithRelatedLinks).toBe(converters.length);
+    expect(converterSeoAuditChecks).toHaveLength(8);
+    expect(converterSeoAuditChecks.some((item) => item.status === 'partial')).toBe(true);
+    expect(converterSeoAuditSummary.convertersWithMultipleExamples).toBeLessThan(converters.length);
+    expect(converterSeoAuditSummary.convertersUsingOnlyGenericFaq).toBeGreaterThan(0);
   });
 });

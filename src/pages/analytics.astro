@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import {
   analyticsCategoryRows,
+  converterSeoAuditChecks,
+  converterSeoAuditSummary,
   analyticsEvents,
   analyticsProviders,
   analyticsSummary,
@@ -16,6 +18,7 @@ import {
   priorityIntentRows,
   priorityKeywordRows,
   priorityRankingRows,
+  priorityConverterSeoAuditRows,
   prioritySearchDemandProxyRows,
   rankingMonitorSummary,
   rankingWorkflowSteps,
@@ -523,6 +526,70 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
               <td>{row.proxyScore}</td>
               <td>{row.tier}</td>
               <td>{row.reasons.slice(0, 4).join(' • ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Converter page audit</p>
+        <h2>Template SEO coverage</h2>
+      </div>
+      <span class="analytics-date">Step 7.1</span>
+    </div>
+    <div class="ranking-summary-list">
+      <div>
+        <span>Tracked</span>
+        <strong>{converterSeoAuditSummary.trackedConverters}</strong>
+      </div>
+      <div>
+        <span>Multi-example</span>
+        <strong>{converterSeoAuditSummary.convertersWithMultipleExamples}</strong>
+      </div>
+      <div>
+        <span>Generic FAQ only</span>
+        <strong>{converterSeoAuditSummary.convertersUsingOnlyGenericFaq}</strong>
+      </div>
+      <div>
+        <span>Reverse links</span>
+        <strong>{converterSeoAuditSummary.convertersWithReverseLink}</strong>
+      </div>
+    </div>
+    <div class="analytics-event-list">
+      {converterSeoAuditChecks.map((item) => (
+        <div class="analytics-event-row">
+          <code>{item.area}</code>
+          <span>{item.evidence}</span>
+          <small>{item.status} · {item.nextStep}</small>
+        </div>
+      ))}
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table opportunity-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Examples</th>
+            <th>Generic FAQ only</th>
+            <th>Related</th>
+            <th>Reverse</th>
+          </tr>
+        </thead>
+        <tbody>
+          {priorityConverterSeoAuditRows.map((row) => (
+            <tr>
+              <td>
+                <a href={`/en/${row.slug}/`}>{row.slug}</a>
+                <small>{row.title}</small>
+              </td>
+              <td>{row.hasMultipleExamples ? '2+' : '1'}</td>
+              <td>{row.hasOnlyGenericFaq ? 'yes' : 'no'}</td>
+              <td>{row.relatedCount}</td>
+              <td>{row.hasReverseLink ? 'yes' : 'no'}</td>
             </tr>
           ))}
         </tbody>
