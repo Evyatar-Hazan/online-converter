@@ -9,6 +9,22 @@ const getPrimaryQuery = (tool: (typeof converters)[number], locale: 'en' | 'he')
   return normalizeQuery(firstKeyword || tool.shortTitle[locale] || tool.title[locale]);
 };
 
+const getKeywordMap = (tool: (typeof converters)[number], locale: 'en' | 'he') => {
+  const candidates = [...tool.keywords[locale], tool.shortTitle[locale], tool.title[locale]]
+    .map(normalizeQuery)
+    .filter(Boolean);
+
+  const deduped = candidates.filter((query, index) => {
+    const key = query.toLowerCase();
+    return candidates.findIndex((candidate) => candidate.toLowerCase() === key) === index;
+  });
+
+  return {
+    primary: deduped[0],
+    secondary: deduped.slice(1)
+  };
+};
+
 export const analyticsEvents = [
   {
     name: 'view_home',
@@ -194,6 +210,37 @@ export const rankingMonitorSummary = {
 
 export const priorityRankingRows = rankingMonitorRows
   .filter((row) => row.priority !== 'P3')
+  .slice(0, 24);
+
+export const keywordMapRows = converters.map((tool) => {
+  const englishKeywords = getKeywordMap(tool, 'en');
+  const hebrewKeywords = getKeywordMap(tool, 'he');
+
+  return {
+    slug: tool.slug,
+    category: tool.category,
+    categoryLabel: categoryLabels[tool.category].en,
+    popular: Boolean(tool.popular),
+    new: Boolean(tool.new),
+    englishUrl: `/en/${tool.slug}/`,
+    hebrewUrl: `/he/${tool.slug}/`,
+    primaryEnglishQuery: englishKeywords.primary,
+    secondaryEnglishQueries: englishKeywords.secondary,
+    primaryHebrewQuery: hebrewKeywords.primary,
+    secondaryHebrewQueries: hebrewKeywords.secondary
+  };
+});
+
+export const keywordMapSummary = {
+  trackedConverters: keywordMapRows.length,
+  mappedEnglishPrimary: keywordMapRows.filter((row) => row.primaryEnglishQuery).length,
+  mappedHebrewPrimary: keywordMapRows.filter((row) => row.primaryHebrewQuery).length,
+  mappedEnglishSecondary: keywordMapRows.filter((row) => row.secondaryEnglishQueries.length > 0).length,
+  mappedHebrewSecondary: keywordMapRows.filter((row) => row.secondaryHebrewQueries.length > 0).length
+};
+
+export const priorityKeywordRows = keywordMapRows
+  .filter((row) => row.popular || row.new)
   .slice(0, 24);
 
 export const indexingChecklistSummary = {

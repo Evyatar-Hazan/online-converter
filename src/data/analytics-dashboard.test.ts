@@ -3,6 +3,8 @@ import {
   analyticsSummary,
   indexingChecklistSteps,
   indexingChecklistSummary,
+  keywordMapRows,
+  keywordMapSummary,
   rankingMonitorRows,
   rankingMonitorSummary,
   searchConsoleBaseline
@@ -43,5 +45,19 @@ describe('analytics dashboard ranking monitor', () => {
     expect(indexingChecklistSteps).toHaveLength(7);
     expect(indexingChecklistSteps.some((step) => step.status === 'automated')).toBe(true);
     expect(indexingChecklistSteps.some((step) => step.label === 'Inspect top 20 converters')).toBe(true);
+  });
+
+  it('maps bilingual primary and secondary keywords for every converter', () => {
+    expect(keywordMapRows).toHaveLength(converters.length);
+    expect(keywordMapSummary.trackedConverters).toBe(converters.length);
+    expect(keywordMapSummary.mappedEnglishPrimary).toBe(converters.length);
+    expect(keywordMapSummary.mappedHebrewPrimary).toBe(converters.length);
+
+    for (const row of keywordMapRows) {
+      expect(row.primaryEnglishQuery.length).toBeGreaterThan(2);
+      expect(row.primaryHebrewQuery.length).toBeGreaterThan(2);
+      expect(row.secondaryEnglishQueries).not.toContain(row.primaryEnglishQuery);
+      expect(row.secondaryHebrewQueries).not.toContain(row.primaryHebrewQuery);
+    }
   });
 });

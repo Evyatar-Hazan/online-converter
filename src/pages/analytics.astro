@@ -7,6 +7,8 @@ import {
   analyticsSummary,
   indexingChecklistSteps,
   indexingChecklistSummary,
+  keywordMapSummary,
+  priorityKeywordRows,
   priorityRankingRows,
   rankingMonitorSummary,
   rankingWorkflowSteps,
@@ -242,6 +244,63 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           <small>{item.owner} · {item.status}</small>
         </div>
       ))}
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Keyword strategy</p>
+        <h2>Bilingual keyword map</h2>
+      </div>
+      <span class="analytics-date">Registry coverage</span>
+    </div>
+    <div class="ranking-summary-list">
+      <div>
+        <span>Converters mapped</span>
+        <strong>{keywordMapSummary.trackedConverters}</strong>
+      </div>
+      <div>
+        <span>EN primary</span>
+        <strong>{keywordMapSummary.mappedEnglishPrimary}</strong>
+      </div>
+      <div>
+        <span>HE primary</span>
+        <strong>{keywordMapSummary.mappedHebrewPrimary}</strong>
+      </div>
+      <div>
+        <span>Secondary coverage</span>
+        <strong>{keywordMapSummary.mappedEnglishSecondary}/{keywordMapSummary.mappedHebrewSecondary}</strong>
+      </div>
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table keyword-map-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>Primary EN</th>
+            <th>Secondary EN</th>
+            <th>Primary HE</th>
+            <th>Secondary HE</th>
+          </tr>
+        </thead>
+        <tbody>
+          {priorityKeywordRows.map((row) => (
+            <tr>
+              <td>
+                <a href={row.englishUrl}>{row.slug}</a>
+                <small>{row.hebrewUrl}</small>
+              </td>
+              <td>{row.categoryLabel}</td>
+              <td>{row.primaryEnglishQuery}</td>
+              <td>{row.secondaryEnglishQueries.join(' • ') || 'n/a'}</td>
+              <td dir="rtl">{row.primaryHebrewQuery}</td>
+              <td dir="rtl">{row.secondaryHebrewQueries.join(' • ') || 'n/a'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   </section>
 

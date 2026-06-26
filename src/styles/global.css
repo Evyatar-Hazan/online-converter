@@ -1261,6 +1261,10 @@ summary {
   min-width: 1120px;
 }
 
+.keyword-map-table {
+  min-width: 1260px;
+}
+
 .ranking-table a {
   color: var(--brand-strong);
   font-weight: 900;
