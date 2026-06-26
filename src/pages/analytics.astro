@@ -7,7 +7,9 @@ import {
   analyticsSummary,
   indexingChecklistSteps,
   indexingChecklistSummary,
+  keywordIntentSummary,
   keywordMapSummary,
+  priorityIntentRows,
   priorityKeywordRows,
   priorityRankingRows,
   rankingMonitorSummary,
@@ -297,6 +299,51 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
               <td>{row.secondaryEnglishQueries.join(' • ') || 'n/a'}</td>
               <td dir="rtl">{row.primaryHebrewQuery}</td>
               <td dir="rtl">{row.secondaryHebrewQueries.join(' • ') || 'n/a'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Intent map</p>
+        <h2>Search intent coverage</h2>
+      </div>
+      <span class="analytics-date">Registry classification</span>
+    </div>
+    <div class="ranking-summary-list">
+      {keywordIntentSummary.map((item) => (
+        <div>
+          <span>{item.intent}</span>
+          <strong>{item.count}</strong>
+        </div>
+      ))}
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table intent-map-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>Intent</th>
+            <th>Primary EN</th>
+            <th>Primary HE</th>
+          </tr>
+        </thead>
+        <tbody>
+          {priorityIntentRows.map((row) => (
+            <tr>
+              <td>
+                <a href={row.englishUrl}>{row.slug}</a>
+                <small>{row.hebrewUrl}</small>
+              </td>
+              <td>{row.categoryLabel}</td>
+              <td><strong>{row.intent}</strong></td>
+              <td>{row.primaryEnglishQuery}</td>
+              <td dir="rtl">{row.primaryHebrewQuery}</td>
             </tr>
           ))}
         </tbody>

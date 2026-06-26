@@ -3,6 +3,8 @@ import {
   analyticsSummary,
   indexingChecklistSteps,
   indexingChecklistSummary,
+  keywordIntentRows,
+  keywordIntentSummary,
   keywordMapRows,
   keywordMapSummary,
   rankingMonitorRows,
@@ -58,6 +60,25 @@ describe('analytics dashboard ranking monitor', () => {
       expect(row.primaryHebrewQuery.length).toBeGreaterThan(2);
       expect(row.secondaryEnglishQueries).not.toContain(row.primaryEnglishQuery);
       expect(row.secondaryHebrewQueries).not.toContain(row.primaryHebrewQuery);
+    }
+  });
+
+  it('assigns a search intent to every converter', () => {
+    expect(keywordIntentRows).toHaveLength(converters.length);
+    expect(keywordIntentSummary.reduce((sum, item) => sum + item.count, 0)).toBe(converters.length);
+    expect(keywordIntentSummary.every((item) => item.count > 0)).toBe(true);
+
+    for (const row of keywordIntentRows) {
+      expect([
+        'convert',
+        'calculate',
+        'validate',
+        'format',
+        'decode',
+        'clean',
+        'generate',
+        'explain'
+      ]).toContain(row.intent);
     }
   });
 });

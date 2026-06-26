@@ -25,6 +25,85 @@ const getKeywordMap = (tool: (typeof converters)[number], locale: 'en' | 'he') =
   };
 };
 
+const searchIntents = ['convert', 'calculate', 'validate', 'format', 'decode', 'clean', 'generate', 'explain'] as const;
+
+type SearchIntent = (typeof searchIntents)[number];
+
+const getSearchIntent = (tool: (typeof converters)[number]): SearchIntent => {
+  const slug = tool.slug.toLowerCase();
+  const converterId = tool.converterId.toLowerCase();
+
+  if (tool.category === 'calculator') {
+    return 'calculate';
+  }
+
+  if (
+    slug.includes('lookup') ||
+    slug.includes('parser') ||
+    slug.includes('explainer')
+  ) {
+    return 'explain';
+  }
+
+  if (
+    slug.includes('validator') ||
+    slug.includes('checker') ||
+    slug.includes('tester') ||
+    slug.includes('contrast-checker')
+  ) {
+    return 'validate';
+  }
+
+  if (
+    slug.includes('formatter') ||
+    slug.includes('minifier') ||
+    slug.includes('sorter') ||
+    slug.includes('generator') ||
+    slug.includes('json-path-extractor') ||
+    slug.includes('column-extractor')
+  ) {
+    return slug.includes('generator') ? 'generate' : 'format';
+  }
+
+  if (
+    slug.includes('decode') ||
+    slug.includes('decoder') ||
+    slug.includes('unescape') ||
+    slug.includes('binary-to-text') ||
+    slug.includes('morse-code-to-text') ||
+    slug.includes('jwt-decoder')
+  ) {
+    return 'decode';
+  }
+
+  if (
+    slug.includes('remove') ||
+    slug.includes('trim') ||
+    slug.includes('diff') ||
+    slug.includes('filter') ||
+    slug.includes('find-replace') ||
+    slug.includes('alphabetizer')
+  ) {
+    return 'clean';
+  }
+
+  if (
+    slug.includes('encode') ||
+    slug.includes('escape') ||
+    slug.includes('uuid-generator') ||
+    slug.includes('random-number-generator') ||
+    converterId.includes('generator')
+  ) {
+    return 'generate';
+  }
+
+  if (tool.inputType !== tool.outputType || slug.includes('-to-')) {
+    return 'convert';
+  }
+
+  return 'format';
+};
+
 export const analyticsEvents = [
   {
     name: 'view_home',
@@ -240,6 +319,24 @@ export const keywordMapSummary = {
 };
 
 export const priorityKeywordRows = keywordMapRows
+  .filter((row) => row.popular || row.new)
+  .slice(0, 24);
+
+export const keywordIntentRows = keywordMapRows.map((row) => {
+  const tool = converters.find((item) => item.slug === row.slug)!;
+
+  return {
+    ...row,
+    intent: getSearchIntent(tool)
+  };
+});
+
+export const keywordIntentSummary = searchIntents.map((intent) => ({
+  intent,
+  count: keywordIntentRows.filter((row) => row.intent === intent).length
+}));
+
+export const priorityIntentRows = keywordIntentRows
   .filter((row) => row.popular || row.new)
   .slice(0, 24);
 
