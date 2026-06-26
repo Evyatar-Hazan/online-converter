@@ -5,48 +5,8 @@ import ToolCard from '../../components/ToolCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { locales, siteName, siteUrl, ui } from '../../data/site';
+import { formatContentType, getConverterIntro } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
-
-function contentIntro(tool: ConverterTool, locale: Locale) {
-  const categoryText = {
-    data: {
-      en: 'Use this converter when data needs to move between spreadsheets, APIs, config files or reporting tools without changing the meaning of the original values.',
-      he: 'השתמש בממיר הזה כשצריך להעביר נתונים בין גיליונות, API, קבצי הגדרות או כלי דיווח בלי לשנות את משמעות הערכים המקוריים.'
-    },
-    text: {
-      en: 'This text tool is useful for cleaning lists, preparing content, editing copy and handling repeated formatting tasks quickly.',
-      he: 'כלי הטקסט הזה מתאים לניקוי רשימות, הכנת תוכן, עריכת טקסט וביצוע פעולות פורמט שחוזרות על עצמן במהירות.'
-    },
-    encoding: {
-      en: 'Use this utility when text has to be safely encoded, decoded or moved between URLs, forms, scripts and data payloads.',
-      he: 'השתמש בכלי הזה כאשר צריך לקודד, לפענח או להעביר טקסט בצורה בטוחה בין URL, טפסים, סקריפטים ומטעני נתונים.'
-    },
-    time: {
-      en: 'This date and time converter helps compare machine-readable timestamps with readable dates for logs, APIs and debugging.',
-      he: 'ממיר התאריכים והזמנים הזה עוזר להשוות בין timestamps שמיועדים למכונה לבין תאריכים קריאים ללוגים, API ודיבוג.'
-    },
-    developer: {
-      en: 'This developer utility is designed for quick inspection, formatting and cleanup while working with code, API responses or technical content.',
-      he: 'כלי הפיתוח הזה נועד לבדיקה מהירה, עיצוב וניקוי בזמן עבודה עם קוד, תגובות API או תוכן טכני.'
-    },
-    color: {
-      en: 'Use this color converter when moving between design tools, CSS values and frontend implementation details.',
-      he: 'השתמש בממיר הצבעים הזה כשצריך לעבור בין כלי עיצוב, ערכי CSS ופרטי יישום בפרונטאנד.'
-    },
-    calculator: {
-      en: 'Use this calculator for quick everyday math, pricing checks, percentage work and simple number summaries.',
-      he: 'השתמש במחשבון הזה לחישובים יומיומיים מהירים, בדיקת מחירים, אחוזים וסיכום מספרים פשוט.'
-    }
-  };
-
-  return contentIntroText(tool, categoryText[tool.category][locale], locale);
-}
-
-function contentIntroText(tool: ConverterTool, base: string, locale: Locale) {
-  return locale === 'he'
-    ? `${base} ${tool.shortTitle.he} רץ מקומית בדפדפן, כך שאפשר לבדוק קלט אמיתי, להעתיק תוצאה או להוריד קובץ בלי להעלות מידע לשרת.`
-    : `${base} ${tool.shortTitle.en} runs locally in the browser, so you can test real input, copy the result or download a file without uploading data to a server.`;
-}
 
 function exampleOutputNote(tool: ConverterTool, locale: Locale) {
   return locale === 'he'
@@ -54,51 +14,9 @@ function exampleOutputNote(tool: ConverterTool, locale: Locale) {
     : `The ${tool.shortTitle.en} example shows the input shape this tool expects. Load it with the sample button, change values and immediately see how the output changes.`;
 }
 
-function formatName(value: string) {
-  const names: Record<string, string> = {
-    json: 'JSON',
-    jsonl: 'JSONL',
-    csv: 'CSV',
-    xml: 'XML',
-    yaml: 'YAML',
-    html: 'HTML',
-    'escaped html': 'escaped HTML',
-    base64: 'Base64',
-    binary: 'binary',
-    decimal: 'decimal',
-    url: 'URL',
-    'query string': 'query string',
-    jwt: 'JWT',
-    hex: 'HEX',
-    rgb: 'RGB',
-    hsl: 'HSL',
-    cmyk: 'CMYK',
-    regex: 'Regex',
-    'unicode escape': 'Unicode escape',
-    count: 'count',
-    uuid: 'UUID',
-    numbers: 'numbers',
-    percentage: 'percentage',
-    calculation: 'calculation',
-    ratio: 'ratio',
-    'trimmed text': 'trimmed text',
-    'compact lines': 'compact lines',
-    'numbered lines': 'numbered lines',
-    'clean text': 'clean text',
-    'camel case': 'camelCase',
-    'snake case': 'snake_case',
-    'kebab case': 'kebab-case',
-    lines: 'lines',
-    'sorted lines': 'sorted lines',
-    'unique lines': 'unique lines'
-  };
-
-  return names[value] ?? value.replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
 function generatedFaq(tool: ConverterTool) {
-  const input = formatName(tool.inputType);
-  const output = formatName(tool.outputType);
+  const input = formatContentType(tool.inputType);
+  const output = formatContentType(tool.outputType);
   return [
     {
       question: {
@@ -308,7 +226,7 @@ const jsonLd = [
     <article class="content-panel content-panel-wide">
       <p class="eyebrow">{locale === 'he' ? 'שימוש מעשי' : 'Practical use'}</p>
       <h2>{locale === 'he' ? `מתי להשתמש ב־${tool.shortTitle[locale]}` : `When to use ${tool.shortTitle[locale]}`}</h2>
-      <p>{contentIntro(tool, locale)}</p>
+      <p>{getConverterIntro(tool, locale)}</p>
       <ul class="check-list">
         {tool.features[locale].map((feature) => <li>{feature}</li>)}
       </ul>

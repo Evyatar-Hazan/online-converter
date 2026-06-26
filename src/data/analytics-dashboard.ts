@@ -1,5 +1,6 @@
 import { converters } from './converters';
 import { categoryLabels, locales, siteUrl } from './site';
+import { getConverterIntro, getSearchIntent, searchIntents, type SearchIntent } from '../lib/converter-seo';
 
 const normalizeQuery = (query: string) => query.replace(/\s+/g, ' ').trim();
 
@@ -25,87 +26,9 @@ const getKeywordMap = (tool: (typeof converters)[number], locale: 'en' | 'he') =
   };
 };
 
-const searchIntents = ['convert', 'calculate', 'validate', 'format', 'decode', 'clean', 'generate', 'explain'] as const;
-
-type SearchIntent = (typeof searchIntents)[number];
 type OpportunityBand = 'high' | 'medium' | 'watch';
 type PriorityTier = 'tier-1' | 'tier-2' | 'tier-3';
 type AuditStatus = 'good' | 'partial' | 'missing';
-
-const getSearchIntent = (tool: (typeof converters)[number]): SearchIntent => {
-  const slug = tool.slug.toLowerCase();
-  const converterId = tool.converterId.toLowerCase();
-
-  if (tool.category === 'calculator') {
-    return 'calculate';
-  }
-
-  if (
-    slug.includes('lookup') ||
-    slug.includes('parser') ||
-    slug.includes('explainer')
-  ) {
-    return 'explain';
-  }
-
-  if (
-    slug.includes('validator') ||
-    slug.includes('checker') ||
-    slug.includes('tester') ||
-    slug.includes('contrast-checker')
-  ) {
-    return 'validate';
-  }
-
-  if (
-    slug.includes('formatter') ||
-    slug.includes('minifier') ||
-    slug.includes('sorter') ||
-    slug.includes('generator') ||
-    slug.includes('json-path-extractor') ||
-    slug.includes('column-extractor')
-  ) {
-    return slug.includes('generator') ? 'generate' : 'format';
-  }
-
-  if (
-    slug.includes('decode') ||
-    slug.includes('decoder') ||
-    slug.includes('unescape') ||
-    slug.includes('binary-to-text') ||
-    slug.includes('morse-code-to-text') ||
-    slug.includes('jwt-decoder')
-  ) {
-    return 'decode';
-  }
-
-  if (
-    slug.includes('remove') ||
-    slug.includes('trim') ||
-    slug.includes('diff') ||
-    slug.includes('filter') ||
-    slug.includes('find-replace') ||
-    slug.includes('alphabetizer')
-  ) {
-    return 'clean';
-  }
-
-  if (
-    slug.includes('encode') ||
-    slug.includes('escape') ||
-    slug.includes('uuid-generator') ||
-    slug.includes('random-number-generator') ||
-    converterId.includes('generator')
-  ) {
-    return 'generate';
-  }
-
-  if (tool.inputType !== tool.outputType || slug.includes('-to-')) {
-    return 'convert';
-  }
-
-  return 'format';
-};
 
 export const analyticsEvents = [
   {
@@ -545,6 +468,8 @@ const genericFaqQuestions = new Set([
 const seoAuditRows = converters.map((tool) => ({
   slug: tool.slug,
   title: tool.title.en,
+  uniqueIntroEn: getConverterIntro(tool, 'en'),
+  uniqueIntroHe: getConverterIntro(tool, 'he'),
   hasSingleExample: tool.examples.length === 1,
   hasMultipleExamples: tool.examples.length >= 2,
   hasOnlyGenericFaq:
@@ -559,6 +484,11 @@ export const converterSeoAuditSummary = {
   localizedTitles: converters.length,
   localizedMetaDescriptions: converters.length,
   visibleH1: converters.length,
+  convertersWithUniqueIntroCopy:
+    new Set(seoAuditRows.map((row) => row.uniqueIntroEn)).size === converters.length &&
+    new Set(seoAuditRows.map((row) => row.uniqueIntroHe)).size === converters.length
+      ? converters.length
+      : 0,
   convertersWithExamples: seoAuditRows.filter((row) => !row.hasSingleExample || row.hasMultipleExamples).length,
   convertersWithMultipleExamples: seoAuditRows.filter((row) => row.hasMultipleExamples).length,
   convertersUsingOnlyGenericFaq: seoAuditRows.filter((row) => row.hasOnlyGenericFaq).length,
@@ -592,9 +522,9 @@ export const converterSeoAuditChecks: Array<{
   },
   {
     area: 'Intro copy',
-    status: 'partial',
-    evidence: 'The “When to use” block exists for every converter, but it is generated from shared category copy rather than unique intent-specific copy per tool.',
-    nextStep: 'Implement 7.2 with stronger per-converter intros in Hebrew and English.'
+    status: 'good',
+    evidence: `${converterSeoAuditSummary.convertersWithUniqueIntroCopy}/${converterSeoAuditSummary.trackedConverters} converters now render unique intent-specific intro copy in both Hebrew and English.`,
+    nextStep: 'Use the same intent layer to guide examples and FAQ depth in 7.3 and 7.4.'
   },
   {
     area: 'Examples',

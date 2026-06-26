@@ -136,9 +136,10 @@ describe('analytics dashboard ranking monitor', () => {
     expect(converterSeoAuditSummary.localizedTitles).toBe(converters.length);
     expect(converterSeoAuditSummary.localizedMetaDescriptions).toBe(converters.length);
     expect(converterSeoAuditSummary.visibleH1).toBe(converters.length);
+    expect(converterSeoAuditSummary.convertersWithUniqueIntroCopy).toBe(converters.length);
     expect(converterSeoAuditSummary.convertersWithRelatedLinks).toBe(converters.length);
     expect(converterSeoAuditChecks).toHaveLength(8);
-    expect(converterSeoAuditChecks.some((item) => item.status === 'partial')).toBe(true);
+    expect(converterSeoAuditChecks.find((item) => item.area === 'Intro copy')?.status).toBe('good');
     expect(converterSeoAuditSummary.convertersWithMultipleExamples).toBeLessThan(converters.length);
     expect(converterSeoAuditSummary.convertersUsingOnlyGenericFaq).toBeGreaterThan(0);
   });
