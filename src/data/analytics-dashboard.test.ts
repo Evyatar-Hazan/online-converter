@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   analyticsSummary,
+  englishLongTailRows,
+  englishLongTailSummary,
   hebrewOpportunityRows,
   hebrewOpportunitySummary,
   indexingChecklistSteps,
@@ -91,6 +93,19 @@ describe('analytics dashboard ranking monitor', () => {
     expect(hebrewOpportunitySummary.high).toBeGreaterThan(0);
 
     for (const row of hebrewOpportunityRows) {
+      expect(row.score).toBeGreaterThan(0);
+      expect(['high', 'medium', 'watch']).toContain(row.band);
+      expect(row.reasons.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('prioritizes English long-tail opportunities for every converter', () => {
+    expect(englishLongTailRows).toHaveLength(converters.length);
+    expect(englishLongTailSummary.trackedConverters).toBe(converters.length);
+    expect(englishLongTailSummary.high + englishLongTailSummary.medium + englishLongTailSummary.watch).toBe(converters.length);
+    expect(englishLongTailSummary.high).toBeGreaterThan(0);
+
+    for (const row of englishLongTailRows) {
       expect(row.score).toBeGreaterThan(0);
       expect(['high', 'medium', 'watch']).toContain(row.band);
       expect(row.reasons.length).toBeGreaterThan(0);

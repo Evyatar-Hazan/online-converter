@@ -343,6 +343,22 @@ export const priorityIntentRows = keywordIntentRows
 
 const hebrewAdvantageIntents: SearchIntent[] = ['calculate', 'validate', 'clean', 'explain'];
 const hebrewAdvantageCategories = new Set(['text', 'calculator', 'developer', 'time']);
+const englishLongTailIntents: SearchIntent[] = ['convert', 'validate', 'decode', 'clean', 'explain'];
+const englishLongTailCategories = new Set(['data', 'text', 'encoding', 'developer', 'time']);
+const englishLongTailModifiers = [
+  'online',
+  'converter',
+  'calculator',
+  'checker',
+  'parser',
+  'decoder',
+  'encoder',
+  'formatter',
+  'generator',
+  'remover',
+  'extractor',
+  'lookup'
+];
 
 const getHebrewOpportunity = (row: (typeof keywordIntentRows)[number]) => {
   let score = 0;
@@ -396,6 +412,80 @@ export const hebrewOpportunitySummary = {
 };
 
 export const priorityHebrewOpportunityRows = [...hebrewOpportunityRows]
+  .sort((left, right) => right.score - left.score || Number(right.popular) - Number(left.popular) || left.slug.localeCompare(right.slug))
+  .slice(0, 24);
+
+const getEnglishLongTailOpportunity = (row: (typeof keywordIntentRows)[number]) => {
+  let score = 0;
+  const reasons: string[] = [];
+  const englishWordCount = row.primaryEnglishQuery.split(/\s+/).filter(Boolean).length;
+  const hasSpecificModifier = englishLongTailModifiers.some((modifier) =>
+    row.primaryEnglishQuery.toLowerCase().includes(modifier)
+  );
+
+  if (englishWordCount >= 3) {
+    score += 2;
+    reasons.push('clear multi-word exact-match query');
+  }
+
+  if (englishWordCount >= 4) {
+    score += 1;
+    reasons.push('deeper long-tail phrasing');
+  }
+
+  if (row.secondaryEnglishQueries.length >= 2) {
+    score += 1;
+    reasons.push('multiple English search variants');
+  }
+
+  if (englishLongTailIntents.includes(row.intent)) {
+    score += 2;
+    reasons.push('intent fits exact-match utility pages');
+  }
+
+  if (englishLongTailCategories.has(row.category)) {
+    score += 1;
+    reasons.push('category competes well on specific utility terms');
+  }
+
+  if (hasSpecificModifier) {
+    score += 1;
+    reasons.push('query includes a strong utility modifier');
+  }
+
+  if (row.popular) {
+    score += 1;
+    reasons.push('already a priority converter');
+  }
+
+  if (row.new) {
+    score += 1;
+    reasons.push('new page with room to win long-tail coverage early');
+  }
+
+  if (score === 0) {
+    score = 1;
+    reasons.push('niche exact-match page worth monitoring');
+  }
+
+  const band: OpportunityBand = score >= 6 ? 'high' : score >= 4 ? 'medium' : 'watch';
+
+  return { score, band, reasons };
+};
+
+export const englishLongTailRows = keywordIntentRows.map((row) => ({
+  ...row,
+  ...getEnglishLongTailOpportunity(row)
+}));
+
+export const englishLongTailSummary = {
+  trackedConverters: englishLongTailRows.length,
+  high: englishLongTailRows.filter((row) => row.band === 'high').length,
+  medium: englishLongTailRows.filter((row) => row.band === 'medium').length,
+  watch: englishLongTailRows.filter((row) => row.band === 'watch').length
+};
+
+export const priorityEnglishLongTailRows = [...englishLongTailRows]
   .sort((left, right) => right.score - left.score || Number(right.popular) - Number(left.popular) || left.slug.localeCompare(right.slug))
   .slice(0, 24);
 
