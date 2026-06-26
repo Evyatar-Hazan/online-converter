@@ -1,6 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { analyticsCategoryRows, analyticsEvents, analyticsProviders, analyticsSummary } from '../data/analytics-dashboard';
+import {
+  analyticsCategoryRows,
+  analyticsEvents,
+  analyticsProviders,
+  analyticsSummary,
+  priorityRankingRows,
+  rankingMonitorSummary,
+  rankingWorkflowSteps,
+  searchConsoleBaseline
+} from '../data/analytics-dashboard';
 import { siteName } from '../data/site';
 
 const title = `Analytics Dashboard | ${siteName.en}`;
@@ -93,6 +102,37 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
   </section>
 
   <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Search Console</p>
+        <h2>Ranking baseline</h2>
+      </div>
+      <span class="analytics-date">Verified {searchConsoleBaseline.verifiedAt}</span>
+    </div>
+    <div class="ranking-baseline-grid" aria-label="Search Console ranking baseline">
+      <article>
+        <span>Clicks</span>
+        <strong>{searchConsoleBaseline.clicks}</strong>
+      </article>
+      <article>
+        <span>Impressions</span>
+        <strong>{searchConsoleBaseline.impressions}</strong>
+      </article>
+      <article>
+        <span>CTR</span>
+        <strong>{searchConsoleBaseline.ctr}</strong>
+      </article>
+      <article>
+        <span>Avg. position</span>
+        <strong>{searchConsoleBaseline.averagePosition}</strong>
+      </article>
+    </div>
+    <p class="analytics-note">
+      {searchConsoleBaseline.note} Visible page: <code>{searchConsoleBaseline.onlyVisiblePage}</code>.
+    </p>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
     <div class="analytics-panel-heading">
       <p class="eyebrow">SEO inventory</p>
       <h2>Coverage by category</h2>
@@ -116,6 +156,89 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
               <td>{row.localizedPages}</td>
               <td>{row.popular}</td>
               <td>{row.newTools}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="analytics-grid">
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Ranking workflow</p>
+        <h2>Weekly loop</h2>
+      </div>
+      <div class="analytics-event-list">
+        {rankingWorkflowSteps.map((item) => (
+          <div class="analytics-event-row">
+            <code>{item.step}</code>
+            <span>{item.description}</span>
+            <small>SEO · P1</small>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Ranking monitor</p>
+        <h2>Tracked converter pages</h2>
+      </div>
+      <div class="ranking-summary-list">
+        <div>
+          <span>Converters</span>
+          <strong>{rankingMonitorSummary.trackedConverters}</strong>
+        </div>
+        <div>
+          <span>Localized pages</span>
+          <strong>{rankingMonitorSummary.trackedLocalizedPages}</strong>
+        </div>
+        <div>
+          <span>P1 converters</span>
+          <strong>{rankingMonitorSummary.p1Converters}</strong>
+        </div>
+        <div>
+          <span>Rows with GSC data</span>
+          <strong>{rankingMonitorSummary.rowsWithSearchConsoleData}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading">
+      <p class="eyebrow">Priority converters</p>
+      <h2>First ranking watchlist</h2>
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table ranking-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>English query</th>
+            <th>Hebrew query</th>
+            <th>Indexed</th>
+            <th>Impr.</th>
+            <th>Avg. pos.</th>
+            <th>Next action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {priorityRankingRows.map((row) => (
+            <tr>
+              <td>
+                <a href={row.englishUrl}>{row.slug}</a>
+                <small>{row.hebrewUrl}</small>
+              </td>
+              <td>{row.categoryLabel}</td>
+              <td>{row.targetEnglishQuery}</td>
+              <td dir="rtl">{row.targetHebrewQuery}</td>
+              <td>{row.indexed}</td>
+              <td>{row.impressions}</td>
+              <td>{row.averagePosition}</td>
+              <td>{row.nextAction}</td>
             </tr>
           ))}
         </tbody>

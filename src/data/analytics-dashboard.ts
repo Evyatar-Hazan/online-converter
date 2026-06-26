@@ -1,5 +1,13 @@
 import { converters } from './converters';
-import { categoryLabels, locales } from './site';
+import { categoryLabels, locales, siteUrl } from './site';
+
+const normalizeQuery = (query: string) => query.replace(/\s+/g, ' ').trim();
+
+const getPrimaryQuery = (tool: (typeof converters)[number], locale: 'en' | 'he') => {
+  const [firstKeyword] = tool.keywords[locale];
+
+  return normalizeQuery(firstKeyword || tool.shortTitle[locale] || tool.title[locale]);
+};
 
 export const analyticsEvents = [
   {
@@ -117,6 +125,76 @@ export const analyticsSummary = {
   trackedEvents: analyticsEvents.length,
   adPlacements: 4
 };
+
+export const searchConsoleBaseline = {
+  verifiedAt: '2026-06-26',
+  period: 'Last 3 months',
+  source: 'Google Search Console performance report',
+  clicks: 0,
+  impressions: 1,
+  ctr: '0%',
+  averagePosition: 3,
+  onlyVisiblePage: `${siteUrl}/`,
+  note: 'Search Console has one homepage impression and no visible converter-page ranking rows yet.'
+} as const;
+
+export const rankingWorkflowSteps = [
+  {
+    step: 'Collect',
+    description: 'Export Search Console rows by page and query once meaningful impressions exist.'
+  },
+  {
+    step: 'Map',
+    description: 'Match each URL to converter slug, locale, category and target Hebrew/English query.'
+  },
+  {
+    step: 'Prioritize',
+    description: 'Improve indexed pages with impressions, low CTR, or average positions 4-20 first.'
+  },
+  {
+    step: 'Repeat',
+    description: 'Refresh weekly until rankings stabilize enough for per-converter decisions.'
+  }
+] as const;
+
+export const rankingMonitorRows = converters.map((tool) => {
+  const priority = tool.popular ? 'P1' : tool.new ? 'P2' : 'P3';
+  const nextAction =
+    priority === 'P1'
+      ? 'Inspect indexing and strengthen snippet/content first.'
+      : priority === 'P2'
+        ? 'Wait for indexing data, then tune title and internal links.'
+        : 'Monitor until impressions appear.';
+
+  return {
+    slug: tool.slug,
+    category: tool.category,
+    categoryLabel: categoryLabels[tool.category].en,
+    englishUrl: `/en/${tool.slug}/`,
+    hebrewUrl: `/he/${tool.slug}/`,
+    targetEnglishQuery: getPrimaryQuery(tool, 'en'),
+    targetHebrewQuery: getPrimaryQuery(tool, 'he'),
+    indexed: 'pending',
+    impressions: 0,
+    clicks: 0,
+    ctr: 'n/a',
+    averagePosition: 'n/a',
+    priority,
+    nextAction
+  };
+});
+
+export const rankingMonitorSummary = {
+  trackedConverters: rankingMonitorRows.length,
+  trackedLocalizedPages: rankingMonitorRows.length * locales.length,
+  p1Converters: rankingMonitorRows.filter((row) => row.priority === 'P1').length,
+  p2Converters: rankingMonitorRows.filter((row) => row.priority === 'P2').length,
+  rowsWithSearchConsoleData: 0
+};
+
+export const priorityRankingRows = rankingMonitorRows
+  .filter((row) => row.priority !== 'P3')
+  .slice(0, 24);
 
 export const analyticsCategoryRows = categoryKeys.map((category) => {
   const tools = converters.filter((tool) => tool.category === category);

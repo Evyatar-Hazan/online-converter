@@ -1086,8 +1086,67 @@ summary {
   margin-bottom: 16px;
 }
 
+.analytics-heading-split {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .analytics-panel-heading h2 {
   margin-bottom: 0;
+}
+
+.analytics-date,
+.analytics-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.analytics-note {
+  margin: 14px 0 0;
+}
+
+.analytics-note code {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  padding: 4px 8px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+
+.ranking-baseline-grid,
+.ranking-summary-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ranking-baseline-grid article,
+.ranking-summary-list div {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 14px;
+}
+
+.ranking-baseline-grid span,
+.ranking-summary-list span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ranking-baseline-grid strong,
+.ranking-summary-list strong {
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .analytics-provider-list,
@@ -1190,6 +1249,23 @@ summary {
   text-transform: uppercase;
 }
 
+.ranking-table {
+  min-width: 1120px;
+}
+
+.ranking-table a {
+  color: var(--brand-strong);
+  font-weight: 900;
+}
+
+.ranking-table small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+}
+
 .site-footer {
   justify-content: space-between;
   gap: 16px;
@@ -1230,6 +1306,11 @@ summary {
   }
 
   .analytics-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ranking-baseline-grid,
+  .ranking-summary-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1286,8 +1367,14 @@ summary {
   }
 
   .analytics-kpi-grid,
+  .ranking-baseline-grid,
+  .ranking-summary-list,
   .analytics-provider-row {
     grid-template-columns: 1fr;
+  }
+
+  .analytics-heading-split {
+    display: grid;
   }
 
   .converter-toolbar,
