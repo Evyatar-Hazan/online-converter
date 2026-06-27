@@ -5,6 +5,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { converters } from '../../../data/converters';
 import { categoryContent, categoryLabels, locales, siteName, siteUrl, ui } from '../../../data/site';
 import { getCategoryToolBuckets } from '../../../lib/category-tools';
+import { getCategoryMetaDescription, getCategoryPageTitle } from '../../../lib/category-seo';
 import type { ConverterCategory, Locale } from '../../../types';
 
 export function getStaticPaths() {
@@ -23,8 +24,8 @@ const quickLinks = buckets.ordered.slice(0, 6);
 const popularTools = buckets.popular.slice(0, 4);
 const newTools = buckets.fresh.slice(0, 4);
 const canonicalPath = `/${locale}/${category}/`;
-const title = `${content.title} | ${siteName[locale]}`;
-const description = content.description;
+const title = `${getCategoryPageTitle(category, locale)} | ${siteName[locale]}`;
+const description = getCategoryMetaDescription(category, locale, tools.length);
 const copy = {
   commonUsesEyebrow: locale === 'he' ? 'שימושים נפוצים' : 'Common uses',
   commonUsesTitle: locale === 'he' ? 'מה אפשר לעשות כאן' : 'What you can do here',
