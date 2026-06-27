@@ -4,7 +4,8 @@ import AdSlot from '../../components/AdSlot.astro';
 import ToolCard from '../../components/ToolCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
-import { locales, ui } from '../../data/site';
+import { categoryLabels, locales, ui } from '../../data/site';
+import { getPriorityCategoryTools } from '../../lib/category-tools';
 import { getRelatedConverters } from '../../lib/related-tools';
 import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
@@ -161,13 +162,26 @@ if (!tool) {
 
 const labels = ui[locale];
 const related = getRelatedConverters(tool, 3);
+const categoryTools = converters.filter((item) => item.category === tool.category);
+const priorityCategoryTools = getPriorityCategoryTools(categoryTools, locale, { excludeSlug: tool.slug, limit: 4 });
 const contextualFaq = [...generatedFaq(tool), ...tool.faq];
 const tips = conversionTips(tool, locale);
 const issues = commonIssues(tool, locale);
 const title = getConverterPageTitle(tool, locale);
 const description = getConverterMetaDescription(tool, locale);
 const canonicalPath = `/${locale}/${tool.slug}/`;
-const jsonLd = getConverterStructuredData(tool, locale, description, contextualFaq, labels.home);
+const categoryPath = `/${locale}/${tool.category}/`;
+const categoryLabel = categoryLabels[tool.category][locale];
+const jsonLd = getConverterStructuredData(tool, locale, description, contextualFaq, labels.home, categoryLabel);
+const categoryCopy = {
+  eyebrow: locale === 'he' ? 'עוד מהקטגוריה' : 'More from this category',
+  title: locale === 'he' ? `המשך לכלי ${categoryLabel}` : `Continue into ${categoryLabel}`,
+  description:
+    locale === 'he'
+      ? `דף הקטגוריה מרכז את הכלים הבולטים ביותר ב־${categoryLabel}, כולל כלים פופולריים, כלים חדשים וקישורים מהירים למשימות דומות.`
+      : `The category page brings together the strongest ${categoryLabel} tools, including popular picks, newer additions, and fast links for related tasks.`,
+  openCategory: locale === 'he' ? 'פתח את דף הקטגוריה' : 'Open category page'
+};
 ---
 
 <BaseLayout
@@ -181,6 +195,8 @@ const jsonLd = getConverterStructuredData(tool, locale, description, contextualF
 >
   <nav class="breadcrumbs" aria-label="Breadcrumbs">
     <a href={`/${locale}/`}>{labels.home}</a>
+    <span>/</span>
+    <a href={categoryPath}>{categoryLabel}</a>
     <span>/</span>
     <span>{tool.shortTitle[locale]}</span>
   </nav>
@@ -269,6 +285,18 @@ const jsonLd = getConverterStructuredData(tool, locale, description, contextualF
       <ul class="issue-list">
         {issues.map((issue) => <li>{issue}</li>)}
       </ul>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{categoryCopy.eyebrow}</p>
+      <h2>{categoryCopy.title}</h2>
+      <p>{categoryCopy.description}</p>
+      <div class="link-cloud">
+        <a href={categoryPath}>{categoryCopy.openCategory}</a>
+        {priorityCategoryTools.map((item) => <a href={`/${locale}/${item.slug}/`}>{item.shortTitle[locale]}</a>)}
+      </div>
     </article>
   </section>
 

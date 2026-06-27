@@ -30,3 +30,12 @@ export const getCategoryToolBuckets = (tools: ConverterTool[], locale: Locale) =
     remaining
   };
 };
+
+export const getPriorityCategoryTools = (
+  tools: ConverterTool[],
+  locale: Locale,
+  options?: { excludeSlug?: string; limit?: number }
+) => {
+  const ordered = rankCategoryTools(tools, locale).filter((tool) => tool.slug !== options?.excludeSlug);
+  return ordered.slice(0, options?.limit ?? 4);
+};

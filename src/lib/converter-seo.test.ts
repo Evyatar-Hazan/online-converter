@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from '../data/converters';
-import { ui } from '../data/site';
+import { categoryLabels, ui } from '../data/site';
 import { getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData, getSearchIntent, searchIntents } from './converter-seo';
 
 describe('converter SEO helpers', () => {
@@ -75,7 +75,7 @@ describe('converter SEO helpers', () => {
           ...tool.faq
         ];
 
-        const schemas = getConverterStructuredData(tool, locale, description, contextualFaq, ui[locale].home);
+        const schemas = getConverterStructuredData(tool, locale, description, contextualFaq, ui[locale].home, categoryLabels[tool.category][locale]);
         expect(schemas).toHaveLength(3);
 
         const software = schemas.find((item) => item['@type'] === 'SoftwareApplication');
@@ -101,9 +101,10 @@ describe('converter SEO helpers', () => {
         if (!breadcrumbs || !Array.isArray(breadcrumbs.itemListElement)) {
           throw new Error(`Missing BreadcrumbList schema for ${tool.slug} (${locale})`);
         }
-        expect(breadcrumbs.itemListElement).toHaveLength(2);
+        expect(breadcrumbs.itemListElement).toHaveLength(3);
         expect(breadcrumbs.itemListElement[0]?.name).toBe(ui[locale].home);
-        expect(breadcrumbs.itemListElement[1]?.name).toBe(tool.shortTitle[locale]);
+        expect(breadcrumbs.itemListElement[1]?.name).toBe(categoryLabels[tool.category][locale]);
+        expect(breadcrumbs.itemListElement[2]?.name).toBe(tool.shortTitle[locale]);
       }
     }
   });

@@ -241,9 +241,11 @@ export function getConverterStructuredData(
   locale: Locale,
   description: string,
   contextualFaq: FaqItem[],
-  homeLabel: string
+  homeLabel: string,
+  categoryLabel: string
 ) {
   const canonicalPath = `/${locale}/${tool.slug}/`;
+  const categoryPath = `/${locale}/${tool.category}/`;
 
   return [
     {
@@ -273,7 +275,8 @@ export function getConverterStructuredData(
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: homeLabel, item: `${siteUrl}/${locale}/` },
-        { '@type': 'ListItem', position: 2, name: tool.shortTitle[locale], item: `${siteUrl}${canonicalPath}` }
+        { '@type': 'ListItem', position: 2, name: categoryLabel, item: `${siteUrl}${categoryPath}` },
+        { '@type': 'ListItem', position: 3, name: tool.shortTitle[locale], item: `${siteUrl}${canonicalPath}` }
       ]
     }
   ];

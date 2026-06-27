@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from '../data/converters';
-import { getCategoryToolBuckets, rankCategoryTools } from './category-tools';
+import { getCategoryToolBuckets, getPriorityCategoryTools, rankCategoryTools } from './category-tools';
 
 describe('category tool ordering', () => {
   it('sorts popular tools before new tools and standard tools', () => {
@@ -24,5 +24,16 @@ describe('category tool ordering', () => {
     }
 
     expect(seen.size).toBe(developerTools.length);
+  });
+
+  it('returns top category tools without the current converter when requested', () => {
+    const textTools = converters.filter((tool) => tool.category === 'text');
+    const priority = getPriorityCategoryTools(textTools, 'en', {
+      excludeSlug: 'text-case-converter',
+      limit: 4
+    });
+
+    expect(priority).toHaveLength(4);
+    expect(priority.some((tool) => tool.slug === 'text-case-converter')).toBe(false);
   });
 });
