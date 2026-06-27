@@ -175,11 +175,11 @@ const categoryLabel = categoryLabels[tool.category][locale];
 const jsonLd = getConverterStructuredData(tool, locale, description, contextualFaq, labels.home, categoryLabel);
 const categoryCopy = {
   eyebrow: locale === 'he' ? 'עוד מהקטגוריה' : 'More from this category',
-  title: locale === 'he' ? `המשך לכלי ${categoryLabel}` : `Continue into ${categoryLabel}`,
+  title: locale === 'he' ? `המשך לקטגוריית ${categoryLabel}` : `Continue into the ${categoryLabel} category`,
   description:
     locale === 'he'
-      ? `דף הקטגוריה מרכז את הכלים הבולטים ביותר ב־${categoryLabel}, כולל כלים פופולריים, כלים חדשים וקישורים מהירים למשימות דומות.`
-      : `The category page brings together the strongest ${categoryLabel} tools, including popular picks, newer additions, and fast links for related tasks.`,
+      ? `דף הקטגוריה מרכז את הכלים הבולטים ביותר בקטגוריית ${categoryLabel}, כולל כלים פופולריים, כלים חדשים וקישורים מהירים למשימות דומות.`
+      : `The category page brings together the strongest converters in ${categoryLabel}, including popular picks, newer additions, and fast links for related tasks.`,
   openCategory: locale === 'he' ? 'פתח את דף הקטגוריה' : 'Open category page'
 };
 ---
