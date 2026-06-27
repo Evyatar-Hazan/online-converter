@@ -4,6 +4,7 @@ import ToolCard from '../../../components/ToolCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { converters } from '../../../data/converters';
 import { categoryContent, categoryLabels, locales, siteName, siteUrl, ui } from '../../../data/site';
+import { getCategoryToolBuckets } from '../../../lib/category-tools';
 import type { ConverterCategory, Locale } from '../../../types';
 
 export function getStaticPaths() {
@@ -16,9 +17,59 @@ const category = Astro.params.category as ConverterCategory;
 const labels = ui[locale];
 const content = categoryContent[category][locale];
 const tools = converters.filter((tool) => tool.category === category);
+const buckets = getCategoryToolBuckets(tools, locale);
+const featuredTools = buckets.ordered.slice(0, 3);
+const quickLinks = buckets.ordered.slice(0, 6);
+const popularTools = buckets.popular.slice(0, 4);
+const newTools = buckets.fresh.slice(0, 4);
 const canonicalPath = `/${locale}/${category}/`;
 const title = `${content.title} | ${siteName[locale]}`;
 const description = content.description;
+const copy = {
+  commonUsesEyebrow: locale === 'he' ? 'שימושים נפוצים' : 'Common uses',
+  commonUsesTitle: locale === 'he' ? 'מה אפשר לעשות כאן' : 'What you can do here',
+  featuredEyebrow: locale === 'he' ? 'מומלץ להתחיל כאן' : 'Start here',
+  featuredTitle: locale === 'he' ? 'כלים מומלצים מתוך הקטגוריה' : 'Recommended tools in this category',
+  whyEyebrow: locale === 'he' ? 'למה זה שימושי' : 'Why this category matters',
+  whyTitle: locale === 'he' ? 'מתי להשתמש בכלים האלה' : 'When these tools help',
+  linksEyebrow: locale === 'he' ? 'גישה מהירה' : 'Quick access',
+  linksTitle: locale === 'he' ? 'כלים בולטים שכדאי לפתוח' : 'Useful tools to open next',
+  popularSectionEyebrow: locale === 'he' ? 'פופולרי עכשיו' : 'Popular now',
+  popularSectionTitle: locale === 'he' ? 'הכלים הכי מבוקשים בקטגוריה' : 'Most-used tools in this category',
+  newSectionEyebrow: locale === 'he' ? 'חדש בקטגוריה' : 'New in this category',
+  newSectionTitle: locale === 'he' ? 'כלים חדשים שכדאי לבדוק' : 'New tools worth checking',
+  popularLabel: locale === 'he' ? 'פופולריים' : 'Popular',
+  newLabel: locale === 'he' ? 'חדשים' : 'New',
+  browseLabel: locale === 'he' ? 'פתח את הכלי' : 'Open tool',
+  allToolsDescription:
+    locale === 'he'
+      ? 'הרשימה המלאה ממוינת כך שכלים פופולריים וחדשים יופיעו קודם.'
+      : 'The full list is sorted so popular and new tools appear first.',
+  summary:
+    locale === 'he'
+      ? `${content.title} מתאימים לעבודה יומיומית כשצריך להמיר, לנקות או להכין מידע מהר בלי לעבור בין כמה כלים שונים.`
+      : `${content.title} are useful when you need to convert, clean, or prepare information quickly without bouncing between several different tools.`,
+  secondarySummary:
+    locale === 'he'
+      ? `הקטגוריה הזו כוללת ${tools.length} כלים עם תמיכה מלאה בעברית ובאנגלית, והיא בנויה לעבודה מהירה ישירות מתוך הדפדפן.`
+      : `This category currently includes ${tools.length} tools with full Hebrew and English support, built for fast in-browser work.`,
+  featuredDescription:
+    locale === 'he'
+      ? 'אם אתה לא בטוח מאיפה להתחיל, אלה הכלים שנותנים את הערך הכי מהיר בקטגוריה הזאת.'
+      : 'If you are not sure where to begin, these are the tools that usually give the fastest value in this category.',
+  linksDescription:
+    locale === 'he'
+      ? 'קישורים ישירים לכלים בולטים כדי להגיע מהר להמרה המתאימה.'
+      : 'Direct links to standout tools so you can jump straight to the right converter.',
+  emptyPopular:
+    locale === 'he'
+      ? 'כרגע אין סימון פופולריים בקטגוריה הזו, אבל כל הכלים כאן זמינים לשימוש מלא.'
+      : 'There are no tools marked as popular in this category yet, but every tool here is fully available.',
+  emptyNew:
+    locale === 'he'
+      ? 'כרגע אין כלים חדשים מסומנים בקטגוריה הזו.'
+      : 'There are no tools marked as new in this category yet.'
+};
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -89,13 +140,73 @@ const jsonLd = [
 
   <section class="content-grid">
     <article class="content-panel">
-      <p class="eyebrow">{locale === 'he' ? 'שימושים נפוצים' : 'Common uses'}</p>
-      <h2>{locale === 'he' ? 'מה אפשר לעשות כאן' : 'What you can do here'}</h2>
+      <p class="eyebrow">{copy.commonUsesEyebrow}</p>
+      <h2>{copy.commonUsesTitle}</h2>
       <ul class="check-list">
         {content.useCases.map((item) => <li>{item}</li>)}
       </ul>
     </article>
     <article class="content-panel">
+      <p class="eyebrow">{copy.featuredEyebrow}</p>
+      <h2>{copy.featuredTitle}</h2>
+      <p>{copy.featuredDescription}</p>
+      <ol class="feature-list">
+        {featuredTools.map((tool) => (
+          <li>
+            <div>
+              <strong>{tool.shortTitle[locale]}</strong>
+              <p>{tool.description[locale]}</p>
+            </div>
+            <a href={`/${locale}/${tool.slug}/`}>{copy.browseLabel}</a>
+          </li>
+        ))}
+      </ol>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{copy.whyEyebrow}</p>
+      <h2>{copy.whyTitle}</h2>
+      <div class="content-stack">
+        <p>{copy.summary}</p>
+        <p>{copy.secondarySummary}</p>
+      </div>
+      <div class="cluster-groups">
+        <div>
+          <strong>{copy.popularLabel}</strong>
+          {popularTools.length > 0 ? (
+            <div class="link-cloud">
+              {popularTools.map((tool) => <a href={`/${locale}/${tool.slug}/`}>{tool.shortTitle[locale]}</a>)}
+            </div>
+          ) : (
+            <p>{copy.emptyPopular}</p>
+          )}
+        </div>
+        <div>
+          <strong>{copy.newLabel}</strong>
+          {newTools.length > 0 ? (
+            <div class="link-cloud">
+              {newTools.map((tool) => <a href={`/${locale}/${tool.slug}/`}>{tool.shortTitle[locale]}</a>)}
+            </div>
+          ) : (
+            <p>{copy.emptyNew}</p>
+          )}
+        </div>
+      </div>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{copy.linksEyebrow}</p>
+      <h2>{copy.linksTitle}</h2>
+      <p>{copy.linksDescription}</p>
+      <div class="link-cloud">
+        {quickLinks.map((tool) => <a href={`/${locale}/${tool.slug}/`}>{tool.shortTitle[locale]}</a>)}
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel content-panel-wide">
       <p class="eyebrow">{labels.faqTitle}</p>
       <h2>{labels.faqTitle}</h2>
       {content.faq.map((item) => (
@@ -107,13 +218,44 @@ const jsonLd = [
     </article>
   </section>
 
+  {popularTools.length > 0 && (
+    <section class="section-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{copy.popularSectionEyebrow}</p>
+          <h2>{copy.popularSectionTitle}</h2>
+        </div>
+      </div>
+      <div class="tools-grid compact">
+        {popularTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+      </div>
+    </section>
+  )}
+
+  {newTools.length > 0 && (
+    <section class="section-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{copy.newSectionEyebrow}</p>
+          <h2>{copy.newSectionTitle}</h2>
+        </div>
+      </div>
+      <div class="tools-grid compact">
+        {newTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+      </div>
+    </section>
+  )}
+
   <section class="section-shell">
     <div class="section-heading">
-      <p class="eyebrow">{categoryLabels[category][locale]}</p>
-      <h2>{labels.allTools}</h2>
+      <div>
+        <p class="eyebrow">{categoryLabels[category][locale]}</p>
+        <h2>{labels.allTools}</h2>
+      </div>
+      <p class="section-note">{copy.allToolsDescription}</p>
     </div>
     <div class="tools-grid">
-      {tools.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+      {buckets.ordered.map((tool) => <ToolCard tool={tool} locale={locale} />)}
     </div>
   </section>
 </BaseLayout>

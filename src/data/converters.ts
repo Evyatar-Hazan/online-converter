@@ -1,4 +1,4 @@
-import type { ConverterTool } from '../types';
+import type { ConverterTool, FaqItem } from '../types';
 
 const faq = {
   private: {
@@ -22,6 +22,207 @@ const faq = {
     }
   }
 };
+
+const faqSpecific = {
+  jsonToCsv: [
+    {
+      question: {
+        en: 'Can this JSON to CSV converter handle arrays of objects?',
+        he: 'האם ממיר JSON ל־CSV הזה תומך במערכים של אובייקטים?'
+      },
+      answer: {
+        en: 'Yes. JSON arrays of objects are the best fit. Each object usually becomes one CSV row, and keys become columns.',
+        he: 'כן. מערכי JSON של אובייקטים הם המקרה המתאים ביותר. בדרך כלל כל אובייקט הופך לשורת CSV והמפתחות הופכים לעמודות.'
+      }
+    },
+    {
+      question: {
+        en: 'What happens to nested JSON values in JSON to CSV?',
+        he: 'מה קורה לערכי JSON מקוננים בהמרת JSON ל־CSV?'
+      },
+      answer: {
+        en: 'Nested values are flattened only in simple cases. Deeper objects or arrays may appear as JSON text inside a CSV cell, so review the output before importing it into spreadsheets.',
+        he: 'ערכים מקוננים נפרסים רק במקרים פשוטים. אובייקטים או מערכים עמוקים יותר עשויים להופיע כטקסט JSON בתוך תא CSV, לכן כדאי לבדוק את הפלט לפני ייבוא לגיליון.'
+      }
+    }
+  ],
+  csvToJson: [
+    {
+      question: {
+        en: 'Does CSV to JSON require a header row?',
+        he: 'האם ממיר CSV ל־JSON דורש שורת כותרות?'
+      },
+      answer: {
+        en: 'Yes. The first row is treated as the property names for each JSON object, so a clean header row gives the best output.',
+        he: 'כן. השורה הראשונה משמשת כשמות המפתחות לכל אובייקט JSON, ולכן שורת כותרות נקייה תיתן את התוצאה הטובה ביותר.'
+      }
+    },
+    {
+      question: {
+        en: 'Can CSV to JSON parse quoted commas correctly?',
+        he: 'האם ממיר CSV ל־JSON יודע לטפל נכון בפסיקים בתוך מרכאות?'
+      },
+      answer: {
+        en: 'Yes, quoted values are supported. If a row still breaks, check for unmatched quotes or pasted formatting characters.',
+        he: 'כן, ערכים במרכאות נתמכים. אם שורה עדיין נשברת, בדוק שאין מרכאות לא סגורות או תווי עיצוב שהודבקו מבחוץ.'
+      }
+    }
+  ],
+  jsonToYaml: [
+    {
+      question: {
+        en: 'When should I use JSON to YAML?',
+        he: 'מתי כדאי להשתמש בממיר JSON ל־YAML?'
+      },
+      answer: {
+        en: 'Use it when you need a more readable configuration format for DevOps files, app settings, CI pipelines or documentation.',
+        he: 'כדאי להשתמש בו כשצריך פורמט הגדרות קריא יותר עבור קבצי DevOps, הגדרות אפליקציה, צינורות CI או תיעוד.'
+      }
+    },
+    {
+      question: {
+        en: 'Will JSON arrays stay arrays in YAML output?',
+        he: 'האם מערכי JSON נשמרים כמערכים גם בפלט YAML?'
+      },
+      answer: {
+        en: 'Yes. Arrays remain list items in YAML, and nested objects stay nested as long as the JSON input is valid.',
+        he: 'כן. מערכים נשמרים כרשימות ב־YAML, ואובייקטים מקוננים נשארים מקוננים כל עוד קלט ה־JSON תקין.'
+      }
+    }
+  ],
+  jsonFormatter: [
+    {
+      question: {
+        en: 'Does the JSON formatter also validate my JSON?',
+        he: 'האם מעצב ה־JSON גם מאמת את ה־JSON שלי?'
+      },
+      answer: {
+        en: 'Yes. If the JSON is invalid, the tool shows an error instead of formatting broken content, which makes it useful as both a formatter and a validator.',
+        he: 'כן. אם ה־JSON לא תקין, הכלי מציג שגיאה במקום לעצב תוכן שבור, ולכן הוא שימושי גם כמעצב וגם כמאמת.'
+      }
+    },
+    {
+      question: {
+        en: 'What kind of JSON input works best here?',
+        he: 'איזה סוג קלט JSON עובד הכי טוב בכלי הזה?'
+      },
+      answer: {
+        en: 'Objects, arrays and API responses work well. The main requirement is valid JSON with correct quotes, commas and brackets.',
+        he: 'אובייקטים, מערכים ותגובות API עובדים מצוין. הדרישה העיקרית היא JSON תקין עם מרכאות, פסיקים וסוגריים נכונים.'
+      }
+    }
+  ],
+  base64Encode: [
+    {
+      question: {
+        en: 'Can this Base64 encoder handle Hebrew and Unicode text?',
+        he: 'האם מקודד Base64 הזה תומך בעברית ובטקסט Unicode?'
+      },
+      answer: {
+        en: 'Yes. It supports Unicode text, including Hebrew, so you can encode multilingual strings directly in the browser.',
+        he: 'כן. הוא תומך בטקסט Unicode כולל עברית, כך שאפשר לקודד מחרוזות רב־לשוניות ישירות בדפדפן.'
+      }
+    },
+    {
+      question: {
+        en: 'When should I use URL-safe Base64 output?',
+        he: 'מתי כדאי להשתמש בפלט Base64 בטוח ל־URL?'
+      },
+      answer: {
+        en: 'Use URL-safe output when the encoded value will be placed inside links, tokens or systems that expect `-` and `_` instead of `+` and `/`.',
+        he: 'כדאי להשתמש בפלט בטוח ל־URL כשהערך המקודד ישולב בתוך קישורים, טוקנים או מערכות שמצפות ל־`-` ו־`_` במקום `+` ו־`/`.'
+      }
+    }
+  ],
+  base64Decode: [
+    {
+      question: {
+        en: 'Why would Base64 decode fail?',
+        he: 'למה פענוח Base64 עלול להיכשל?'
+      },
+      answer: {
+        en: 'It usually fails when the input is cut off, contains invalid characters, or mixes regular Base64 with URL-safe Base64.',
+        he: 'ברוב המקרים הפענוח נכשל כשהקלט חסר, מכיל תווים לא חוקיים או מערבב בין Base64 רגיל ל־Base64 בטוח ל־URL.'
+      }
+    },
+    {
+      question: {
+        en: 'Can this Base64 decoder return readable Hebrew text?',
+        he: 'האם מפענח Base64 הזה יכול להחזיר טקסט עברי קריא?'
+      },
+      answer: {
+        en: 'Yes. If the original text was encoded as Unicode text, the decoded output can include Hebrew and other non-Latin characters correctly.',
+        he: 'כן. אם הטקסט המקורי קודד כטקסט Unicode, הפלט המפוענח יכול לכלול עברית ותווים נוספים בצורה תקינה.'
+      }
+    }
+  ],
+  textCase: [
+    {
+      question: {
+        en: 'Which text case formats does this converter show?',
+        he: 'אילו פורמטי אותיות הכלי הזה מציג?'
+      },
+      answer: {
+        en: 'It shows common variants such as uppercase, lowercase, title case, sentence case and slug-style output so you can copy the one you need.',
+        he: 'הוא מציג וריאציות נפוצות כמו אותיות גדולות, קטנות, כותרת, משפט ופלט בסגנון slug כדי שתוכל להעתיק את מה שאתה צריך.'
+      }
+    },
+    {
+      question: {
+        en: 'Does the text case converter work with Hebrew and English together?',
+        he: 'האם ממיר האותיות עובד גם עם עברית וגם עם אנגלית יחד?'
+      },
+      answer: {
+        en: 'Yes. Mixed Hebrew and English text is supported, although some case transformations mainly affect Latin characters.',
+        he: 'כן. טקסט משולב בעברית ובאנגלית נתמך, אם כי חלק מהטרנספורמציות משפיעות בעיקר על אותיות לטיניות.'
+      }
+    }
+  ],
+  percentageCalculator: [
+    {
+      question: {
+        en: 'How do I use the percentage calculator input?',
+        he: 'איך משתמשים בקלט של מחשבון האחוזים?'
+      },
+      answer: {
+        en: 'Enter the percent first and the base number second. For example, `20, 150` calculates 20 percent of 150.',
+        he: 'מזינים קודם את האחוז ואחר כך את המספר הבסיסי. למשל `20, 150` מחשב 20 אחוז מתוך 150.'
+      }
+    },
+    {
+      question: {
+        en: 'Should I type 20 or 0.2 for twenty percent?',
+        he: 'האם צריך לכתוב 20 או 0.2 עבור עשרים אחוז?'
+      },
+      answer: {
+        en: 'Type 20 for twenty percent. The tool expects standard percentage input, not decimal fraction form.',
+        he: 'יש לכתוב 20 עבור עשרים אחוז. הכלי מצפה לקלט באחוזים רגילים, לא לשבר עשרוני.'
+      }
+    }
+  ],
+  discountCalculator: [
+    {
+      question: {
+        en: 'What does the discount calculator return?',
+        he: 'מה מחזיר מחשבון ההנחה?'
+      },
+      answer: {
+        en: 'It returns both the discount amount and the final price after the discount, so you can see the full sale breakdown.',
+        he: 'הוא מחזיר גם את סכום ההנחה וגם את המחיר הסופי לאחר ההנחה, כך שאפשר לראות את כל הפירוט של המבצע.'
+      }
+    },
+    {
+      question: {
+        en: 'How do I enter the discount value?',
+        he: 'איך מזינים את ערך ההנחה?'
+      },
+      answer: {
+        en: 'Enter the original price first and the discount percent second. For example, `200, 25` means 25 percent off 200.',
+        he: 'מזינים קודם את המחיר המקורי ואחר כך את אחוז ההנחה. למשל `200, 25` פירושו 25 אחוז הנחה על 200.'
+      }
+    }
+  ]
+} satisfies Record<string, FaqItem[]>;
 
 const jsonIndentOptions = [
   {
@@ -259,7 +460,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Nested values', he: 'ערכים מקוננים' }, input: '[{"name":"Avi","tags":["admin","editor"]},{"name":"Maya","tags":["viewer"]}]' }
     ],
     options: csvOutputOptions,
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.jsonToCsv, faq.private, faq.free],
     related: ['csv-to-json', 'json-to-yaml', 'json-formatter']
   },
   {
@@ -288,7 +489,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'Quoted commas', he: 'פסיקים במרכאות' }, input: 'name,note\nAvi,"Jerusalem, Israel"\nMaya,"Tel Aviv, Israel"' }
     ],
     options: csvInputOptions,
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.csvToJson, faq.private, faq.free],
     related: ['json-to-csv', 'json-formatter', 'yaml-to-json']
   },
   {
@@ -305,8 +506,11 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['json to xml', 'json xml converter'], he: ['JSON ל XML', 'ממיר JSON ל XML'] },
     features: { en: ['Nested objects', 'Array items', 'XML escaping'], he: ['אובייקטים מקוננים', 'פריטי מערך', 'המלטת XML'] },
     guide: { en: ['Paste valid JSON.', 'Convert to XML.', 'Copy or download the XML output.'], he: ['הדבק JSON תקין.', 'המר ל־XML.', 'העתק או הורד את פלט ה־XML.'] },
-    examples: [{ label: { en: 'Product XML', he: 'XML מוצר' }, input: '{"product":{"name":"Plan","price":29}}' }],
-    faq: [faq.private, faq.free],
+    examples: [
+      { label: { en: 'Product XML', he: 'XML מוצר' }, input: '{"product":{"name":"Plan","price":29}}' },
+      { label: { en: 'Team list', he: 'רשימת צוות' }, input: '{"team":{"lead":"Dana","members":["Avi","Noa"]}}' }
+    ],
+    faq: [...faqSpecific.jsonToYaml, faq.private, faq.free],
     related: ['xml-to-json', 'json-formatter', 'json-to-yaml']
   },
   {
@@ -323,8 +527,11 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['xml to json', 'convert xml json'], he: ['XML ל JSON', 'ממיר XML ל JSON'] },
     features: { en: ['Attributes', 'Nested nodes', 'Pretty output'], he: ['תכונות XML', 'צמתים מקוננים', 'פלט קריא'] },
     guide: { en: ['Paste XML.', 'Convert to JSON.', 'Review attributes marked with @ prefixes.'], he: ['הדבק XML.', 'המר ל־JSON.', 'בדוק תכונות המסומנות עם @.'] },
-    examples: [{ label: { en: 'Book XML', he: 'XML ספר' }, input: '<book id="1"><title>Guide</title><pages>120</pages></book>' }],
-    faq: [faq.private, faq.free],
+    examples: [
+      { label: { en: 'Book XML', he: 'XML ספר' }, input: '<book id="1"><title>Guide</title><pages>120</pages></book>' },
+      { label: { en: 'Support ticket', he: 'קריאת שירות' }, input: '<ticket priority="high"><id>1042</id><owner>Dana</owner></ticket>' }
+    ],
+    faq: [...faqSpecific.jsonFormatter, faq.private, faq.free],
     related: ['json-to-xml', 'json-formatter', 'csv-to-json']
   },
   {
@@ -342,8 +549,11 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['json to yaml', 'json yaml converter'], he: ['JSON ל YAML', 'ממיר JSON ל YAML'] },
     features: { en: ['Readable YAML', 'Config friendly', 'No upload'], he: ['YAML קריא', 'מתאים לקונפיגורציה', 'בלי העלאה'] },
     guide: { en: ['Paste JSON.', 'Convert to YAML.', 'Use the output in config files.'], he: ['הדבק JSON.', 'המר ל־YAML.', 'השתמש בפלט בקבצי הגדרות.'] },
-    examples: [{ label: { en: 'Config object', he: 'אובייקט הגדרות' }, input: '{"app":"converter","enabled":true,"ports":[80,443]}' }],
-    faq: [faq.private, faq.free],
+    examples: [
+      { label: { en: 'Config object', he: 'אובייקט הגדרות' }, input: '{"app":"converter","enabled":true,"ports":[80,443]}' },
+      { label: { en: 'Feature flags', he: 'פיצ׳רי מערכת' }, input: '{"featureFlags":{"ads":true,"analytics":true},"locale":"he"}' }
+    ],
+    faq: [...faqSpecific.base64Encode, faq.private, faq.free],
     related: ['yaml-to-json', 'json-formatter', 'json-to-csv']
   },
   {
@@ -360,8 +570,11 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['yaml to json', 'convert yaml json'], he: ['YAML ל JSON', 'ממיר YAML ל JSON'] },
     features: { en: ['Strict parsing', 'Pretty JSON', 'Config friendly'], he: ['פענוח קפדני', 'JSON קריא', 'מתאים להגדרות'] },
     guide: { en: ['Paste YAML.', 'Convert to JSON.', 'Copy or download the formatted result.'], he: ['הדבק YAML.', 'המר ל־JSON.', 'העתק או הורד את התוצאה המעוצבת.'] },
-    examples: [{ label: { en: 'YAML config', he: 'קונפיג YAML' }, input: 'app: converter\nenabled: true\nports:\n  - 80\n  - 443' }],
-    faq: [faq.private, faq.free],
+    examples: [
+      { label: { en: 'YAML config', he: 'קונפיג YAML' }, input: 'app: converter\nenabled: true\nports:\n  - 80\n  - 443' },
+      { label: { en: 'Deploy settings', he: 'הגדרות פריסה' }, input: 'env: production\nregion: eu\nfeatures:\n  analytics: true\n  ads: true' }
+    ],
+    faq: [...faqSpecific.base64Decode, faq.private, faq.free],
     related: ['json-to-yaml', 'json-formatter', 'csv-to-json']
   },
   {
@@ -383,7 +596,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'API response', he: 'תגובת API' }, input: '{"ok":true,"data":{"count":2,"items":["he","en"]}}' }
     ],
     options: jsonIndentOptions,
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.textCase, faq.private, faq.free],
     related: ['json-minifier', 'json-to-csv', 'yaml-to-json']
   },
   {
@@ -399,8 +612,11 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['json minifier', 'minify json'], he: ['כיווץ JSON', 'JSON מיניפייר'] },
     features: { en: ['Smaller output', 'Validation', 'Instant'], he: ['פלט קטן', 'אימות', 'מידי'] },
     guide: { en: ['Paste formatted JSON.', 'Convert to minify.', 'Copy the compact JSON.'], he: ['הדבק JSON מעוצב.', 'המר לכיווץ.', 'העתק את ה־JSON הדחוס.'] },
-    examples: [{ label: { en: 'Formatted JSON', he: 'JSON מעוצב' }, input: '{\n  "name": "Dana",\n  "active": true\n}' }],
-    faq: [faq.private, faq.free],
+    examples: [
+      { label: { en: 'Formatted JSON', he: 'JSON מעוצב' }, input: '{\n  "name": "Dana",\n  "active": true\n}' },
+      { label: { en: 'Nested payload', he: 'Payload מקונן' }, input: '{\n  "campaign": {\n    "name": "summer",\n    "budget": 1200\n  }\n}' }
+    ],
+    faq: [...faqSpecific.percentageCalculator, faq.private, faq.free],
     related: ['json-formatter', 'json-to-yaml']
   },
   {
@@ -423,7 +639,7 @@ export const converters: ConverterTool[] = [
       { label: { en: 'URL text', he: 'טקסט לקישור' }, input: 'email=test@example.com&lang=he' }
     ],
     options: base64EncodeOptions,
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.discountCalculator, faq.private, faq.free],
     related: ['base64-decode', 'url-encode', 'html-escape']
   },
   {
@@ -441,9 +657,12 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['base64 decode', 'base64 decoder'], he: ['פענוח Base64', 'מפענח Base64'] },
     features: { en: ['Unicode safe', 'Validation', 'Instant'], he: ['תומך Unicode', 'אימות', 'מידי'] },
     guide: { en: ['Paste Base64.', 'Decode to text.', 'Copy the decoded result.'], he: ['הדבק Base64.', 'פענח לטקסט.', 'העתק את התוצאה.'] },
-    examples: [{ label: { en: 'Encoded greeting', he: 'ברכה מקודדת' }, input: 'SGVsbG8g16nXnNeV150=' }],
+    examples: [
+      { label: { en: 'Encoded greeting', he: 'ברכה מקודדת' }, input: 'SGVsbG8g16nXnNeV150=' },
+      { label: { en: 'Encoded email body', he: 'תוכן מייל מקודד' }, input: 'VXBkYXRlOiB0aGUgYWRzIGFyZSByZWFkeQ==' }
+    ],
     options: base64DecodeOptions,
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.base64Decode, faq.private, faq.free],
     related: ['base64-encode', 'url-decode', 'html-unescape']
   },
   {
@@ -524,7 +743,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['url decode', 'decode url'], he: ['פענוח URL', 'URL decode'] },
     features: { en: ['Percent decoding', 'Readable output', 'Instant'], he: ['פענוח אחוזים', 'פלט קריא', 'מידי'] },
     guide: { en: ['Paste an encoded URL string.', 'Decode it.', 'Copy the readable result.'], he: ['הדבק מחרוזת URL מקודדת.', 'פענח אותה.', 'העתק את התוצאה הקריאה.'] },
-    examples: [{ label: { en: 'Encoded query', he: 'שאילתה מקודדת' }, input: 'hello%20world%20%D7%A9%D7%9C%D7%95%D7%9D' }],
+    examples: [
+      { label: { en: 'Encoded query', he: 'שאילתה מקודדת' }, input: 'hello%20world%20%D7%A9%D7%9C%D7%95%D7%9D' },
+      { label: { en: 'UTM link', he: 'קישור UTM' }, input: 'https%3A%2F%2Fevyatarhazan.com%2Ftools%3Futm_source%3Dgoogle%26utm_medium%3Dcpc' }
+    ],
     options: urlDecodeOptions,
     faq: [faq.private, faq.free],
     related: ['url-encode', 'query-string-to-json', 'base64-decode']
@@ -627,7 +849,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['html escape', 'escape html'], he: ['המלטת HTML', 'HTML escape'] },
     features: { en: ['Escapes tags', 'Code friendly', 'Instant'], he: ['ממלט תגיות', 'נוח לקוד', 'מידי'] },
     guide: { en: ['Paste HTML or text.', 'Escape characters.', 'Use the result inside pages or docs.'], he: ['הדבק HTML או טקסט.', 'המלט תווים.', 'השתמש בתוצאה בעמודים או תיעוד.'] },
-    examples: [{ label: { en: 'HTML snippet', he: 'קטע HTML' }, input: '<strong>Hello & welcome</strong>' }],
+    examples: [
+      { label: { en: 'HTML snippet', he: 'קטע HTML' }, input: '<strong>Hello & welcome</strong>' },
+      { label: { en: 'CTA button', he: 'כפתור קריאה לפעולה' }, input: '<a href="/signup" class="cta">Start now</a>' }
+    ],
     faq: [faq.private, faq.free],
     related: ['html-unescape', 'url-encode']
   },
@@ -645,7 +870,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['html unescape', 'decode html entities'], he: ['פענוח HTML', 'HTML entities'] },
     features: { en: ['Entity decoding', 'Readable output', 'Instant'], he: ['פענוח ישויות', 'פלט קריא', 'מידי'] },
     guide: { en: ['Paste escaped HTML.', 'Decode entities.', 'Copy the readable result.'], he: ['הדבק HTML ממולט.', 'פענח ישויות.', 'העתק את התוצאה הקריאה.'] },
-    examples: [{ label: { en: 'Escaped snippet', he: 'קטע ממולט' }, input: '&lt;strong&gt;Hello &amp; welcome&lt;/strong&gt;' }],
+    examples: [
+      { label: { en: 'Escaped snippet', he: 'קטע ממולט' }, input: '&lt;strong&gt;Hello &amp; welcome&lt;/strong&gt;' },
+      { label: { en: 'Escaped button', he: 'כפתור ממולט' }, input: '&lt;a href=&quot;/signup&quot; class=&quot;cta&quot;&gt;Start now&lt;/a&gt;' }
+    ],
     faq: [faq.private, faq.free],
     related: ['html-escape', 'url-decode']
   },
@@ -725,8 +953,11 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['case converter', 'uppercase lowercase'], he: ['שינוי אותיות', 'אותיות גדולות קטנות'] },
     features: { en: ['Multiple formats', 'Unicode text', 'Fast copy'], he: ['כמה פורמטים', 'טקסט Unicode', 'העתקה מהירה'] },
     guide: { en: ['Paste text.', 'Convert to see common case formats.', 'Copy the line you need.'], he: ['הדבק טקסט.', 'המר כדי לראות פורמטים נפוצים.', 'העתק את השורה הרצויה.'] },
-    examples: [{ label: { en: 'Mixed case', he: 'טקסט מעורב' }, input: 'hello world from Online Converter' }],
-    faq: [faq.private, faq.free],
+    examples: [
+      { label: { en: 'Mixed case', he: 'טקסט מעורב' }, input: 'hello world from Online Converter' },
+      { label: { en: 'Hebrew and English headline', he: 'כותרת עברית ואנגלית' }, input: 'online converter for Hebrew and English seo' }
+    ],
+    faq: [...faqSpecific.textCase, faq.private, faq.free],
     related: ['text-to-camel-case', 'text-to-snake-case', 'slug-generator']
   },
   {
@@ -1048,7 +1279,7 @@ export const converters: ConverterTool[] = [
       { label: { en: '20% of 150', he: '20% מתוך 150' }, input: '20, 150' },
       { label: { en: '17% of 240', he: '17% מתוך 240' }, input: '17, 240' }
     ],
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.percentageCalculator, faq.private, faq.free],
     related: ['percentage-change-calculator', 'discount-calculator', 'vat-calculator']
   },
   {
@@ -1089,7 +1320,7 @@ export const converters: ConverterTool[] = [
       { label: { en: '25% off 200', he: '25% הנחה מ־200' }, input: '200, 25' },
       { label: { en: 'Sale price', he: 'מחיר מבצע' }, input: '349, 15' }
     ],
-    faq: [faq.private, faq.free],
+    faq: [...faqSpecific.discountCalculator, faq.private, faq.free],
     related: ['percentage-calculator', 'vat-calculator', 'percentage-change-calculator']
   },
   {

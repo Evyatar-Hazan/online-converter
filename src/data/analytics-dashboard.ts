@@ -1,6 +1,7 @@
 import { converters } from './converters';
 import { categoryLabels, locales, siteUrl } from './site';
 import { getConverterIntro, getSearchIntent, searchIntents, type SearchIntent } from '../lib/converter-seo';
+import { getRelatedConverters } from '../lib/related-tools';
 
 const normalizeQuery = (query: string) => query.replace(/\s+/g, ' ').trim();
 
@@ -475,8 +476,9 @@ const seoAuditRows = converters.map((tool) => ({
   hasOnlyGenericFaq:
     tool.faq.length > 0 &&
     tool.faq.every((item) => genericFaqQuestions.has(item.question.en)),
-  relatedCount: tool.related.length,
-  hasReverseLink: Boolean(tool.reverseSlug)
+  relatedCount: getRelatedConverters(tool, 3).length,
+  hasReverseLink: Boolean(tool.reverseSlug),
+  relatedIncludesReverse: Boolean(tool.reverseSlug && getRelatedConverters(tool, 3).some((item) => item.slug === tool.reverseSlug))
 }));
 
 export const converterSeoAuditSummary = {
@@ -493,7 +495,8 @@ export const converterSeoAuditSummary = {
   convertersWithMultipleExamples: seoAuditRows.filter((row) => row.hasMultipleExamples).length,
   convertersUsingOnlyGenericFaq: seoAuditRows.filter((row) => row.hasOnlyGenericFaq).length,
   convertersWithReverseLink: seoAuditRows.filter((row) => row.hasReverseLink).length,
-  convertersWithRelatedLinks: seoAuditRows.filter((row) => row.relatedCount > 0).length
+  convertersWithRelatedLinks: seoAuditRows.filter((row) => row.relatedCount > 0).length,
+  convertersWhoseRelatedIncludesReverse: seoAuditRows.filter((row) => row.relatedIncludesReverse).length
 };
 
 export const converterSeoAuditChecks: Array<{
@@ -505,14 +508,14 @@ export const converterSeoAuditChecks: Array<{
   {
     area: 'Title',
     status: 'good',
-    evidence: `${converterSeoAuditSummary.localizedTitles}/${converterSeoAuditSummary.trackedConverters} converters have localized page titles from the registry.`,
-    nextStep: 'Improve CTR patterns in 7.6 without breaking uniqueness.'
+    evidence: `${converterSeoAuditSummary.localizedTitles}/${converterSeoAuditSummary.trackedConverters} converters now render localized page titles with intent-aware CTR suffixes while keeping exact-match converter names visible.`,
+    nextStep: 'Monitor impressions and tighten suffixes only where Search Console shows weak CTR.'
   },
   {
     area: 'Meta description',
     status: 'good',
-    evidence: `${converterSeoAuditSummary.localizedMetaDescriptions}/${converterSeoAuditSummary.trackedConverters} converters have localized meta descriptions and uniqueness checks already run in tests.`,
-    nextStep: 'Tune wording for click-through rate once impression data appears.'
+    evidence: `${converterSeoAuditSummary.localizedMetaDescriptions}/${converterSeoAuditSummary.trackedConverters} converters now render localized meta descriptions that highlight browser-based usage, bilingual support, examples and no-upload privacy cues.`,
+    nextStep: 'Tune wording per page only after impression and CTR data appears in Search Console.'
   },
   {
     area: 'H1',
@@ -540,15 +543,15 @@ export const converterSeoAuditChecks: Array<{
   },
   {
     area: 'Related tools',
-    status: 'partial',
-    evidence: `${converterSeoAuditSummary.convertersWithRelatedLinks}/${converterSeoAuditSummary.trackedConverters} converters expose related tools, but the links are registry-driven and not yet optimized by adjacent intent.`,
-    nextStep: 'Implement 7.5 with stronger intent-based related links and inverse pairs.'
+    status: 'good',
+    evidence: `${converterSeoAuditSummary.convertersWithRelatedLinks}/${converterSeoAuditSummary.trackedConverters} converters now render intent-ranked related tools, and ${converterSeoAuditSummary.convertersWhoseRelatedIncludesReverse}/${converterSeoAuditSummary.convertersWithReverseLink} reverse-capable converters surface the inverse tool inside the related section.`,
+    nextStep: 'Use this intent layer again when expanding category hubs and internal linking in 8.4 and 9.2.'
   },
   {
     area: 'Structured data',
-    status: 'partial',
-    evidence: 'The converter template emits SoftwareApplication, FAQPage and BreadcrumbList JSON-LD, but schema coverage is not yet enforced by dedicated tests.',
-    nextStep: 'Implement 7.7 by adding structured-data assertions to the SEO test suite.'
+    status: 'good',
+    evidence: 'The converter template now emits SoftwareApplication, FAQPage and BreadcrumbList JSON-LD through a shared helper, and dedicated tests enforce schema presence and core fields for every converter in both locales.',
+    nextStep: 'Keep the helper as the single source of truth when expanding converter schema depth later.'
   }
 ];
 

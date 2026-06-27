@@ -45,6 +45,14 @@ export const categoryContent: Record<
         {
           question: 'Which data formats are supported here?',
           answer: 'This category includes JSON, CSV, XML and YAML tools, with more structured data converters planned.'
+        },
+        {
+          question: 'When should I use a data format converter instead of editing manually?',
+          answer: 'Use a converter when you need to reshape large payloads, move data between tools, or avoid formatting mistakes that happen when editing structured content by hand.'
+        },
+        {
+          question: 'Are these converters useful for API and spreadsheet work?',
+          answer: 'Yes. This category is especially helpful when turning API responses into spreadsheet-friendly data or cleaning exports before sharing them with teammates.'
         }
       ]
     },
@@ -61,6 +69,14 @@ export const categoryContent: Record<
         {
           question: 'אילו פורמטים נתמכים כאן?',
           answer: 'הקטגוריה כוללת כלי JSON, CSV, XML ו־YAML, ובהמשך אפשר להוסיף עוד ממירי נתונים מובנים.'
+        },
+        {
+          question: 'מתי עדיף להשתמש בממיר פורמטים במקום לערוך ידנית?',
+          answer: 'כדאי להשתמש בממיר כשצריך להעביר payloads גדולים בין כלים, לשנות מבנה נתונים במהירות, או להימנע משגיאות פורמט שנוצרות בעריכה ידנית.'
+        },
+        {
+          question: 'האם הכלים האלה מתאימים לעבודה עם API וגיליונות?',
+          answer: 'כן. הקטגוריה הזאת שימושית במיוחד כשצריך להפוך תגובות API לנתונים נוחים לגיליון או לנקות יצוא לפני שיתוף עם צוות.'
         }
       ]
     }
@@ -79,6 +95,14 @@ export const categoryContent: Record<
         {
           question: 'Can I use these tools for long lists?',
           answer: 'Yes. They run locally in your browser and are useful for sorting, counting and cleaning pasted lists.'
+        },
+        {
+          question: 'Which text tasks are most common in this category?',
+          answer: 'People usually use these tools to sort lines, remove duplicates, count words, clean pasted content, and prepare text for websites or spreadsheets.'
+        },
+        {
+          question: 'Are these text tools good for SEO and content work?',
+          answer: 'Yes. They are useful for preparing headings, slugs, meta text, keyword lists, and content drafts in both Hebrew and English.'
         }
       ]
     },
@@ -95,6 +119,14 @@ export const categoryContent: Record<
         {
           question: 'אפשר להשתמש בהם לרשימות ארוכות?',
           answer: 'כן. הם רצים מקומית בדפדפן ומתאימים למיון, ספירה וניקוי של רשימות מודבקות.'
+        },
+        {
+          question: 'אילו משימות טקסט נפוצות יש בקטגוריה הזאת?',
+          answer: 'בדרך כלל משתמשים כאן כדי למיין שורות, להסיר כפילויות, לספור מילים, לנקות טקסט מודבק ולהכין תוכן לאתרים או לגיליונות.'
+        },
+        {
+          question: 'האם כלי הטקסט טובים גם ל־SEO ולעבודה על תוכן?',
+          answer: 'כן. הם מתאימים להכנת כותרות, slugs, תיאורי מטא, רשימות מילות מפתח וטיוטות תוכן בעברית ובאנגלית.'
         }
       ]
     }
@@ -113,6 +145,14 @@ export const categoryContent: Record<
         {
           question: 'Does Base64 encryption protect my data?',
           answer: 'No. Base64 is encoding, not encryption. Anyone can decode it.'
+        },
+        {
+          question: 'When do I need URL encoding or decoding?',
+          answer: 'You usually need it when building query strings, sharing links with special characters, or debugging parameters that break after being pasted into a browser or API request.'
+        },
+        {
+          question: 'Are these tools useful for developers only?',
+          answer: 'No. Marketers, content editors and operations teams also use encoding tools when they work with links, tracking parameters, copied snippets and embedded values.'
         }
       ]
     },
@@ -129,6 +169,14 @@ export const categoryContent: Record<
         {
           question: 'האם Base64 מצפין את המידע?',
           answer: 'לא. Base64 הוא קידוד ולא הצפנה. כל אחד יכול לפענח אותו.'
+        },
+        {
+          question: 'מתי צריך קידוד או פענוח של URL?',
+          answer: 'בדרך כלל כשבונים פרמטרים לקישור, משתפים כתובות עם תווים מיוחדים, או מדבגים ערכים שנשברים אחרי הדבקה לדפדפן או לבקשת API.'
+        },
+        {
+          question: 'האם הכלים האלה מיועדים רק למפתחים?',
+          answer: 'לא. גם אנשי שיווק, תוכן ואופרציה משתמשים בכלי קידוד כשעובדים עם קישורים, פרמטרי מעקב, קטעים מועתקים וערכים משובצים.'
         }
       ]
     }
@@ -147,6 +195,14 @@ export const categoryContent: Record<
         {
           question: 'Why do UTC and local dates look different?',
           answer: 'UTC is a global time standard, while local time depends on your device timezone.'
+        },
+        {
+          question: 'What are these date and time converters useful for?',
+          answer: 'They are useful for logs, analytics, API debugging, scheduling, and checking whether a system stores values in seconds, milliseconds, UTC, or local time.'
+        },
+        {
+          question: 'Can I use these tools for product and reporting workflows?',
+          answer: 'Yes. They help when reviewing exported reports, debugging event timestamps, or comparing backend time values with human-readable dates.'
         }
       ]
     },
@@ -163,6 +219,14 @@ export const categoryContent: Record<
         {
           question: 'למה UTC וזמן מקומי נראים שונים?',
           answer: 'UTC הוא תקן זמן גלובלי, וזמן מקומי תלוי באזור הזמן של המכשיר שלך.'
+        },
+        {
+          question: 'למה ממירי תאריך וזמן שימושיים בפועל?',
+          answer: 'הם שימושיים ללוגים, אנליטיקה, דיבוג API, תזמונים ובדיקת השאלה אם מערכת שומרת ערכים בשניות, מילישניות, UTC או זמן מקומי.'
+        },
+        {
+          question: 'אפשר להשתמש בהם גם בדוחות ובעבודת מוצר?',
+          answer: 'כן. הם עוזרים כשבודקים דוחות מיוצאים, מדבגים timestamps של אירועים או משווים ערכי זמן מהשרת לתאריכים קריאים.'
         }
       ]
     }
@@ -181,6 +245,14 @@ export const categoryContent: Record<
         {
           question: 'Are these tools meant for production secrets?',
           answer: 'Avoid pasting secrets into any web tool. These utilities run locally, but sensitive secrets should still be handled carefully.'
+        },
+        {
+          question: 'Which developer tasks fit this category best?',
+          answer: 'This category is best for quick formatting, escaping, decoding and small debugging steps that save time during everyday development work.'
+        },
+        {
+          question: 'Can non-developers use some of these tools too?',
+          answer: 'Yes. Product managers, QA and technical writers often use developer utilities for inspecting payloads, formatting snippets and checking encoded values.'
         }
       ]
     },
@@ -197,6 +269,14 @@ export const categoryContent: Record<
         {
           question: 'האם כדאי להדביק כאן סודות פרודקשן?',
           answer: 'לא מומלץ להדביק סודות בכלי רשת. הכלים רצים מקומית, אבל סודות רגישים עדיין דורשים זהירות.'
+        },
+        {
+          question: 'אילו משימות פיתוח הכי מתאימות לקטגוריה הזאת?',
+          answer: 'הקטגוריה מתאימה במיוחד לעיצוב מהיר, המלטה, פענוח ובדיקות קטנות שחוסכות זמן בעבודת פיתוח יומיומית.'
+        },
+        {
+          question: 'האם גם מי שלא מפתח יכול להשתמש בחלק מהכלים?',
+          answer: 'כן. מנהלי מוצר, QA וכותבים טכניים משתמשים לעיתים בכלי פיתוח כדי לבדוק payloads, לעצב קטעים ולבחון ערכים מקודדים.'
         }
       ]
     }
@@ -215,6 +295,14 @@ export const categoryContent: Record<
         {
           question: 'What formats are supported?',
           answer: 'This category currently supports HEX, RGB, HSL and CMYK conversion.'
+        },
+        {
+          question: 'Who usually uses these color converters?',
+          answer: 'They are commonly used by frontend developers, designers, marketers and anyone who needs to move a color between design tools, CSS and print-related formats.'
+        },
+        {
+          question: 'Can these tools help with design system work?',
+          answer: 'Yes. They make it easier to normalize brand colors, compare formats, and copy consistent values into tokens, stylesheets or component libraries.'
         }
       ]
     },
@@ -231,6 +319,14 @@ export const categoryContent: Record<
         {
           question: 'אילו פורמטים נתמכים?',
           answer: 'הקטגוריה תומכת כרגע בהמרה בין HEX, RGB, HSL ו־CMYK.'
+        },
+        {
+          question: 'מי בדרך כלל משתמש בממירי הצבעים האלה?',
+          answer: 'בדרך כלל משתמשים בהם מפתחי פרונטאנד, מעצבים, אנשי שיווק וכל מי שצריך להעביר צבע בין כלי עיצוב, CSS ופורמטים שקשורים להדפסה.'
+        },
+        {
+          question: 'האם הכלים האלה עוזרים גם בעבודה עם design systems?',
+          answer: 'כן. הם מקלים על יישור צבעי מותג, השוואת פורמטים והעתקת ערכים עקביים ל־tokens, stylesheets או ספריות רכיבים.'
         }
       ]
     }
@@ -249,6 +345,14 @@ export const categoryContent: Record<
         {
           question: 'Should I treat calculator output as professional advice?',
           answer: 'No. These tools are meant for quick everyday calculations. Verify important financial, tax or business decisions separately.'
+        },
+        {
+          question: 'What kinds of calculator tasks fit this category?',
+          answer: 'This category fits percentage checks, discount math, averages, ratios and other quick calculations that people often do before moving into a spreadsheet.'
+        },
+        {
+          question: 'Are these calculators useful for business and pricing work?',
+          answer: 'Yes. They are helpful for quick validation during pricing, content planning, simple budgeting and comparing number scenarios without opening a larger tool.'
         }
       ]
     },
@@ -265,6 +369,14 @@ export const categoryContent: Record<
         {
           question: 'האם התוצאה היא ייעוץ מקצועי?',
           answer: 'לא. הכלים מיועדים לחישובים יומיומיים מהירים. החלטות פיננסיות, מס או עסק חשובות כדאי לאמת בנפרד.'
+        },
+        {
+          question: 'אילו סוגי חישובים מתאימים לקטגוריה הזאת?',
+          answer: 'הקטגוריה מתאימה לבדיקות אחוזים, הנחות, ממוצעים, יחסים וחישובים מהירים שאנשים עושים לפני שעוברים לגיליון מפורט.'
+        },
+        {
+          question: 'האם המחשבונים שימושיים גם לעבודה עסקית ותמחור?',
+          answer: 'כן. הם עוזרים לבדיקות מהירות בזמן תמחור, תכנון תוכן, תקציבים בסיסיים והשוואת תרחישים מספריים בלי לפתוח כלי גדול יותר.'
         }
       ]
     }

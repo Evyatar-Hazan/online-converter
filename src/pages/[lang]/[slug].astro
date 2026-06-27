@@ -4,14 +4,27 @@ import AdSlot from '../../components/AdSlot.astro';
 import ToolCard from '../../components/ToolCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
-import { locales, siteName, siteUrl, ui } from '../../data/site';
-import { formatContentType, getConverterIntro } from '../../lib/converter-seo';
+import { locales, ui } from '../../data/site';
+import { getRelatedConverters } from '../../lib/related-tools';
+import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
 
 function exampleOutputNote(tool: ConverterTool, locale: Locale) {
   return locale === 'he'
-    ? `הדוגמה של ${tool.shortTitle.he} מראה את מבנה הקלט שהכלי מצפה לקבל. אפשר לטעון אותה בכפתור הדוגמה, לשנות ערכים ולראות מיד איך הפלט משתנה.`
-    : `The ${tool.shortTitle.en} example shows the input shape this tool expects. Load it with the sample button, change values and immediately see how the output changes.`;
+    ? `טען אחת מהדוגמאות כדי להתחיל מהר, להתאים את הערכים לצורך שלך ולראות איך ${tool.shortTitle.he} מגיב לקלט אמיתי.`
+    : `Load one of the examples to start faster, adapt the values to your case, and see how ${tool.shortTitle.en} behaves with realistic input.`;
+}
+
+function examplesHeading(tool: ConverterTool, locale: Locale) {
+  return locale === 'he'
+    ? `דוגמאות שימוש ל־${tool.shortTitle.he}`
+    : `Examples for ${tool.shortTitle.en}`;
+}
+
+function exampleHelperText(locale: Locale) {
+  return locale === 'he'
+    ? `כל כפתור דוגמה בתוך הכלי יטען את הקלט המתאים, כך שאפשר להתחיל בלי לנחש את הפורמט.`
+    : `Each example button inside the tool loads the matching input so you can start without guessing the format.`;
 }
 
 function generatedFaq(tool: ConverterTool) {
@@ -147,46 +160,14 @@ if (!tool) {
 }
 
 const labels = ui[locale];
-const related = tool.related.map((item) => converterBySlug.get(item)).filter(Boolean).slice(0, 3);
-const example = tool.examples[0];
+const related = getRelatedConverters(tool, 3);
 const contextualFaq = [...generatedFaq(tool), ...tool.faq];
 const tips = conversionTips(tool, locale);
 const issues = commonIssues(tool, locale);
-const title = `${tool.title[locale]} | ${siteName[locale]}`;
-const description = tool.metaDescription[locale];
+const title = getConverterPageTitle(tool, locale);
+const description = getConverterMetaDescription(tool, locale);
 const canonicalPath = `/${locale}/${tool.slug}/`;
-const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: tool.title[locale],
-    applicationCategory: 'UtilitiesApplication',
-    operatingSystem: 'Web browser',
-    url: `${siteUrl}${canonicalPath}`,
-    description,
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: contextualFaq.map((item) => ({
-      '@type': 'Question',
-      name: item.question[locale],
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: item.answer[locale]
-      }
-    }))
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: labels.home, item: `${siteUrl}/${locale}/` },
-      { '@type': 'ListItem', position: 2, name: tool.shortTitle[locale], item: `${siteUrl}${canonicalPath}` }
-    ]
-  }
-];
+const jsonLd = getConverterStructuredData(tool, locale, description, contextualFaq, labels.home);
 ---
 
 <BaseLayout
@@ -231,15 +212,28 @@ const jsonLd = [
         {tool.features[locale].map((feature) => <li>{feature}</li>)}
       </ul>
     </article>
-    {example && (
-      <article class="content-panel example-card">
-        <p class="eyebrow">{locale === 'he' ? 'דוגמה' : 'Example'}</p>
-        <h2>{example.label[locale]}</h2>
-        <p>{exampleOutputNote(tool, locale)}</p>
-        <pre><code>{example.input}</code></pre>
-      </article>
-    )}
   </section>
+
+  {tool.examples.length > 0 && (
+    <section class="content-panel examples-panel">
+      <div class="examples-header">
+        <div>
+          <p class="eyebrow">{locale === 'he' ? 'דוגמאות התחלה' : 'Starter examples'}</p>
+          <h2>{examplesHeading(tool, locale)}</h2>
+        </div>
+        <p>{exampleOutputNote(tool, locale)}</p>
+      </div>
+      <p class="examples-helper">{exampleHelperText(locale)}</p>
+      <div class="examples-grid">
+        {tool.examples.slice(0, 3).map((example) => (
+          <article class="example-card">
+            <h3>{example.label[locale]}</h3>
+            <pre><code>{example.input}</code></pre>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
 
   <section class="content-grid">
     <article class="content-panel">

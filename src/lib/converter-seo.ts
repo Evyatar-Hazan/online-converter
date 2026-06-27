@@ -1,4 +1,5 @@
-import type { ConverterTool, Locale } from '../types';
+import { siteUrl } from '../data/site';
+import type { ConverterTool, FaqItem, Locale } from '../types';
 
 export const searchIntents = ['convert', 'calculate', 'validate', 'format', 'decode', 'clean', 'generate', 'explain'] as const;
 
@@ -159,4 +160,121 @@ export function getConverterIntro(tool: ConverterTool, locale: Locale) {
     : `It runs locally in the browser, supports Hebrew and English input, and includes ${firstFeature || 'instant output'} with copy or download actions without uploading data to a server.`;
 
   return `${intentLead[intent][locale]} ${supportLine}`;
+}
+
+function formatFeatureForSnippet(feature: string, locale: Locale) {
+  if (!feature) return locale === 'he' ? 'תוצאה מהירה' : 'fast results';
+
+  if (locale === 'he') {
+    return feature;
+  }
+
+  return feature.charAt(0).toLowerCase() + feature.slice(1);
+}
+
+function getTitleSuffix(tool: ConverterTool, locale: Locale) {
+  const intent = getSearchIntent(tool);
+
+  const englishSuffixes: Record<SearchIntent, string> = {
+    convert: 'Free Online, No Upload',
+    calculate: 'Free Online Calculator',
+    validate: 'Free Online Checker',
+    format: 'Free Online Formatter',
+    decode: 'Free Online Decoder',
+    clean: 'Free Online Cleanup',
+    generate: 'Free Online Generator',
+    explain: 'Free Online Tool'
+  };
+
+  const hebrewSuffixes: Record<SearchIntent, string> = {
+    convert: 'חינם אונליין, בלי העלאה',
+    calculate: 'מחשבון חינמי אונליין',
+    validate: 'בדיקה חינמית אונליין',
+    format: 'עיצוב חינמי אונליין',
+    decode: 'פענוח חינמי אונליין',
+    clean: 'ניקוי חינמי אונליין',
+    generate: 'מחולל חינמי אונליין',
+    explain: 'כלי חינמי אונליין'
+  };
+
+  return locale === 'he' ? hebrewSuffixes[intent] : englishSuffixes[intent];
+}
+
+export function getConverterPageTitle(tool: ConverterTool, locale: Locale) {
+  return `${tool.title[locale]} | ${getTitleSuffix(tool, locale)}`;
+}
+
+export function getConverterMetaDescription(tool: ConverterTool, locale: Locale) {
+  const intent = getSearchIntent(tool);
+  const input = formatContentType(tool.inputType);
+  const output = formatContentType(tool.outputType);
+  const featureOne = formatFeatureForSnippet(tool.features[locale][0] ?? '', locale);
+  const featureTwo = formatFeatureForSnippet(tool.features[locale][1] ?? '', locale);
+
+  const englishTemplates: Record<SearchIntent, string> = {
+    convert: `${tool.shortTitle.en} converts ${input} to ${output} in your browser with ${featureOne}, ${featureTwo}, examples, copy/download actions, and no upload.`,
+    calculate: `Use ${tool.shortTitle.en} in your browser for fast results with examples, instant output, copy/download actions, and no upload.`,
+    validate: `${tool.shortTitle.en} checks ${input} quickly in your browser with ${featureOne}, clear results, examples, and no upload.`,
+    format: `${tool.shortTitle.en} formats ${input} into cleaner ${output} output in your browser with ${featureOne}, examples, copy/download, and no upload.`,
+    decode: `${tool.shortTitle.en} reveals readable ${output} from ${input} values in your browser with ${featureOne}, examples, copy/download, and no upload.`,
+    clean: `${tool.shortTitle.en} cleans ${input} in your browser with ${featureOne}, examples, copy/download actions, and no upload.`,
+    generate: `${tool.shortTitle.en} creates ready-to-use ${output} in your browser with ${featureOne}, examples, copy/download actions, and no upload.`,
+    explain: `${tool.shortTitle.en} breaks down ${input} in your browser with ${featureOne}, examples, clear output, and no upload.`
+  };
+
+  const hebrewTemplates: Record<SearchIntent, string> = {
+    convert: `${tool.shortTitle.he} ממיר ${input} ל־${output} ישירות בדפדפן עם ${featureOne}, ${featureTwo}, דוגמאות, העתקה או הורדה, ובלי העלאת מידע.`,
+    calculate: `${tool.shortTitle.he} נותן תוצאה מהירה בדפדפן עם דוגמאות, פלט מיידי, העתקה או הורדה, ובלי העלאת מידע.`,
+    validate: `${tool.shortTitle.he} בודק ${input} במהירות בדפדפן עם ${featureOne}, תוצאה ברורה, דוגמאות ובלי העלאת מידע.`,
+    format: `${tool.shortTitle.he} מסדר ${input} לפלט ${output} נקי יותר בדפדפן עם ${featureOne}, דוגמאות, העתקה או הורדה, ובלי העלאת מידע.`,
+    decode: `${tool.shortTitle.he} חושף ${output} קריא מתוך ${input} בדפדפן עם ${featureOne}, דוגמאות, העתקה או הורדה, ובלי העלאת מידע.`,
+    clean: `${tool.shortTitle.he} מנקה ${input} בדפדפן עם ${featureOne}, דוגמאות, העתקה או הורדה, ובלי העלאת מידע.`,
+    generate: `${tool.shortTitle.he} יוצר ${output} מוכן לשימוש בדפדפן עם ${featureOne}, דוגמאות, העתקה או הורדה, ובלי העלאת מידע.`,
+    explain: `${tool.shortTitle.he} מפרק ${input} לפרטים קריאים בדפדפן עם ${featureOne}, דוגמאות, פלט ברור ובלי העלאת מידע.`
+  };
+
+  return locale === 'he' ? hebrewTemplates[intent] : englishTemplates[intent];
+}
+
+export function getConverterStructuredData(
+  tool: ConverterTool,
+  locale: Locale,
+  description: string,
+  contextualFaq: FaqItem[],
+  homeLabel: string
+) {
+  const canonicalPath = `/${locale}/${tool.slug}/`;
+
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: tool.title[locale],
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Web browser',
+      url: `${siteUrl}${canonicalPath}`,
+      description,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: contextualFaq.map((item) => ({
+        '@type': 'Question',
+        name: item.question[locale],
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer[locale]
+        }
+      }))
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: homeLabel, item: `${siteUrl}/${locale}/` },
+        { '@type': 'ListItem', position: 2, name: tool.shortTitle[locale], item: `${siteUrl}${canonicalPath}` }
+      ]
+    }
+  ];
 }
