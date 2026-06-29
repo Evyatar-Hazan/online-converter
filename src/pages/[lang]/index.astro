@@ -96,7 +96,7 @@ const copy = {
       <button type="button" data-filter="all" class="active">{labels.allTools}</button>
       {categories.map((category) => <button type="button" data-filter={category}>{categoryLabels[category][locale]}</button>)}
     </div>
-    <div class="tools-grid">
+    <div class="tools-grid" data-home-tools-grid>
       {converters.map((tool) => <ToolCard tool={tool} locale={locale} />)}
     </div>
   </section>

@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { converters } from '../../src/data/converters';
 
+const categoryCount = 7;
+const expectedPublicSeoPages = 2 + categoryCount * 2 + converters.length * 2;
+
 test('English tool page converts JSON to CSV', async ({ page }) => {
   await page.goto('/en/json-to-csv/');
   await expect(page).toHaveTitle(/JSON to CSV Converter/);
@@ -14,7 +17,7 @@ test('Hebrew home page supports RTL and search filtering', async ({ page }) => {
   await page.goto('/he/');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await page.getByLabel('חיפוש ממירים').fill('Base64');
-  await expect(page.locator('[data-tool-card]:visible')).toHaveCount(2);
+  await expect(page.locator('[data-home-tools-grid] [data-tool-card]:visible')).toHaveCount(2);
   await expect(page.getByRole('link', { name: 'Evyatar Hazan' })).toHaveAttribute('href', 'https://evyatarhazan.com/');
 });
 
@@ -25,8 +28,8 @@ test('Hebrew category page lists matching tools', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('כלי טקסט');
   await expect(page.getByText('מה אפשר לעשות כאן')).toBeVisible();
   await expect(page.getByText('האם הכלים עובדים טוב עם עברית?')).toBeVisible();
-  await expect(page.locator('[data-tool-card]')).toHaveCount(textToolCount);
-  await expect(page.getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
+  await expect(page.locator('[data-category-tools-grid] [data-tool-card]')).toHaveCount(textToolCount);
+  await expect(page.locator('[data-category-tools-grid]').getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
 });
 
 test('all English category pages expose tool cards and SEO content', async ({ page }) => {
@@ -37,7 +40,7 @@ test('all English category pages expose tool cards and SEO content', async ({ pa
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`/en/${category}/$`));
     await expect(page.locator('link[hreflang="he"]')).toHaveAttribute('href', new RegExp(`/he/${category}/$`));
-    await expect(page.locator('[data-tool-card]').first()).toBeVisible();
+    await expect(page.locator('[data-category-tools-grid] [data-tool-card]').first()).toBeVisible();
     await expect(page.getByText('FAQ').first()).toBeVisible();
   }
 });
@@ -173,8 +176,8 @@ test('analytics dashboard is internal and summarizes tracking readiness', async 
   await expect(page).toHaveTitle(/Analytics Dashboard/);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
   await expect(page.locator('h1')).toContainText('Analytics readiness');
-  await expect(page.getByText('Public SEO pages')).toBeVisible();
-  await expect(page.getByText('244')).toBeVisible();
+  await expect(page.locator('[data-analytics-kpi="public-seo-pages"]')).toContainText('Public SEO pages');
+  await expect(page.locator('[data-analytics-kpi="public-seo-pages"] strong')).toHaveText(String(expectedPublicSeoPages));
   await expect(page.getByText('view_tool')).toBeVisible();
   await expect(page.getByText('convert_tool')).toBeVisible();
   await expect(page.getByText('Cloudflare Web Analytics')).toBeVisible();

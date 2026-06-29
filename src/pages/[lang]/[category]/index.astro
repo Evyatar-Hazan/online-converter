@@ -227,7 +227,7 @@ const jsonLd = [
           <h2>{copy.popularSectionTitle}</h2>
         </div>
       </div>
-      <div class="tools-grid compact">
+      <div class="tools-grid compact" data-category-highlight-grid="popular">
         {popularTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}
       </div>
     </section>
@@ -241,7 +241,7 @@ const jsonLd = [
           <h2>{copy.newSectionTitle}</h2>
         </div>
       </div>
-      <div class="tools-grid compact">
+      <div class="tools-grid compact" data-category-highlight-grid="new">
         {newTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}
       </div>
     </section>
@@ -255,7 +255,7 @@ const jsonLd = [
       </div>
       <p class="section-note">{copy.allToolsDescription}</p>
     </div>
-    <div class="tools-grid">
+    <div class="tools-grid" data-category-tools-grid>
       {buckets.ordered.map((tool) => <ToolCard tool={tool} locale={locale} />)}
     </div>
   </section>

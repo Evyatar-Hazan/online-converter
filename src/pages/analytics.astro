@@ -57,22 +57,22 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
   </section>
 
   <section class="analytics-kpi-grid" aria-label="Analytics KPIs">
-    <article>
+    <article data-analytics-kpi="public-seo-pages">
       <span>Public SEO pages</span>
       <strong>{analyticsSummary.publicSeoPages}</strong>
       <small>Home, category and converter pages</small>
     </article>
-    <article>
+    <article data-analytics-kpi="localized-tool-pages">
       <span>Localized tool pages</span>
       <strong>{analyticsSummary.localizedToolPages}</strong>
       <small>Hebrew and English converter URLs</small>
     </article>
-    <article>
+    <article data-analytics-kpi="converters">
       <span>Converters</span>
       <strong>{analyticsSummary.totalConverters}</strong>
       <small>{analyticsSummary.categories} categories</small>
     </article>
-    <article>
+    <article data-analytics-kpi="ad-placements">
       <span>Ad placements</span>
       <strong>{analyticsSummary.adPlacements}</strong>
       <small>Top, inline, sidebar and bottom</small>
