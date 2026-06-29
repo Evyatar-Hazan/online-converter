@@ -18,6 +18,20 @@ const htmlPathFor = (pathname) => {
 
 const getDocument = (pathname) => new JSDOM(readDistFile(htmlPathFor(pathname))).window.document;
 
+const walkDistFiles = (directory = '') => {
+  const root = join(distDir, directory);
+  const entries = readdirSync(root, { withFileTypes: true });
+
+  return entries.flatMap((entry) => {
+    const nested = directory ? join(directory, entry.name) : entry.name;
+    if (entry.isDirectory()) {
+      return walkDistFiles(nested);
+    }
+
+    return [nested];
+  });
+};
+
 const countLocalizedHtmlPages = () => {
   const countIndexFiles = (directory) => {
     const entries = readdirSync(join(distDir, directory), { withFileTypes: true });
@@ -43,6 +57,74 @@ const getAttribute = (document, selector, attribute) => {
   }
 
   return element.getAttribute(attribute);
+};
+
+const normalizePublicPath = (pathname) => {
+  if (!pathname || pathname === '/') {
+    return '/';
+  }
+
+  if (/\.[a-z0-9]+$/i.test(pathname)) {
+    return pathname;
+  }
+
+  return pathname.endsWith('/') ? pathname : `${pathname}/`;
+};
+
+const toPublicPath = (relativeFile) => {
+  if (relativeFile === 'index.html') {
+    return '/';
+  }
+
+  if (relativeFile.endsWith('/index.html')) {
+    return `/${relativeFile.slice(0, -'index.html'.length)}`;
+  }
+
+  return `/${relativeFile}`;
+};
+
+const resolvableInternalHref = (href) => {
+  if (!href) return null;
+  if (href.startsWith('#')) return null;
+  if (/^(mailto:|tel:|javascript:)/i.test(href)) return null;
+
+  const url = new URL(href, `${siteUrl}/`);
+  if (url.origin !== siteUrl) {
+    return null;
+  }
+
+  return normalizePublicPath(url.pathname);
+};
+
+const assertNoBrokenInternalLinks = () => {
+  const distFiles = walkDistFiles();
+  const publicTargets = new Set(
+    distFiles.map((file) => normalizePublicPath(toPublicPath(file)))
+  );
+  const htmlFiles = distFiles.filter((file) => file.endsWith('.html'));
+  const brokenLinks = [];
+
+  for (const htmlFile of htmlFiles) {
+    const sourcePath = normalizePublicPath(toPublicPath(htmlFile));
+    const document = new JSDOM(readDistFile(htmlFile)).window.document;
+    const anchors = [...document.querySelectorAll('a[href]')];
+
+    for (const anchor of anchors) {
+      const href = anchor.getAttribute('href');
+      if (!href) continue;
+
+      const resolved = resolvableInternalHref(href.startsWith('/') ? href : new URL(href, `${siteUrl}${sourcePath}`).pathname);
+      if (!resolved) continue;
+
+      if (!publicTargets.has(resolved)) {
+        brokenLinks.push(`${sourcePath} -> ${href} (resolved to ${resolved})`);
+      }
+    }
+  }
+
+  if (brokenLinks.length > 0) {
+    fail(`Broken internal links found:\n${brokenLinks.join('\n')}`);
+  }
 };
 
 const assertEqual = (actual, expected, label) => {
@@ -119,5 +201,7 @@ if (/Disallow:\s*\//.test(robots)) {
 if (!robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`)) {
   fail('robots.txt must point to the canonical sitemap URL');
 }
+
+assertNoBrokenInternalLinks();
 
 console.log(`SEO build check passed for ${publicPaths.length} representative pages and ${locCount} sitemap URLs.`);
