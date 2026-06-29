@@ -1,8 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { JSDOM } from 'jsdom';
-import { converters } from '../src/data/converters.ts';
-import { categoryLabels, locales } from '../src/data/site.ts';
 
 const siteUrl = 'https://online-converter.evyatarhazan.com';
 const distDir = join(process.cwd(), 'dist');
@@ -19,6 +17,23 @@ const htmlPathFor = (pathname) => {
 };
 
 const getDocument = (pathname) => new JSDOM(readDistFile(htmlPathFor(pathname))).window.document;
+
+const countLocalizedHtmlPages = () => {
+  const countIndexFiles = (directory) => {
+    const entries = readdirSync(join(distDir, directory), { withFileTypes: true });
+
+    return entries.reduce((total, entry) => {
+      if (entry.isDirectory()) {
+        const nested = join(directory, entry.name);
+        return total + (readDistFile(join(nested, 'index.html')) ? 1 : 0);
+      }
+
+      return total;
+    }, 1);
+  };
+
+  return countIndexFiles('en') + countIndexFiles('he');
+};
 
 const getAttribute = (document, selector, attribute) => {
   const element = document.querySelector(selector);
@@ -81,7 +96,7 @@ for (const pathname of publicPaths) {
 }
 
 const locCount = [...sitemap.matchAll(/<loc>/g)].length;
-const expectedLocCount = locales.length + locales.length * Object.keys(categoryLabels).length + locales.length * converters.length;
+const expectedLocCount = countLocalizedHtmlPages();
 if (locCount !== expectedLocCount) {
   fail(`Expected ${expectedLocCount} sitemap URLs, received ${locCount}`);
 }
