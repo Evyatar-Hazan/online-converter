@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   analyticsSummary,
   backlogQualityRequirements,
+  contentQualitySummary,
   converterBacklogRows,
   converterBacklogSummary,
   converterSeoAuditChecks,
@@ -164,6 +165,12 @@ describe('analytics dashboard ranking monitor', () => {
       'Use cases',
       'Reverse or related links'
     ]);
+  });
+
+  it('tracks how many fresh tools are launch-ready for homepage and category highlights', () => {
+    expect(contentQualitySummary.launchReadyFreshTools).toBeGreaterThan(0);
+    expect(contentQualitySummary.toolsWithUseCases).toBe(converters.length);
+    expect(contentQualitySummary.toolsWithRichFaq).toBe(converters.length);
   });
 
   it('audits converter page SEO template coverage', () => {

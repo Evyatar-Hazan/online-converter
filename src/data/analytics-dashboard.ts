@@ -1,5 +1,6 @@
 import { converters } from './converters';
 import { categoryLabels, locales, siteUrl } from './site';
+import { getToolContentReadiness, isLaunchReadyFreshTool } from '../lib/converter-content';
 import { getConverterIntro, getSearchIntent, searchIntents, type SearchIntent } from '../lib/converter-seo';
 import { getRelatedConverters } from '../lib/related-tools';
 
@@ -145,9 +146,16 @@ export const analyticsSummary = {
   locales: locales.length,
   categories: categoryKeys.length,
   popularTools: converters.filter((tool) => tool.popular).length,
-  newTools: converters.filter((tool) => tool.new).length,
+  newTools: converters.filter((tool) => isLaunchReadyFreshTool(tool)).length,
   trackedEvents: analyticsEvents.length,
   adPlacements: 4
+};
+
+export const contentQualitySummary = {
+  launchReadyFreshTools: converters.filter((tool) => isLaunchReadyFreshTool(tool)).length,
+  toolsWithTwoExamples: converters.filter((tool) => getToolContentReadiness(tool).exampleCount >= 2).length,
+  toolsWithRichFaq: converters.filter((tool) => getToolContentReadiness(tool).faqCount >= 4).length,
+  toolsWithUseCases: converters.filter((tool) => getToolContentReadiness(tool).useCaseCount >= 3).length
 };
 
 export const searchConsoleBaseline = {
@@ -182,7 +190,7 @@ export const rankingWorkflowSteps = [
 ] as const;
 
 export const rankingMonitorRows = converters.map((tool) => {
-  const priority = tool.popular ? 'P1' : tool.new ? 'P2' : 'P3';
+  const priority = tool.popular ? 'P1' : isLaunchReadyFreshTool(tool) ? 'P2' : 'P3';
   const nextAction =
     priority === 'P1'
       ? 'Inspect indexing and strengthen snippet/content first.'
@@ -229,7 +237,7 @@ export const keywordMapRows = converters.map((tool) => {
     category: tool.category,
     categoryLabel: categoryLabels[tool.category].en,
     popular: Boolean(tool.popular),
-    new: Boolean(tool.new),
+    new: isLaunchReadyFreshTool(tool),
     englishUrl: `/en/${tool.slug}/`,
     hebrewUrl: `/he/${tool.slug}/`,
     primaryEnglishQuery: englishKeywords.primary,
@@ -628,7 +636,7 @@ export const analyticsCategoryRows = categoryKeys.map((category) => {
     tools: tools.length,
     localizedPages: tools.length * locales.length,
     popular: tools.filter((tool) => tool.popular).length,
-    newTools: tools.filter((tool) => tool.new).length
+    newTools: tools.filter((tool) => isLaunchReadyFreshTool(tool)).length
   };
 });
 

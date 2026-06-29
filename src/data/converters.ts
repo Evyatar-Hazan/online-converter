@@ -2687,7 +2687,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['timezone converter meeting', 'timezone meeting planner'], he: ['מתכנן פגישות אזורי זמן', 'המרת שעה בין אזורי זמן'] },
     features: { en: ['Multiple time zones', 'UTC output', 'Team scheduling'], he: ['מספר אזורי זמן', 'פלט UTC', 'תזמון צוותים'] },
     guide: { en: ['Add date=YYYY-MM-DD and time=HH:MM.', 'Set from= with the source timezone.', 'Add to= with comma-separated target zones and convert.'], he: ['הוסף date=YYYY-MM-DD ו־time=HH:MM.', 'הגדר from= עם אזור הזמן המקורי.', 'הוסף to= עם אזורי זמן מופרדים בפסיקים והמר.'] },
-    examples: [{ label: { en: 'Product sync', he: 'סנכרון מוצר' }, input: 'date=2026-07-01\ntime=14:30\nfrom=Asia/Jerusalem\nto=Europe/London,America/New_York,Asia/Tokyo' }],
+    examples: [
+      { label: { en: 'Product sync', he: 'סנכרון מוצר' }, input: 'date=2026-07-01\ntime=14:30\nfrom=Asia/Jerusalem\nto=Europe/London,America/New_York,Asia/Tokyo' },
+      { label: { en: 'Sales handoff', he: 'העברת מכירות' }, input: 'date=2026-09-15\ntime=09:00\nfrom=Europe/London\nto=Asia/Jerusalem,America/Los_Angeles,Asia/Singapore' }
+    ],
     faq: [
       {
         question: { en: 'Which timezone names should I use here?', he: 'אילו שמות אזורי זמן צריך להזין כאן?' },
@@ -2716,7 +2719,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['cron expression explainer', 'cron schedule explainer'], he: ['הסבר cron', 'מסביר ביטוי cron'] },
     features: { en: ['5-field cron', 'Step values', 'Ranges and lists'], he: ['cron בן 5 שדות', 'ערכי step', 'טווחים ורשימות'] },
     guide: { en: ['Paste a five-part cron expression.', 'Convert to inspect minute, hour, day, month and weekday meaning.', 'Use the summary to catch scheduling mistakes faster.'], he: ['הדבק ביטוי cron בן חמישה חלקים.', 'המר כדי לבדוק את משמעות הדקות, השעות, היום, החודש ויום השבוע.', 'השתמש בסיכום כדי לזהות טעויות תזמון מהר יותר.'] },
-    examples: [{ label: { en: 'Workday quarter hour', he: 'כל רבע שעה בימי עבודה' }, input: '*/15 9-17 * * 1-5' }],
+    examples: [
+      { label: { en: 'Workday quarter hour', he: 'כל רבע שעה בימי עבודה' }, input: '*/15 9-17 * * 1-5' },
+      { label: { en: 'Nightly backup', he: 'גיבוי לילי' }, input: '0 2 * * *' }
+    ],
     faq: [
       {
         question: { en: 'Does this cron explainer support six-part cron syntax?', he: 'האם המסביר הזה תומך גם ב־cron בן שישה חלקים?' },
@@ -2745,7 +2751,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['date difference calculator', 'days between dates'], he: ['מחשבון הפרש תאריכים', 'ימים בין תאריכים'] },
     features: { en: ['Days difference', 'Weeks and days', 'Date summary'], he: ['הפרש ימים', 'שבועות וימים', 'סיכום תאריכים'] },
     guide: { en: ['Paste the first date on line 1.', 'Paste the second date on line 2.', 'Convert to see the difference in days and weeks.'], he: ['הדבק את התאריך הראשון בשורה 1.', 'הדבק את התאריך השני בשורה 2.', 'המר כדי לראות את ההפרש בימים ובשבועות.'] },
-    examples: [{ label: { en: 'Project window', he: 'חלון פרויקט' }, input: '2026-06-01\n2026-06-10' }],
+    examples: [
+      { label: { en: 'Project window', he: 'חלון פרויקט' }, input: '2026-06-01\n2026-06-10' },
+      { label: { en: 'Quarter planning', he: 'תכנון רבעוני' }, input: '2026-07-01\n2026-09-30' }
+    ],
     faq: [
       {
         question: { en: 'Does the date difference calculator count full days only?', he: 'האם מחשבון הפרש התאריכים סופר רק ימים מלאים?' },
@@ -2774,7 +2783,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['detect text case', 'text case detector'], he: ['זיהוי סוג אותיות', 'מזהה case בטקסט'] },
     features: { en: ['camelCase', 'snake_case', 'Mixed detection'], he: ['camelCase', 'snake_case', 'זיהוי טקסט מעורב'] },
     guide: { en: ['Paste a word, phrase or identifier.', 'Convert to detect the closest case pattern.', 'Use the result before transforming the text into another naming style.'], he: ['הדבק מילה, ביטוי או מזהה.', 'המר לזיהוי דפוס האותיות הקרוב ביותר.', 'השתמש בתוצאה לפני המרה לסגנון שמות אחר.'] },
-    examples: [{ label: { en: 'Frontend key', he: 'מפתח frontend' }, input: 'customerAccountNumber' }],
+    examples: [
+      { label: { en: 'Frontend key', he: 'מפתח frontend' }, input: 'customerAccountNumber' },
+      { label: { en: 'CSV header', he: 'כותרת CSV' }, input: 'order_status' }
+    ],
     faq: [
       {
         question: { en: 'Is text case detection useful outside programming?', he: 'האם זיהוי case בטקסט שימושי גם מחוץ לתכנות?' },
@@ -2803,7 +2815,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['parse http headers', 'http header parser'], he: ['פירוש כותרות HTTP', 'מפרש כותרות HTTP'] },
     features: { en: ['Request line', 'Repeated headers', 'JSON output'], he: ['שורת בקשה', 'כותרות חוזרות', 'פלט JSON'] },
     guide: { en: ['Paste the request line or status line first.', 'Paste each header on a new line.', 'Convert to inspect normalized header keys and values.'], he: ['הדבק קודם את שורת הבקשה או שורת הסטטוס.', 'הדבק כל כותרת בשורה חדשה.', 'המר כדי לבדוק מפתחות וערכים מנורמלים.'] },
-    examples: [{ label: { en: 'Request headers', he: 'כותרות בקשה' }, input: 'GET /api HTTP/1.1\nHost: example.com\nAuthorization: Bearer token\nX-Test: one\nX-Test: two' }],
+    examples: [
+      { label: { en: 'Request headers', he: 'כותרות בקשה' }, input: 'GET /api HTTP/1.1\nHost: example.com\nAuthorization: Bearer token\nX-Test: one\nX-Test: two' },
+      { label: { en: 'Response headers', he: 'כותרות תגובה' }, input: 'HTTP/1.1 200 OK\nContent-Type: application/json\nCache-Control: no-store\nSet-Cookie: session=abc\nSet-Cookie: theme=dark' }
+    ],
     faq: [
       {
         question: { en: 'Does the HTTP header parser preserve repeated headers?', he: 'האם מפרש כותרות HTTP שומר כותרות שחוזרות כמה פעמים?' },
@@ -2832,7 +2847,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['count json keys', 'json key counter'], he: ['ספירת מפתחות JSON', 'סופר מפתחות JSON'] },
     features: { en: ['Total keys', 'Unique keys', 'Max depth'], he: ['מפתחות כוללים', 'מפתחות ייחודיים', 'עומק מרבי'] },
     guide: { en: ['Paste a JSON object or array.', 'Convert to count keys and nesting depth.', 'Use the summary to understand payload complexity fast.'], he: ['הדבק אובייקט או מערך JSON.', 'המר לספירת מפתחות ועומק קינון.', 'השתמש בסיכום כדי להבין מהר את מורכבות ה־payload.'] },
-    examples: [{ label: { en: 'Nested object', he: 'אובייקט מקונן' }, input: '{"user":{"name":"Dana","address":{"city":"Jerusalem"}}}' }],
+    examples: [
+      { label: { en: 'Nested object', he: 'אובייקט מקונן' }, input: '{"user":{"name":"Dana","address":{"city":"Jerusalem"}}}' },
+      { label: { en: 'Array payload', he: 'payload של מערך' }, input: '[{"id":1,"status":"active"},{"id":2,"status":"paused","owner":{"name":"Avi"}}]' }
+    ],
     faq: [
       {
         question: { en: 'Does the JSON key counter work on arrays too?', he: 'האם סופר המפתחות עובד גם על מערכים?' },
@@ -2861,7 +2879,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['find duplicate csv rows', 'csv duplicate finder'], he: ['איתור כפילויות CSV', 'שורות כפולות ב־CSV'] },
     features: { en: ['Full-row duplicates', 'Column mode', 'CSV inspection'], he: ['כפילויות שורה מלאה', 'מצב עמודה', 'בדיקת CSV'] },
     guide: { en: ['Paste CSV data directly.', 'Optional: add column=name on top to inspect one column only.', 'Convert to list duplicates and their counts.'], he: ['הדבק CSV ישירות.', 'אופציונלי: הוסף למעלה column=name כדי לבדוק רק עמודה אחת.', 'המר כדי לראות כפילויות והספירה שלהן.'] },
-    examples: [{ label: { en: 'Duplicate cities', he: 'כפילויות עיר' }, input: 'column=city\nname,city\nDana,Jerusalem\nAvi,Haifa\nNoa,Jerusalem' }],
+    examples: [
+      { label: { en: 'Duplicate cities', he: 'כפילויות עיר' }, input: 'column=city\nname,city\nDana,Jerusalem\nAvi,Haifa\nNoa,Jerusalem' },
+      { label: { en: 'Repeated rows', he: 'שורות חוזרות' }, input: 'name,city\nDana,Jerusalem\nAvi,Haifa\nDana,Jerusalem' }
+    ],
     faq: [
       {
         question: { en: 'Can I search for duplicate rows without selecting a column?', he: 'אפשר לחפש שורות כפולות בלי לבחור עמודה?' },
@@ -2890,7 +2911,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['rgb alpha to hex', 'rgb to hex with alpha'], he: ['RGB alpha ל HEX', 'RGB ל HEX עם שקיפות'] },
     features: { en: ['8-digit HEX', '0-1 or 0-100 alpha', 'CSS ready'], he: ['HEX בן 8 ספרות', 'alpha של 0-1 או 0-100', 'מוכן ל־CSS'] },
     guide: { en: ['Enter red, green, blue and alpha.', 'Use alpha as 0.6 or 60.', 'Convert and copy the 8-digit HEX result.'], he: ['הזן אדום, ירוק, כחול ו־alpha.', 'השתמש ב־alpha כ־0.6 או 60.', 'המר והעתק את תוצאת ה־HEX בת 8 הספרות.'] },
-    examples: [{ label: { en: 'Indigo overlay', he: 'שכבת אינדיגו' }, input: '79, 70, 229, 60' }],
+    examples: [
+      { label: { en: 'Indigo overlay', he: 'שכבת אינדיגו' }, input: '79, 70, 229, 60' },
+      { label: { en: 'Soft green badge', he: 'תג ירוק רך' }, input: '16, 185, 129, 0.35' }
+    ],
     faq: [
       {
         question: { en: 'Should alpha be written as 0.6 or 60?', he: 'האם alpha צריך להיכתב כ־0.6 או 60?' },
@@ -2919,7 +2943,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['macro calculator', 'calorie macro calculator'], he: ['מחשבון מאקרו', 'מחשבון קלוריות ומאקרו'] },
     features: { en: ['Protein grams', 'Fat grams', 'Carb grams'], he: ['גרמי חלבון', 'גרמי שומן', 'גרמי פחמימה'] },
     guide: { en: ['Add calories= on the first line.', 'Set proteinPercent=, fatPercent= and carbsPercent=.', 'Convert to get macro grams for the full day.'], he: ['הוסף calories= בשורה הראשונה.', 'הגדר proteinPercent=, fatPercent= ו־carbsPercent=.', 'המר לקבלת גרמי מאקרו לכל היום.'] },
-    examples: [{ label: { en: 'Balanced cut', he: 'חיטוב מאוזן' }, input: 'calories=2200\nproteinPercent=30\nfatPercent=25\ncarbsPercent=45' }],
+    examples: [
+      { label: { en: 'Balanced cut', he: 'חיטוב מאוזן' }, input: 'calories=2200\nproteinPercent=30\nfatPercent=25\ncarbsPercent=45' },
+      { label: { en: 'Maintenance day', he: 'יום תחזוקה' }, input: 'calories=2600\nproteinPercent=25\nfatPercent=30\ncarbsPercent=45' }
+    ],
     faq: [
       {
         question: { en: 'Do the macro percentages need to add up to 100?', he: 'האם אחוזי המאקרו צריכים להסתכם ל־100?' },
@@ -2948,7 +2975,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['mortgage affordability calculator', 'how much mortgage can i afford'], he: ['מחשבון יכולת משכנתה', 'כמה משכנתה אפשר לקחת'] },
     features: { en: ['Monthly payment', 'Estimated loan size', 'DTI based'], he: ['תשלום חודשי', 'גודל הלוואה משוער', 'מבוסס DTI'] },
     guide: { en: ['Add monthlyIncome= and monthlyDebts=.', 'Set rate= and years= for the loan assumption.', 'Optional: add maxDti= to change the debt-to-income threshold.'], he: ['הוסף monthlyIncome= ו־monthlyDebts=.', 'הגדר rate= ו־years= להנחת ההלוואה.', 'אופציונלי: הוסף maxDti= כדי לשנות את סף יחס החוב להכנסה.'] },
-    examples: [{ label: { en: 'Family budget', he: 'תקציב משפחתי' }, input: 'monthlyIncome=18000\nmonthlyDebts=2500\nrate=5.5\nyears=25\nmaxDti=36' }],
+    examples: [
+      { label: { en: 'Family budget', he: 'תקציב משפחתי' }, input: 'monthlyIncome=18000\nmonthlyDebts=2500\nrate=5.5\nyears=25\nmaxDti=36' },
+      { label: { en: 'Single buyer', he: 'רוכש יחיד' }, input: 'monthlyIncome=12500\nmonthlyDebts=1200\nrate=4.9\nyears=20\nmaxDti=32' }
+    ],
     faq: [
       {
         question: { en: 'What does the mortgage affordability estimate include?', he: 'מה כוללת הערכת יכולת המשכנתה?' },

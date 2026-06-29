@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { categoryLabels } from '../data/site';
+import { isLaunchReadyFreshTool } from './converter-content';
 import { getHomepageHighlightTools, getPriorityHubLinks, priorityHubCategories } from './site-navigation';
 
 describe('site navigation helpers', () => {
@@ -28,6 +29,7 @@ describe('site navigation helpers', () => {
 
     expect(popular.length).toBeGreaterThan(0);
     expect(popular.every((tool) => tool.popular)).toBe(true);
-    expect(fresh.every((tool) => tool.new && !tool.popular)).toBe(true);
+    expect(fresh.length).toBeGreaterThan(0);
+    expect(fresh.every((tool) => isLaunchReadyFreshTool(tool) && !tool.popular)).toBe(true);
   });
 });

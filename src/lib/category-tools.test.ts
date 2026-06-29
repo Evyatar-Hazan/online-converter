@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from '../data/converters';
+import { isLaunchReadyFreshTool } from './converter-content';
 import { getCategoryToolBuckets, getPriorityCategoryTools, rankCategoryTools } from './category-tools';
 
 describe('category tool ordering', () => {
@@ -7,7 +8,7 @@ describe('category tool ordering', () => {
     const textTools = converters.filter((tool) => tool.category === 'text');
     const ordered = rankCategoryTools(textTools, 'en');
 
-    const scores = ordered.map((tool) => Number(Boolean(tool.popular)) * 2 + Number(Boolean(tool.new)));
+    const scores = ordered.map((tool) => Number(Boolean(tool.popular)) * 2 + Number(isLaunchReadyFreshTool(tool)));
     expect(scores).toEqual([...scores].sort((left, right) => right - left));
   });
 

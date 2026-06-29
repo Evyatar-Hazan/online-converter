@@ -1,5 +1,6 @@
 import { converters } from '../data/converters';
 import type { ConverterTool } from '../types';
+import { isLaunchReadyFreshTool } from './converter-content';
 import { getSearchIntent } from './converter-seo';
 
 interface ScoredRelatedTool {
@@ -54,7 +55,7 @@ function scoreRelatedTool(source: ConverterTool, candidate: ConverterTool) {
     score += 8;
   }
 
-  if (candidate.new) {
+  if (isLaunchReadyFreshTool(candidate)) {
     score += 4;
   }
 

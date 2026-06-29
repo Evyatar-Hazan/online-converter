@@ -6,6 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { categoryLabels, locales, ui } from '../../data/site';
 import { getPriorityCategoryTools } from '../../lib/category-tools';
+import { getToolUseCases } from '../../lib/converter-content';
 import { getCategoryRelatedConverters, getInverseConverter, getRelatedConverters, getWorkflowRelatedConverters } from '../../lib/related-tools';
 import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
@@ -173,6 +174,7 @@ const categoryRelated = getCategoryRelatedConverters(tool, 3, excludedRelatedSlu
 const categoryTools = converters.filter((item) => item.category === tool.category);
 const priorityCategoryTools = getPriorityCategoryTools(categoryTools, locale, { excludeSlug: tool.slug, limit: 4 });
 const contextualFaq = [...generatedFaq(tool), ...tool.faq];
+const useCases = getToolUseCases(tool, locale);
 const tips = conversionTips(tool, locale);
 const issues = commonIssues(tool, locale);
 const title = getConverterPageTitle(tool, locale);
@@ -255,6 +257,28 @@ const linkingCopy = {
       <p>{getConverterIntro(tool, locale)}</p>
       <ul class="check-list">
         {tool.features[locale].map((feature) => <li>{feature}</li>)}
+      </ul>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'מקרי שימוש' : 'Use cases'}</p>
+      <h2>{locale === 'he' ? `איפה ${tool.shortTitle[locale]} עוזר באמת` : `Where ${tool.shortTitle[locale]} helps most`}</h2>
+      <ul class="check-list">
+        {useCases.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'זרימת עבודה' : 'Workflow fit'}</p>
+      <h2>{locale === 'he' ? 'איך לשלב את הכלי בתהליך' : 'How to fit the tool into a real workflow'}</h2>
+      <p>
+        {locale === 'he'
+          ? `${tool.shortTitle[locale]} מתאים במיוחד כשצריך תוצאה מהירה לפני העתקה, הורדה, שיתוף או מעבר לכלי הבא בשרשרת.`
+          : `${tool.shortTitle[locale]} works best when you need a fast result before copying, downloading, sharing or moving into the next tool in the chain.`}
+      </p>
+      <ul class="check-list">
+        {tool.guide[locale].slice(0, 3).map((step) => <li>{step}</li>)}
       </ul>
     </article>
   </section>

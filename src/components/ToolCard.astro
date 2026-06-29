@@ -1,5 +1,6 @@
 ---
 import { categoryLabels, ui } from '../data/site';
+import { isLaunchReadyFreshTool } from '../lib/converter-content';
 import type { ConverterTool, Locale } from '../types';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 
 const { tool, locale } = Astro.props;
 const labels = ui[locale];
+const showNewBadge = isLaunchReadyFreshTool(tool);
 ---
 
 <article class="tool-card" data-tool-card data-title={`${tool.title[locale]} ${tool.keywords[locale].join(' ')}`.toLowerCase()} data-category={tool.category}>
@@ -16,7 +18,7 @@ const labels = ui[locale];
     <span class="tool-category">{categoryLabels[tool.category][locale]}</span>
     <div class="tool-badges">
       {tool.popular && <span>{labels.popular}</span>}
-      {tool.new && <span>{labels.new}</span>}
+      {showNewBadge && <span>{labels.new}</span>}
     </div>
   </div>
   <h3>{tool.shortTitle[locale]}</h3>

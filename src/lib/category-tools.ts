@@ -1,6 +1,7 @@
+import { isLaunchReadyFreshTool } from './converter-content';
 import type { ConverterTool, Locale } from '../types';
 
-const scoreTool = (tool: ConverterTool) => Number(Boolean(tool.popular)) * 2 + Number(Boolean(tool.new));
+const scoreTool = (tool: ConverterTool) => Number(Boolean(tool.popular)) * 2 + Number(isLaunchReadyFreshTool(tool));
 
 const compareToolTitles = (left: ConverterTool, right: ConverterTool, locale: Locale) =>
   left.shortTitle[locale].localeCompare(right.shortTitle[locale], locale);
@@ -19,7 +20,7 @@ export const rankCategoryTools = (tools: ConverterTool[], locale: Locale) =>
 export const getCategoryToolBuckets = (tools: ConverterTool[], locale: Locale) => {
   const ordered = rankCategoryTools(tools, locale);
   const popular = ordered.filter((tool) => tool.popular);
-  const fresh = ordered.filter((tool) => tool.new && !tool.popular);
+  const fresh = ordered.filter((tool) => isLaunchReadyFreshTool(tool) && !tool.popular);
   const slugsInHighlights = new Set([...popular, ...fresh].map((tool) => tool.slug));
   const remaining = ordered.filter((tool) => !slugsInHighlights.has(tool.slug));
 

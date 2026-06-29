@@ -8,6 +8,7 @@ import {
   analyticsProviders,
   analyticsSummary,
   backlogQualityRequirements,
+  contentQualitySummary,
   converterBacklogBatchRows,
   converterBacklogCategoryRows,
   converterBacklogSummary,
@@ -729,12 +730,12 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
         <strong>{converterSeoAuditSummary.trackedConverters}</strong>
       </div>
       <div>
-        <span>Multi-example</span>
-        <strong>{converterSeoAuditSummary.convertersWithMultipleExamples}</strong>
+        <span>Launch-ready fresh</span>
+        <strong>{contentQualitySummary.launchReadyFreshTools}</strong>
       </div>
       <div>
-        <span>Generic FAQ only</span>
-        <strong>{converterSeoAuditSummary.convertersUsingOnlyGenericFaq}</strong>
+        <span>Multi-example</span>
+        <strong>{converterSeoAuditSummary.convertersWithMultipleExamples}</strong>
       </div>
       <div>
         <span>Reverse links</span>
