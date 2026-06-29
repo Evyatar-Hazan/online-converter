@@ -61,20 +61,22 @@ function scoreRelatedTool(source: ConverterTool, candidate: ConverterTool) {
   return score;
 }
 
-export function getRelatedConverters(source: ConverterTool, limit = 3) {
-  const scored = converters
+function rankRelatedTools(source: ConverterTool, predicate?: (candidate: ConverterTool) => boolean) {
+  return converters
     .map((tool) => ({ tool, score: scoreRelatedTool(source, tool) }))
-    .filter((entry) => entry.score > 0)
+    .filter((entry) => entry.score > 0 && (!predicate || predicate(entry.tool)))
     .sort((left, right) => {
       if (right.score !== left.score) return right.score - left.score;
       if (Number(right.tool.popular) !== Number(left.tool.popular)) return Number(right.tool.popular) - Number(left.tool.popular);
       return left.tool.slug.localeCompare(right.tool.slug);
     });
+}
 
+function pickRankedTools(source: ConverterTool, limit: number, predicate?: (candidate: ConverterTool) => boolean, exclude = new Set<string>()) {
   const picked: ScoredRelatedTool[] = [];
-  const used = new Set<string>();
+  const used = new Set<string>(exclude);
 
-  for (const entry of scored) {
+  for (const entry of rankRelatedTools(source, predicate)) {
     if (used.has(entry.tool.slug)) continue;
     picked.push(entry);
     used.add(entry.tool.slug);
@@ -85,4 +87,33 @@ export function getRelatedConverters(source: ConverterTool, limit = 3) {
   }
 
   return picked.map((entry) => entry.tool);
+}
+
+export function getInverseConverter(source: ConverterTool) {
+  return source.reverseSlug ? converters.find((tool) => tool.slug === source.reverseSlug) : undefined;
+}
+
+export function getWorkflowRelatedConverters(source: ConverterTool, limit = 3, exclude = new Set<string>()) {
+  const sourceIntent = getSearchIntent(source);
+  return pickRankedTools(
+    source,
+    limit,
+    (candidate) =>
+      candidate.slug !== source.slug &&
+      candidate.category !== source.category &&
+      (getSearchIntent(candidate) === sourceIntent ||
+        source.outputType === candidate.inputType ||
+        source.inputType === candidate.outputType ||
+        source.related.includes(candidate.slug) ||
+        candidate.related.includes(source.slug)),
+    exclude
+  );
+}
+
+export function getCategoryRelatedConverters(source: ConverterTool, limit = 3, exclude = new Set<string>()) {
+  return pickRankedTools(source, limit, (candidate) => candidate.slug !== source.slug && candidate.category === source.category, exclude);
+}
+
+export function getRelatedConverters(source: ConverterTool, limit = 3) {
+  return pickRankedTools(source, limit);
 }

@@ -3,6 +3,7 @@ import ThemeScript from '../components/ThemeScript.astro';
 import Analytics from '../components/Analytics.astro';
 import AdSenseScript from '../components/AdSenseScript.astro';
 import { locales, siteName, siteUrl, ui } from '../data/site';
+import { getPriorityHubLinks } from '../lib/site-navigation';
 import type { Locale } from '../types';
 import '../styles/global.css';
 
@@ -38,6 +39,7 @@ const {
   analyticsContext
 } = Astro.props;
 const labels = ui[locale];
+const footerHubLinks = getPriorityHubLinks(locale).slice(0, 4);
 const otherLocale = locale === 'he' ? 'en' : 'he';
 const alternatePath = alternateSlug ? `/${otherLocale}/${alternateSlug}/` : `/${otherLocale}/`;
 const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
@@ -96,6 +98,7 @@ const pageContext = analyticsContext ?? { pageType: 'home', locale };
       </div>
       <nav aria-label="Footer">
         <a href={`/${locale}/`}>{labels.home}</a>
+        {footerHubLinks.map((item) => <a href={item.href}>{item.label}</a>)}
         <a href="/sitemap.xml">{labels.sitemap}</a>
       </nav>
     </footer>

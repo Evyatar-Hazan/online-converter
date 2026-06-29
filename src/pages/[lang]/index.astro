@@ -4,6 +4,7 @@ import AdSlot from '../../components/AdSlot.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { categoryLabels, locales, siteName, ui } from '../../data/site';
 import { converters } from '../../data/converters';
+import { getHomepageHighlightTools, getPriorityHubLinks } from '../../lib/site-navigation';
 import type { ConverterCategory, Locale } from '../../types';
 
 export function getStaticPaths() {
@@ -12,7 +13,9 @@ export function getStaticPaths() {
 
 const locale = Astro.params.lang as Locale;
 const labels = ui[locale];
-const categories = [...new Set(converters.map((tool) => tool.category))] as ConverterCategory[];
+const priorityHubs = getPriorityHubLinks(locale);
+const categories = priorityHubs.map((item) => item.category) as ConverterCategory[];
+const homepageHighlights = getHomepageHighlightTools(6);
 const title = locale === 'he' ? 'אונליין קונברטר - ממירים מהירים בעברית ובאנגלית' : 'Online Converter - Fast bilingual converter tools';
 const description =
   locale === 'he'
@@ -31,6 +34,20 @@ const jsonLd = [
     }
   }
 ];
+const copy = {
+  popularEyebrow: locale === 'he' ? 'פופולרי עכשיו' : 'Popular now',
+  popularTitle: locale === 'he' ? 'ממירים פופולריים שכדאי להתחיל מהם' : 'Popular converters worth opening first',
+  popularDescription:
+    locale === 'he'
+      ? 'הכלים האלה כבר מסומנים כעדיפות גבוהה, ולכן הם גם נקודת כניסה טובה למשתמשים חדשים וגם hub חזק לקישורים פנימיים.'
+      : 'These tools are already marked as high-priority pages, so they work well as starting points for new users and as stronger internal linking hubs.',
+  newEyebrow: locale === 'he' ? 'חדש באתר' : 'New on the site',
+  newTitle: locale === 'he' ? 'כלים חדשים שיכולים למשוך עוד חיפושים' : 'New converters that can win more search demand',
+  newDescription:
+    locale === 'he'
+      ? 'הכלים החדשים עוזרים להרחיב כיסוי חיפושים ולחבר משתמשים לעמודים שעוד צריכים לצבור authority.'
+      : 'Fresh tools expand search coverage and help route users toward pages that still need to build authority.'
+};
 ---
 
 <BaseLayout
@@ -84,13 +101,43 @@ const jsonLd = [
     </div>
   </section>
 
+  {homepageHighlights.popular.length > 0 && (
+    <section class="section-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{copy.popularEyebrow}</p>
+          <h2>{copy.popularTitle}</h2>
+        </div>
+        <p class="section-note">{copy.popularDescription}</p>
+      </div>
+      <div class="tools-grid compact">
+        {homepageHighlights.popular.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+      </div>
+    </section>
+  )}
+
+  {homepageHighlights.fresh.length > 0 && (
+    <section class="section-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{copy.newEyebrow}</p>
+          <h2>{copy.newTitle}</h2>
+        </div>
+        <p class="section-note">{copy.newDescription}</p>
+      </div>
+      <div class="tools-grid compact">
+        {homepageHighlights.fresh.map((tool) => <ToolCard tool={tool} locale={locale} />)}
+      </div>
+    </section>
+  )}
+
   <section class="strategy-band">
     <div>
       <p class="eyebrow">{labels.strategyTitle}</p>
       <h2>{labels.strategyText}</h2>
     </div>
     <ul>
-      {categories.map((category) => <li><a href={`/${locale}/${category}/`}>{categoryLabels[category][locale]}</a></li>)}
+      {priorityHubs.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
     </ul>
   </section>
 

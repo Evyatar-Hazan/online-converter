@@ -6,7 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { categoryLabels, locales, ui } from '../../data/site';
 import { getPriorityCategoryTools } from '../../lib/category-tools';
-import { getRelatedConverters } from '../../lib/related-tools';
+import { getCategoryRelatedConverters, getInverseConverter, getRelatedConverters, getWorkflowRelatedConverters } from '../../lib/related-tools';
 import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
 
@@ -162,6 +162,14 @@ if (!tool) {
 
 const labels = ui[locale];
 const related = getRelatedConverters(tool, 3);
+const inverseTool = getInverseConverter(tool);
+const excludedRelatedSlugs = new Set<string>([tool.slug, ...related.map((item) => item.slug)]);
+if (inverseTool) {
+  excludedRelatedSlugs.add(inverseTool.slug);
+}
+const workflowRelated = getWorkflowRelatedConverters(tool, 3, excludedRelatedSlugs);
+workflowRelated.forEach((item) => excludedRelatedSlugs.add(item.slug));
+const categoryRelated = getCategoryRelatedConverters(tool, 3, excludedRelatedSlugs);
 const categoryTools = converters.filter((item) => item.category === tool.category);
 const priorityCategoryTools = getPriorityCategoryTools(categoryTools, locale, { excludeSlug: tool.slug, limit: 4 });
 const contextualFaq = [...generatedFaq(tool), ...tool.faq];
@@ -181,6 +189,27 @@ const categoryCopy = {
       ? `דף הקטגוריה מרכז את הכלים הבולטים ביותר בקטגוריית ${categoryLabel}, כולל כלים פופולריים, כלים חדשים וקישורים מהירים למשימות דומות.`
       : `The category page brings together the strongest converters in ${categoryLabel}, including popular picks, newer additions, and fast links for related tasks.`,
   openCategory: locale === 'he' ? 'פתח את דף הקטגוריה' : 'Open category page'
+};
+const linkingCopy = {
+  inverseEyebrow: locale === 'he' ? 'המרה הפוכה' : 'Reverse conversion',
+  inverseTitle: locale === 'he' ? 'צריך לחזור לכיוון ההפוך?' : 'Need the opposite direction?',
+  inverseDescription:
+    locale === 'he'
+      ? 'אם התחלת מהפורמט השני או שאתה רוצה לחזור צעד אחד אחורה, זה הכלי הישיר שעושה את ההמרה ההפוכה.'
+      : 'If you started from the opposite format or need to step back one stage, this is the direct tool for the reverse conversion.',
+  inverseAction: locale === 'he' ? 'פתח את ההמרה ההפוכה' : 'Open reverse converter',
+  workflowEyebrow: locale === 'he' ? 'השלב הבא בתהליך' : 'Next in the workflow',
+  workflowTitle: locale === 'he' ? 'כלים שעוזרים אחרי ההמרה הזאת' : 'Tools that usually help after this one',
+  workflowDescription:
+    locale === 'he'
+      ? 'הכלים כאן נבחרו לפי כוונת שימוש וזרימת עבודה, כדי שתוכל להמשיך לניקוי, בדיקה, חילוץ או פרסום בלי לחפש מחדש.'
+      : 'These tools are picked by workflow fit and search intent so you can keep moving into cleanup, validation, extraction or publishing without starting a new search.',
+  categoryRelatedEyebrow: locale === 'he' ? 'עוד כלים דומים' : 'More similar tools',
+  categoryRelatedTitle: locale === 'he' ? `עוד אפשרויות מתוך ${categoryLabel}` : `More options from ${categoryLabel}`,
+  categoryRelatedDescription:
+    locale === 'he'
+      ? 'אם המשימה שלך קרובה אבל לא זהה, הכלים האלה נשארים בתוך אותה משפחת שימוש ונותנים כיסוי רחב יותר.'
+      : 'If your task is nearby but not identical, these tools stay in the same family and broaden your options.'
 };
 ---
 
@@ -299,6 +328,41 @@ const categoryCopy = {
       </div>
     </article>
   </section>
+
+  {(inverseTool || workflowRelated.length > 0 || categoryRelated.length > 0) && (
+    <section class="content-grid">
+      {inverseTool && (
+        <article class="content-panel">
+          <p class="eyebrow">{linkingCopy.inverseEyebrow}</p>
+          <h2>{linkingCopy.inverseTitle}</h2>
+          <p>{linkingCopy.inverseDescription}</p>
+          <div class="link-cloud">
+            <a href={`/${locale}/${inverseTool.slug}/`}>{linkingCopy.inverseAction}</a>
+          </div>
+        </article>
+      )}
+      {workflowRelated.length > 0 && (
+        <article class="content-panel">
+          <p class="eyebrow">{linkingCopy.workflowEyebrow}</p>
+          <h2>{linkingCopy.workflowTitle}</h2>
+          <p>{linkingCopy.workflowDescription}</p>
+          <div class="link-cloud">
+            {workflowRelated.map((item) => <a href={`/${locale}/${item.slug}/`}>{item.shortTitle[locale]}</a>)}
+          </div>
+        </article>
+      )}
+      {categoryRelated.length > 0 && (
+        <article class="content-panel">
+          <p class="eyebrow">{linkingCopy.categoryRelatedEyebrow}</p>
+          <h2>{linkingCopy.categoryRelatedTitle}</h2>
+          <p>{linkingCopy.categoryRelatedDescription}</p>
+          <div class="link-cloud">
+            {categoryRelated.map((item) => <a href={`/${locale}/${item.slug}/`}>{item.shortTitle[locale]}</a>)}
+          </div>
+        </article>
+      )}
+    </section>
+  )}
 
   <AdSlot locale={locale} placement="inline" />
 
