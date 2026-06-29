@@ -30,6 +30,8 @@ const getKeywordMap = (tool: (typeof converters)[number], locale: 'en' | 'he') =
 type OpportunityBand = 'high' | 'medium' | 'watch';
 type PriorityTier = 'tier-1' | 'tier-2' | 'tier-3';
 type AuditStatus = 'good' | 'partial' | 'missing';
+type MonetizationFit = 'high' | 'medium' | 'low';
+type ImplementationRisk = 'low' | 'medium';
 
 export const analyticsEvents = [
   {
@@ -629,3 +631,810 @@ export const analyticsCategoryRows = categoryKeys.map((category) => {
     newTools: tools.filter((tool) => tool.new).length
   };
 });
+
+type BacklogRow = {
+  slugHint: string;
+  converter: string;
+  category: string;
+  batch: string;
+  priorityTier: PriorityTier;
+  monetizationFit: MonetizationFit;
+  implementationRisk: ImplementationRisk;
+  hebrewAdvantage: boolean;
+  primaryIntent: SearchIntent;
+  primaryEnglishQuery: string;
+  primaryHebrewQuery: string;
+  reason: string;
+};
+
+export const converterBacklogRows: BacklogRow[] = [
+  {
+    slugHint: 'keyword-density-checker',
+    converter: 'Keyword density checker',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: 'keyword density checker',
+    primaryHebrewQuery: 'בודק צפיפות מילות מפתח',
+    reason: 'Strong SEO intent and simple browser-side text analysis.'
+  },
+  {
+    slugHint: 'hreflang-tag-generator',
+    converter: 'Hreflang tag generator',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'generate',
+    primaryEnglishQuery: 'hreflang tag generator',
+    primaryHebrewQuery: 'מחולל תגיות hreflang',
+    reason: 'High-value bilingual SEO workflow and a clear fit for this site brand.'
+  },
+  {
+    slugHint: 'canonical-tag-checker',
+    converter: 'Canonical tag checker',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: 'canonical tag checker',
+    primaryHebrewQuery: 'בודק תגית canonical',
+    reason: 'Exact-match SEO utility query with simple parsing rules.'
+  },
+  {
+    slugHint: 'robots-meta-tag-generator',
+    converter: 'Robots meta tag generator',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'generate',
+    primaryEnglishQuery: 'robots meta tag generator',
+    primaryHebrewQuery: 'מחולל תגית robots',
+    reason: 'Strong search intent and direct relevance to search-focused site owners.'
+  },
+  {
+    slugHint: 'open-graph-tag-generator',
+    converter: 'Open Graph tag generator',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'generate',
+    primaryEnglishQuery: 'open graph tag generator',
+    primaryHebrewQuery: 'מחולל תגיות Open Graph',
+    reason: 'Popular marketing workflow with clear value for content teams.'
+  },
+  {
+    slugHint: 'slug-generator',
+    converter: 'Slug generator',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'generate',
+    primaryEnglishQuery: 'slug generator',
+    primaryHebrewQuery: 'מחולל slug',
+    reason: 'Broad utility demand and useful bilingual formatting opportunity.'
+  },
+  {
+    slugHint: 'redirect-mapping-generator',
+    converter: 'Redirect mapping generator',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-2',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'generate',
+    primaryEnglishQuery: 'redirect mapping generator',
+    primaryHebrewQuery: 'מחולל מפת הפניות',
+    reason: 'Good SEO migration intent and structured output from simple logic.'
+  },
+  {
+    slugHint: 'faq-schema-generator',
+    converter: 'FAQ schema generator',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-2',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'generate',
+    primaryEnglishQuery: 'faq schema generator',
+    primaryHebrewQuery: 'מחולל FAQ schema',
+    reason: 'Strong publisher intent and easy JSON-LD generation path.'
+  },
+  {
+    slugHint: 'meta-tags-preview',
+    converter: 'Meta tags preview',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-2',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: 'meta tags preview',
+    primaryHebrewQuery: 'תצוגה מקדימה של meta tags',
+    reason: 'CTR-focused SEO support tool with strong organic intent.'
+  },
+  {
+    slugHint: 'html-headings-outline-extractor',
+    converter: 'HTML headings outline extractor',
+    category: 'SEO',
+    batch: 'Batch 9',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: 'html headings outline extractor',
+    primaryHebrewQuery: 'מחלץ מבנה כותרות HTML',
+    reason: 'Useful audit query for content and SEO workflows using local parsing only.'
+  },
+  {
+    slugHint: 'sql-formatter',
+    converter: 'SQL formatter',
+    category: 'Developer',
+    batch: 'Batch 10',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'format',
+    primaryEnglishQuery: 'sql formatter',
+    primaryHebrewQuery: 'מפרמט SQL',
+    reason: 'Well-known developer query with immediate utility and low implementation risk.'
+  },
+  {
+    slugHint: 'jwt-claims-viewer',
+    converter: 'JWT claims viewer',
+    category: 'Developer',
+    batch: 'Batch 10',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'decode',
+    primaryEnglishQuery: 'jwt claims viewer',
+    primaryHebrewQuery: 'מציג claims של JWT',
+    reason: 'Clear developer exact-match query and safe local token decoding.'
+  },
+  {
+    slugHint: 'env-parser',
+    converter: '.env parser',
+    category: 'Developer',
+    batch: 'Batch 10',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: '.env parser',
+    primaryHebrewQuery: 'מנתח קובץ env',
+    reason: 'Developer utility that fits no-upload privacy positioning.'
+  },
+  {
+    slugHint: 'curl-command-formatter',
+    converter: 'cURL command formatter',
+    category: 'Developer',
+    batch: 'Batch 10',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'format',
+    primaryEnglishQuery: 'curl command formatter',
+    primaryHebrewQuery: 'מפרמט פקודת curl',
+    reason: 'Popular troubleshooting task with simple text transformation.'
+  },
+  {
+    slugHint: 'regex-tester',
+    converter: 'Regex tester',
+    category: 'Developer',
+    batch: 'Batch 10',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'medium',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: 'regex tester',
+    primaryHebrewQuery: 'בודק regex',
+    reason: 'High developer demand, though the UX needs careful edge-case handling.'
+  },
+  {
+    slugHint: 'json-lines-to-json-array',
+    converter: 'JSON Lines to JSON array',
+    category: 'Data',
+    batch: 'Batch 10',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'json lines to json array',
+    primaryHebrewQuery: 'המרת JSON Lines למערך JSON',
+    reason: 'Very direct data-format conversion query with low implementation risk.'
+  },
+  {
+    slugHint: 'json-array-to-json-lines',
+    converter: 'JSON array to JSON Lines',
+    category: 'Data',
+    batch: 'Batch 10',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'json array to json lines',
+    primaryHebrewQuery: 'המרת מערך JSON ל-JSON Lines',
+    reason: 'Strong paired reverse converter that benefits from direct internal linking.'
+  },
+  {
+    slugHint: 'html-table-to-csv',
+    converter: 'HTML table to CSV',
+    category: 'Data',
+    batch: 'Batch 10',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'html table to csv',
+    primaryHebrewQuery: 'המרת טבלת HTML ל-CSV',
+    reason: 'Classic format-conversion search and easy browser-only extraction.'
+  },
+  {
+    slugHint: 'html-table-to-json',
+    converter: 'HTML table to JSON',
+    category: 'Data',
+    batch: 'Batch 10',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'html table to json',
+    primaryHebrewQuery: 'המרת טבלת HTML ל-JSON',
+    reason: 'Strong developer and analyst workflow with clean local parsing.'
+  },
+  {
+    slugHint: 'xml-formatter',
+    converter: 'XML formatter',
+    category: 'Data',
+    batch: 'Batch 10',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'format',
+    primaryEnglishQuery: 'xml formatter',
+    primaryHebrewQuery: 'מפרמט XML',
+    reason: 'Broad utility query and a natural extension of existing structured-data tools.'
+  },
+  {
+    slugHint: 'remove-duplicate-lines',
+    converter: 'Remove duplicate lines',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'clean',
+    primaryEnglishQuery: 'remove duplicate lines',
+    primaryHebrewQuery: 'הסרת שורות כפולות',
+    reason: 'Strong utility phrasing in both languages and tiny implementation surface.'
+  },
+  {
+    slugHint: 'bullet-list-formatter',
+    converter: 'Bullet list formatter',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'format',
+    primaryEnglishQuery: 'bullet list formatter',
+    primaryHebrewQuery: 'מפרמט רשימת בולטים',
+    reason: 'Useful writing workflow with a bilingual gap in Hebrew-first results.'
+  },
+  {
+    slugHint: 'whitespace-visualizer',
+    converter: 'Whitespace visualizer',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'low',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'validate',
+    primaryEnglishQuery: 'whitespace visualizer',
+    primaryHebrewQuery: 'מציג רווחים נסתרים',
+    reason: 'Niche but exact-match query with clear utility and low build cost.'
+  },
+  {
+    slugHint: 'unicode-normalizer',
+    converter: 'Unicode normalizer',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'low',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'clean',
+    primaryEnglishQuery: 'unicode normalizer',
+    primaryHebrewQuery: 'מנרמל Unicode',
+    reason: 'Helps multilingual text cleanup and aligns well with Hebrew support.'
+  },
+  {
+    slugHint: 'sentence-case-converter',
+    converter: 'Sentence case converter',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'sentence case converter',
+    primaryHebrewQuery: 'ממיר ל-sentence case',
+    reason: 'Straightforward text-format query with broad content-team appeal.'
+  },
+  {
+    slugHint: 'title-case-converter',
+    converter: 'Title case converter',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'title case converter',
+    primaryHebrewQuery: 'ממיר ל-title case',
+    reason: 'Popular exact-match text utility that complements the text-case detector.'
+  },
+  {
+    slugHint: 'comma-list-to-bullet-list',
+    converter: 'Comma list to bullet list',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'low',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'comma separated list to bullet list',
+    primaryHebrewQuery: 'המרת רשימה מופרדת בפסיקים לבולטים',
+    reason: 'Simple list transformation with clear copy-and-paste workflows.'
+  },
+  {
+    slugHint: 'bullet-list-to-comma-list',
+    converter: 'Bullet list to comma list',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'low',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'bullet list to comma separated list',
+    primaryHebrewQuery: 'המרת רשימת בולטים לרשימה בפסיקים',
+    reason: 'Natural reverse-tool companion that supports structured internal linking.'
+  },
+  {
+    slugHint: 'rtl-text-cleaner',
+    converter: 'RTL text cleaner',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'clean',
+    primaryEnglishQuery: 'rtl text cleaner',
+    primaryHebrewQuery: 'מנקה טקסט RTL',
+    reason: 'Clear Hebrew-first advantage because many competing tools ignore RTL edge cases.'
+  },
+  {
+    slugHint: 'punctuation-normalizer',
+    converter: 'Punctuation normalizer',
+    category: 'Text',
+    batch: 'Batch 11',
+    priorityTier: 'tier-2',
+    monetizationFit: 'low',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'clean',
+    primaryEnglishQuery: 'punctuation normalizer',
+    primaryHebrewQuery: 'מנרמל סימני פיסוק',
+    reason: 'Useful editorial cleanup tool with bilingual and RTL relevance.'
+  },
+  {
+    slugHint: 'vat-calculator',
+    converter: 'VAT calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'vat calculator',
+    primaryHebrewQuery: 'מחשבון מעמ',
+    reason: 'Strong commercial intent and especially useful for Hebrew-speaking local business users.'
+  },
+  {
+    slugHint: 'discount-percentage-calculator',
+    converter: 'Discount percentage calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'discount percentage calculator',
+    primaryHebrewQuery: 'מחשבון אחוז הנחה',
+    reason: 'Popular commerce query with very simple local math.'
+  },
+  {
+    slugHint: 'profit-margin-calculator',
+    converter: 'Profit margin calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'profit margin calculator',
+    primaryHebrewQuery: 'מחשבון שולי רווח',
+    reason: 'Business-intent query that can monetize well with finance and SaaS ads.'
+  },
+  {
+    slugHint: 'markup-calculator',
+    converter: 'Markup calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'markup calculator',
+    primaryHebrewQuery: 'מחשבון מרקאפ',
+    reason: 'Strong e-commerce/business utility and a good sibling for margin calculations.'
+  },
+  {
+    slugHint: 'break-even-calculator',
+    converter: 'Break-even calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'break even calculator',
+    primaryHebrewQuery: 'מחשבון נקודת איזון',
+    reason: 'High-value SMB search intent with manageable math and strong Hebrew gap.'
+  },
+  {
+    slugHint: 'savings-goal-calculator',
+    converter: 'Savings goal calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-2',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'savings goal calculator',
+    primaryHebrewQuery: 'מחשבון יעד חיסכון',
+    reason: 'Consumer finance query with healthy monetization potential.'
+  },
+  {
+    slugHint: 'invoice-due-date-calculator',
+    converter: 'Invoice due date calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'invoice due date calculator',
+    primaryHebrewQuery: 'מחשבון תאריך יעד לחשבונית',
+    reason: 'Practical business workflow that is underserved in Hebrew.'
+  },
+  {
+    slugHint: 'work-hours-calculator',
+    converter: 'Work hours calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-1',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'work hours calculator',
+    primaryHebrewQuery: 'מחשבון שעות עבודה',
+    reason: 'High repeat-use utility with strong bilingual local-business relevance.'
+  },
+  {
+    slugHint: 'overtime-pay-calculator',
+    converter: 'Overtime pay calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-2',
+    monetizationFit: 'high',
+    implementationRisk: 'medium',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'overtime pay calculator',
+    primaryHebrewQuery: 'מחשבון שעות נוספות',
+    reason: 'Very strong user intent but needs careful assumptions and clear disclaimers.'
+  },
+  {
+    slugHint: 'commission-calculator',
+    converter: 'Commission calculator',
+    category: 'Calculator',
+    batch: 'Batch 12',
+    priorityTier: 'tier-2',
+    monetizationFit: 'high',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'commission calculator',
+    primaryHebrewQuery: 'מחשבון עמלה',
+    reason: 'Commercial-intent math tool that can attract business and sales traffic.'
+  },
+  {
+    slugHint: 'date-format-converter',
+    converter: 'Date format converter',
+    category: 'Time',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'date format converter',
+    primaryHebrewQuery: 'ממיר פורמט תאריך',
+    reason: 'Very literal utility query with broad developer and business use.'
+  },
+  {
+    slugHint: 'unix-timestamp-converter',
+    converter: 'Unix timestamp converter',
+    category: 'Time',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'unix timestamp converter',
+    primaryHebrewQuery: 'ממיר Unix timestamp',
+    reason: 'Classic developer search query and easy local conversion logic.'
+  },
+  {
+    slugHint: 'week-number-calculator',
+    converter: 'Week number calculator',
+    category: 'Time',
+    batch: 'Batch 13',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'week number calculator',
+    primaryHebrewQuery: 'מחשבון מספר שבוע',
+    reason: 'Useful planning utility with decent business workflow demand.'
+  },
+  {
+    slugHint: 'business-quarter-calculator',
+    converter: 'Business quarter calculator',
+    category: 'Time',
+    batch: 'Batch 13',
+    priorityTier: 'tier-2',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: true,
+    primaryIntent: 'calculate',
+    primaryEnglishQuery: 'business quarter calculator',
+    primaryHebrewQuery: 'מחשבון רבעון עסקי',
+    reason: 'Business reporting helper with straightforward date logic.'
+  },
+  {
+    slugHint: 'csv-header-normalizer',
+    converter: 'CSV header normalizer',
+    category: 'Data',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'clean',
+    primaryEnglishQuery: 'csv header normalizer',
+    primaryHebrewQuery: 'מנרמל כותרות CSV',
+    reason: 'Natural extension of the existing CSV suite with simple deterministic logic.'
+  },
+  {
+    slugHint: 'csv-to-html-table',
+    converter: 'CSV to HTML table',
+    category: 'Data',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'csv to html table',
+    primaryHebrewQuery: 'המרת CSV לטבלת HTML',
+    reason: 'Common publishing conversion query and easy reverse-pair opportunity.'
+  },
+  {
+    slugHint: 'markdown-table-to-csv',
+    converter: 'Markdown table to CSV',
+    category: 'Data',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'markdown table to csv',
+    primaryHebrewQuery: 'המרת טבלת Markdown ל-CSV',
+    reason: 'Clear reverse-path companion for existing markdown and CSV tools.'
+  },
+  {
+    slugHint: 'csv-to-json-lines',
+    converter: 'CSV to JSON Lines',
+    category: 'Data',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'csv to json lines',
+    primaryHebrewQuery: 'המרת CSV ל-JSON Lines',
+    reason: 'Strong data engineering workflow with exact-match search intent.'
+  },
+  {
+    slugHint: 'query-string-to-json',
+    converter: 'Query string to JSON',
+    category: 'Developer',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'query string to json',
+    primaryHebrewQuery: 'המרת query string ל-JSON',
+    reason: 'Direct parsing utility with strong developer intent.'
+  },
+  {
+    slugHint: 'json-to-query-string',
+    converter: 'JSON to query string',
+    category: 'Developer',
+    batch: 'Batch 13',
+    priorityTier: 'tier-1',
+    monetizationFit: 'medium',
+    implementationRisk: 'low',
+    hebrewAdvantage: false,
+    primaryIntent: 'convert',
+    primaryEnglishQuery: 'json to query string',
+    primaryHebrewQuery: 'המרת JSON ל-query string',
+    reason: 'Paired reverse converter that supports bundle growth through shared logic.'
+  }
+];
+
+export const converterBacklogSummary = {
+  total: converterBacklogRows.length,
+  tier1: converterBacklogRows.filter((row) => row.priorityTier === 'tier-1').length,
+  tier2: converterBacklogRows.filter((row) => row.priorityTier === 'tier-2').length,
+  tier3: converterBacklogRows.filter((row) => row.priorityTier === 'tier-3').length,
+  highMonetization: converterBacklogRows.filter((row) => row.monetizationFit === 'high').length,
+  lowRisk: converterBacklogRows.filter((row) => row.implementationRisk === 'low').length,
+  hebrewFirst: converterBacklogRows.filter((row) => row.hebrewAdvantage).length
+};
+
+export const converterBacklogCategoryRows = Array.from(
+  converterBacklogRows.reduce((map, row) => {
+    const current = map.get(row.category) ?? {
+      category: row.category,
+      tools: 0,
+      highMonetization: 0,
+      hebrewFirst: 0
+    };
+
+    current.tools += 1;
+    current.highMonetization += Number(row.monetizationFit === 'high');
+    current.hebrewFirst += Number(row.hebrewAdvantage);
+    map.set(row.category, current);
+    return map;
+  }, new Map<string, { category: string; tools: number; highMonetization: number; hebrewFirst: number }>())
+    .values()
+).sort((left, right) => right.tools - left.tools || left.category.localeCompare(right.category));
+
+export const converterBacklogBatchRows = Array.from(
+  converterBacklogRows.reduce((map, row) => {
+    const current = map.get(row.batch) ?? {
+      batch: row.batch,
+      tools: 0,
+      tier1: 0,
+      highMonetization: 0
+    };
+
+    current.tools += 1;
+    current.tier1 += Number(row.priorityTier === 'tier-1');
+    current.highMonetization += Number(row.monetizationFit === 'high');
+    map.set(row.batch, current);
+    return map;
+  }, new Map<string, { batch: string; tools: number; tier1: number; highMonetization: number }>())
+    .values()
+).sort((left, right) => left.batch.localeCompare(right.batch));
+
+export const priorityConverterBacklogRows = [...converterBacklogRows]
+  .sort((left, right) => {
+    const score = (row: BacklogRow) =>
+      Number(row.priorityTier === 'tier-1') * 4 +
+      Number(row.monetizationFit === 'high') * 3 +
+      Number(row.implementationRisk === 'low') * 2 +
+      Number(row.hebrewAdvantage);
+
+    return score(right) - score(left) || left.slugHint.localeCompare(right.slugHint);
+  })
+  .slice(0, 24);
+
+export const hebrewFirstBacklogRows = converterBacklogRows
+  .filter((row) => row.hebrewAdvantage)
+  .sort((left, right) => {
+    const tierRank = { 'tier-1': 0, 'tier-2': 1, 'tier-3': 2 };
+    return (
+      tierRank[left.priorityTier] - tierRank[right.priorityTier] ||
+      Number(right.monetizationFit === 'high') - Number(left.monetizationFit === 'high') ||
+      left.slugHint.localeCompare(right.slugHint)
+    );
+  })
+  .slice(0, 20);
+
+export const backlogQualityRequirements = [
+  {
+    area: 'Unique examples',
+    rule: 'Every new converter must launch with at least two realistic bilingual examples.'
+  },
+  {
+    area: 'Specific FAQ',
+    rule: 'Every new converter must include at least two tool-specific FAQ answers plus the shared privacy guidance.'
+  },
+  {
+    area: 'Use cases',
+    rule: 'Every new converter must explain who it helps, when to use it, and what makes it different from adjacent tools.'
+  },
+  {
+    area: 'Reverse or related links',
+    rule: 'Every new converter should connect to the reverse flow or the next logical step in the workflow.'
+  }
+] as const;

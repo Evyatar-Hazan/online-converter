@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   analyticsSummary,
+  backlogQualityRequirements,
+  converterBacklogRows,
+  converterBacklogSummary,
   converterSeoAuditChecks,
   converterSeoAuditSummary,
   englishLongTailRows,
@@ -129,6 +132,38 @@ describe('analytics dashboard ranking monitor', () => {
       expect(['tier-1', 'tier-2', 'tier-3']).toContain(row.tier);
       expect(row.reasons.length).toBeGreaterThan(0);
     }
+  });
+
+  it('keeps a 50-tool structured expansion backlog with prioritization', () => {
+    expect(converterBacklogRows).toHaveLength(50);
+    expect(converterBacklogSummary.total).toBe(50);
+    expect(converterBacklogSummary.tier1).toBeGreaterThan(0);
+    expect(converterBacklogSummary.highMonetization).toBeGreaterThan(0);
+    expect(converterBacklogSummary.lowRisk).toBeGreaterThanOrEqual(45);
+    expect(converterBacklogSummary.hebrewFirst).toBeGreaterThanOrEqual(15);
+
+    const slugHints = new Set<string>();
+
+    for (const row of converterBacklogRows) {
+      expect(row.primaryEnglishQuery.length).toBeGreaterThan(2);
+      expect(row.primaryHebrewQuery.length).toBeGreaterThan(2);
+      expect(['tier-1', 'tier-2', 'tier-3']).toContain(row.priorityTier);
+      expect(['high', 'medium', 'low']).toContain(row.monetizationFit);
+      expect(['low', 'medium']).toContain(row.implementationRisk);
+      expect(row.reason.length).toBeGreaterThan(20);
+      expect(slugHints.has(row.slugHint)).toBe(false);
+      slugHints.add(row.slugHint);
+    }
+  });
+
+  it('defines quality guardrails for future converters', () => {
+    expect(backlogQualityRequirements).toHaveLength(4);
+    expect(backlogQualityRequirements.map((item) => item.area)).toEqual([
+      'Unique examples',
+      'Specific FAQ',
+      'Use cases',
+      'Reverse or related links'
+    ]);
   });
 
   it('audits converter page SEO template coverage', () => {

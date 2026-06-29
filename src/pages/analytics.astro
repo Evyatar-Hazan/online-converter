@@ -7,12 +7,18 @@ import {
   analyticsEvents,
   analyticsProviders,
   analyticsSummary,
+  backlogQualityRequirements,
+  converterBacklogBatchRows,
+  converterBacklogCategoryRows,
+  converterBacklogSummary,
   englishLongTailSummary,
   hebrewOpportunitySummary,
+  hebrewFirstBacklogRows,
   indexingChecklistSteps,
   indexingChecklistSummary,
   keywordIntentSummary,
   keywordMapSummary,
+  priorityConverterBacklogRows,
   priorityEnglishLongTailRows,
   priorityHebrewOpportunityRows,
   priorityIntentRows,
@@ -530,6 +536,182 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           ))}
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Expansion backlog</p>
+        <h2>Next 50 converter opportunities</h2>
+      </div>
+      <span class="analytics-date">Batches 9-13</span>
+    </div>
+    <div class="ranking-summary-list">
+      <div>
+        <span>Total tools</span>
+        <strong>{converterBacklogSummary.total}</strong>
+      </div>
+      <div>
+        <span>Tier 1</span>
+        <strong>{converterBacklogSummary.tier1}</strong>
+      </div>
+      <div>
+        <span>High monetization</span>
+        <strong>{converterBacklogSummary.highMonetization}</strong>
+      </div>
+      <div>
+        <span>Hebrew-first</span>
+        <strong>{converterBacklogSummary.hebrewFirst}</strong>
+      </div>
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table opportunity-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>Tier</th>
+            <th>Monetization</th>
+            <th>Risk</th>
+            <th>Intent</th>
+            <th>Primary EN</th>
+            <th>Primary HE</th>
+          </tr>
+        </thead>
+        <tbody>
+          {priorityConverterBacklogRows.map((row) => (
+            <tr>
+              <td>
+                <strong>{row.converter}</strong>
+                <small>{row.batch} · {row.slugHint}</small>
+              </td>
+              <td>{row.category}</td>
+              <td>{row.priorityTier}</td>
+              <td>{row.monetizationFit}</td>
+              <td>{row.implementationRisk}</td>
+              <td>{row.primaryIntent}</td>
+              <td>{row.primaryEnglishQuery}</td>
+              <td dir="rtl">{row.primaryHebrewQuery}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="analytics-grid">
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Batch plan</p>
+        <h2>Execution waves</h2>
+      </div>
+      <div class="analytics-table-wrap">
+        <table class="analytics-table">
+          <thead>
+            <tr>
+              <th>Batch</th>
+              <th>Tools</th>
+              <th>Tier 1</th>
+              <th>High monetization</th>
+            </tr>
+          </thead>
+          <tbody>
+            {converterBacklogBatchRows.map((row) => (
+              <tr>
+                <td>{row.batch}</td>
+                <td>{row.tools}</td>
+                <td>{row.tier1}</td>
+                <td>{row.highMonetization}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Category mix</p>
+        <h2>Demand by topic</h2>
+      </div>
+      <div class="analytics-table-wrap">
+        <table class="analytics-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Tools</th>
+              <th>High monetization</th>
+              <th>Hebrew-first</th>
+            </tr>
+          </thead>
+          <tbody>
+            {converterBacklogCategoryRows.map((row) => (
+              <tr>
+                <td>{row.category}</td>
+                <td>{row.tools}</td>
+                <td>{row.highMonetization}</td>
+                <td>{row.hebrewFirst}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
+        <p class="eyebrow">Hebrew-first gap</p>
+        <h2>Tools with stronger local-language upside</h2>
+      </div>
+      <span class="analytics-date">Prioritized subset</span>
+    </div>
+    <div class="analytics-table-wrap">
+      <table class="analytics-table opportunity-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>Tier</th>
+            <th>Monetization</th>
+            <th>Primary HE</th>
+            <th>Why it matters</th>
+          </tr>
+        </thead>
+        <tbody>
+          {hebrewFirstBacklogRows.map((row) => (
+            <tr>
+              <td>
+                <strong>{row.converter}</strong>
+                <small>{row.slugHint}</small>
+              </td>
+              <td>{row.category}</td>
+              <td>{row.priorityTier}</td>
+              <td>{row.monetizationFit}</td>
+              <td dir="rtl">{row.primaryHebrewQuery}</td>
+              <td>{row.reason}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading">
+      <p class="eyebrow">Quality guardrail</p>
+      <h2>Rules for every new converter page</h2>
+    </div>
+    <div class="analytics-event-list">
+      {backlogQualityRequirements.map((item) => (
+        <div class="analytics-event-row">
+          <code>{item.area}</code>
+          <span>{item.rule}</span>
+          <small>Content quality gate</small>
+        </div>
+      ))}
     </div>
   </section>
 
