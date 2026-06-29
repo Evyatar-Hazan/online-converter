@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { once } from 'node:events';
 import process from 'node:process';
 import { chromium } from '@playwright/test';
 
@@ -37,7 +38,8 @@ function startPreviewServer() {
   const child = spawn('npm', ['run', 'preview', '--', '--host', host, '--port', String(port)], {
     cwd: process.cwd(),
     stdio: 'pipe',
-    env: { ...process.env, FORCE_COLOR: '0' }
+    env: { ...process.env, FORCE_COLOR: '0' },
+    detached: true
   });
 
   let stderr = '';
@@ -46,6 +48,32 @@ function startPreviewServer() {
   });
 
   return { child, getStderr: () => stderr };
+}
+
+async function stopPreviewServer(previewServer) {
+  if (previewServer.exitCode !== null) {
+    return;
+  }
+
+  try {
+    process.kill(-previewServer.pid, 'SIGTERM');
+  } catch {
+    previewServer.kill('SIGTERM');
+  }
+
+  const exited = Promise.race([
+    once(previewServer, 'exit'),
+    sleep(3000).then(() => null)
+  ]);
+
+  if ((await exited) === null && previewServer.exitCode === null) {
+    try {
+      process.kill(-previewServer.pid, 'SIGKILL');
+    } catch {
+      previewServer.kill('SIGKILL');
+    }
+    await once(previewServer, 'exit');
+  }
 }
 
 async function collectMetrics(browser, path) {
@@ -153,5 +181,5 @@ try {
   throw error;
 } finally {
   stoppingPreview = true;
-  previewServer.kill('SIGTERM');
+  await stopPreviewServer(previewServer);
 }
