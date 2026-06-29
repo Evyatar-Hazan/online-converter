@@ -23,11 +23,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
       - name: Build
         run: npm run build
 
       - name: SEO build check
         run: npm run seo:check
+
+      - name: Performance check
+        run: npm run perf:check
 
       - name: Lint
         run: npm run lint
