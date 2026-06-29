@@ -721,6 +721,169 @@ function dateLines(input: string, label: string): [Date, Date] {
   return [parseIsoDate(lines[0], 'start date'), parseIsoDate(lines[1], 'end date')];
 }
 
+function parseIsoDateTime(dateValue: string, timeValue: string): { year: number; month: number; day: number; hours: number; minutes: number } {
+  const dateMatch = dateValue.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const timeMatch = timeValue.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!dateMatch) {
+    throw new Error('Invalid date: use YYYY-MM-DD.');
+  }
+  if (!timeMatch) {
+    throw new Error('Invalid time: use HH:MM in 24-hour format.');
+  }
+  const year = Number(dateMatch[1]);
+  const month = Number(dateMatch[2]);
+  const day = Number(dateMatch[3]);
+  const hours = Number(timeMatch[1]);
+  const minutes = Number(timeMatch[2]);
+  if (month < 1 || month > 12 || day < 1 || day > 31 || hours > 23 || minutes > 59) {
+    throw new Error('Invalid date or time values: check month, day, hours and minutes.');
+  }
+  return { year, month, day, hours, minutes };
+}
+
+function timeZoneOffsetMinutes(timeZone: string, date: Date): number {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    timeZoneName: 'shortOffset',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  const part = formatter.formatToParts(date).find((item) => item.type === 'timeZoneName')?.value ?? '';
+  if (part === 'GMT' || part === 'UTC') {
+    return 0;
+  }
+  const match = part.match(/GMT([+-])(\d{1,2})(?::?(\d{2}))?/i);
+  if (!match) {
+    throw new Error(`Unsupported timezone offset for ${timeZone}.`);
+  }
+  const sign = match[1] === '+' ? 1 : -1;
+  const hours = Number(match[2]);
+  const minutes = Number(match[3] ?? '0');
+  return sign * ((hours * 60) + minutes);
+}
+
+function zonedDateTimeToUtc(dateValue: string, timeValue: string, timeZone: string): Date {
+  const parts = parseIsoDateTime(dateValue, timeValue);
+  let utcGuess = new Date(Date.UTC(parts.year, parts.month - 1, parts.day, parts.hours, parts.minutes));
+
+  for (let index = 0; index < 2; index += 1) {
+    const offsetMinutes = timeZoneOffsetMinutes(timeZone, utcGuess);
+    utcGuess = new Date(Date.UTC(parts.year, parts.month - 1, parts.day, parts.hours, parts.minutes) - (offsetMinutes * 60_000));
+  }
+
+  return utcGuess;
+}
+
+function formatZonedMeeting(date: Date, timeZone: string): string {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'short',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZoneName: 'short'
+  });
+  return formatter.format(date);
+}
+
+function explainCronField(value: string, unit: string, names?: string[]): string {
+  if (value === '*') {
+    return `Every ${unit}`;
+  }
+  if (value.includes('/')) {
+    const [base, step] = value.split('/');
+    const every = base === '*' ? `every ${step} ${unit}` : `${base} every ${step} ${unit}`;
+    return `${every}`;
+  }
+  if (value.includes(',')) {
+    const parts = value.split(',').map((item) => item.trim());
+    return `${unit} values: ${parts.join(', ')}`;
+  }
+  if (value.includes('-')) {
+    const [start, end] = value.split('-').map((item) => item.trim());
+    return `${unit} range: ${start} to ${end}`;
+  }
+  if (names && /^\d+$/.test(value)) {
+    const lookup = names[Number(value)] ?? value;
+    return `${unit}: ${lookup}`;
+  }
+  return `${unit}: ${value}`;
+}
+
+function detectTextCaseValue(input: string): string {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    throw new Error('Text case detector expects text to analyze.');
+  }
+  if (trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)) return 'UPPERCASE';
+  if (trimmed === trimmed.toLowerCase() && /[a-z]/.test(trimmed) && !trimmed.includes('_') && !trimmed.includes('-')) return 'lowercase';
+  if (/^[a-z]+(?:[A-Z][a-z0-9]*)+$/.test(trimmed)) return 'camelCase';
+  if (/^[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+$/.test(trimmed)) return 'PascalCase';
+  if (/^[a-z0-9]+(?:_[a-z0-9]+)+$/.test(trimmed)) return 'snake_case';
+  if (/^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(trimmed)) return 'kebab-case';
+  if (/^[A-Z][^\n]*$/.test(trimmed) && trimmed.split(/\s+/).every((word) => !word || word[0] === word[0].toUpperCase())) return 'Title Case';
+  if (/^[A-Z][^.!?]*[.!?]?$/.test(trimmed)) return 'Sentence case';
+  return 'Mixed or unknown';
+}
+
+function normalizeHeaderName(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function countJsonKeys(value: unknown, depth = 1): { totalKeys: number; uniqueKeys: Set<string>; maxDepth: number } {
+  if (Array.isArray(value)) {
+    return value.reduce(
+      (acc, item) => {
+        const child = countJsonKeys(item, depth + 1);
+        child.uniqueKeys.forEach((key) => acc.uniqueKeys.add(key));
+        acc.totalKeys += child.totalKeys;
+        acc.maxDepth = Math.max(acc.maxDepth, child.maxDepth);
+        return acc;
+      },
+      { totalKeys: 0, uniqueKeys: new Set<string>(), maxDepth: depth }
+    );
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.entries(value as JsonObject).reduce(
+      (acc, [key, child]) => {
+        acc.totalKeys += 1;
+        acc.uniqueKeys.add(key);
+        const nested = countJsonKeys(child, depth + 1);
+        nested.uniqueKeys.forEach((item) => acc.uniqueKeys.add(item));
+        acc.totalKeys += nested.totalKeys;
+        acc.maxDepth = Math.max(acc.maxDepth, nested.maxDepth);
+        return acc;
+      },
+      { totalKeys: 0, uniqueKeys: new Set<string>(), maxDepth: depth }
+    );
+  }
+
+  return { totalKeys: 0, uniqueKeys: new Set<string>(), maxDepth: depth };
+}
+
+function parseAlphaValue(raw: string): number {
+  const normalized = raw.trim().replace(/%$/, '');
+  const value = Number(normalized);
+  if (!Number.isFinite(value)) {
+    throw new Error('Invalid alpha value: use 0-1 or 0-100.');
+  }
+  if (value <= 1) {
+    if (value < 0) throw new Error('Invalid alpha value: use a positive value.');
+    return value;
+  }
+  if (value <= 100) {
+    return value / 100;
+  }
+  throw new Error('Invalid alpha value: use 0-1 or 0-100.');
+}
+
 function schemaTypeToTs(value: unknown): string {
   if (!value || typeof value !== 'object') return 'unknown';
   const schema = value as JsonObject;
@@ -2265,6 +2428,254 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Estimated cost: ${formatNumber(cost, 2)}`,
       `Distance: ${formatNumber(distanceKm, 2)} km`
     ].join('\n'), { liters: formatNumber(liters, 2), cost: formatNumber(cost, 2), distanceKm });
+  },
+
+  timezoneMeetingPlanner(input) {
+    const { values } = parseKeyValuePayload(input);
+    const dateValue = values.date;
+    const timeValue = values.time;
+    const fromZone = values.from;
+    const toZones = (values.to ?? '').split(',').map((item) => item.trim()).filter(Boolean);
+    if (!dateValue || !timeValue || !fromZone || !toZones.length) {
+      throw new Error('Timezone meeting planner expects date=YYYY-MM-DD, time=HH:MM, from=Timezone and to=Zone1,Zone2.');
+    }
+
+    const utcDate = zonedDateTimeToUtc(dateValue, timeValue, fromZone);
+    const outputs = [
+      `Base timezone (${fromZone}): ${formatZonedMeeting(utcDate, fromZone)}`,
+      ...toZones.map((zone) => `${zone}: ${formatZonedMeeting(utcDate, zone)}`),
+      `UTC: ${utcDate.toISOString().replace('.000Z', 'Z')}`
+    ];
+
+    return result(outputs.join('\n'), { targets: toZones.length, source: fromZone }, undefined, {
+      type: 'table',
+      title: 'Meeting time zones',
+      rows: toZones.map((zone) => ({ timezone: zone, localTime: formatZonedMeeting(utcDate, zone) }))
+    });
+  },
+
+  cronExpressionExplainer(input) {
+    const expression = input.trim();
+    if (!expression) {
+      throw new Error('Cron expression explainer expects a 5-part cron string like */15 9-17 * * 1-5.');
+    }
+    const parts = expression.split(/\s+/).filter(Boolean);
+    if (parts.length !== 5) {
+      throw new Error('Cron expression explainer currently expects 5 parts: minute hour day month weekday.');
+    }
+    const [minute, hour, day, month, weekday] = parts;
+    const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return result([
+      `Minute: ${explainCronField(minute, 'minute')}`,
+      `Hour: ${explainCronField(hour, 'hour')}`,
+      `Day of month: ${explainCronField(day, 'day')}`,
+      `Month: ${explainCronField(month, 'month', monthNames)}`,
+      `Weekday: ${explainCronField(weekday, 'weekday', weekdayNames)}`,
+      `Expression: ${expression}`
+    ].join('\n'), { fields: parts.length });
+  },
+
+  dateDifferenceCalculator(input) {
+    const [start, end] = dateLines(input, 'date difference calculator');
+    const diffMs = Math.abs(end.getTime() - start.getTime());
+    const days = Math.round(diffMs / 86_400_000);
+    const weeks = Math.floor(days / 7);
+    const remainingDays = days % 7;
+    return result([
+      `Days difference: ${days}`,
+      `Weeks and days: ${weeks} week${weeks === 1 ? '' : 's'} and ${remainingDays} day${remainingDays === 1 ? '' : 's'}`,
+      `Start date: ${start.toISOString().slice(0, 10)}`,
+      `End date: ${end.toISOString().slice(0, 10)}`
+    ].join('\n'), { days, weeks, remainingDays });
+  },
+
+  textCaseDetector(input) {
+    const text = input.trim();
+    const detected = detectTextCaseValue(text);
+    return result([
+      `Detected case: ${detected}`,
+      `Words: ${textWords(text).length}`,
+      `Characters: ${text.length}`
+    ].join('\n'), { words: textWords(text).length, characters: text.length, detectedCase: detected });
+  },
+
+  httpHeaderParser(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (!lines.length) {
+      throw new Error('HTTP header parser expects raw request or response headers.');
+    }
+    const firstLine = lines[0];
+    const headers = new Map<string, string[]>();
+    const headerLines = lines.slice(1);
+    for (const line of headerLines) {
+      const separatorIndex = line.indexOf(':');
+      if (separatorIndex < 0) {
+        throw new Error(`Invalid header line: ${line}. Use Header-Name: value format.`);
+      }
+      const key = line.slice(0, separatorIndex).trim();
+      const value = line.slice(separatorIndex + 1).trim();
+      const normalized = normalizeHeaderName(key);
+      headers.set(normalized, [...(headers.get(normalized) ?? []), value]);
+    }
+    const output = {
+      firstLine,
+      headers: Object.fromEntries([...headers.entries()].map(([key, values]) => [key, values.length === 1 ? values[0] : values])),
+      headerCount: headerLines.length
+    };
+    return result(JSON.stringify(output, null, 2), { headerCount: headerLines.length, uniqueHeaders: headers.size }, undefined, {
+      type: 'json',
+      title: 'Parsed headers',
+      values: { firstLine, uniqueHeaders: headers.size }
+    });
+  },
+
+  jsonKeyCounter(input) {
+    const data = parseJson(input);
+    const counts = countJsonKeys(data);
+    const topLevelKeys = data && typeof data === 'object' && !Array.isArray(data) ? Object.keys(data as JsonObject) : [];
+    return result([
+      `Total keys: ${counts.totalKeys}`,
+      `Unique keys: ${counts.uniqueKeys.size}`,
+      `Top-level keys: ${topLevelKeys.length}`,
+      `Max depth: ${counts.maxDepth}`
+    ].join('\n'), {
+      totalKeys: counts.totalKeys,
+      uniqueKeys: counts.uniqueKeys.size,
+      topLevelKeys: topLevelKeys.length,
+      maxDepth: counts.maxDepth
+    }, undefined, {
+      type: 'json',
+      title: 'JSON key summary',
+      values: {
+        totalKeys: counts.totalKeys,
+        uniqueKeys: counts.uniqueKeys.size,
+        topLevelKeys: topLevelKeys.join(', ') || 'none'
+      }
+    });
+  },
+
+  csvDuplicateRowFinder(input) {
+    const { values, body } = parseKeyValuePayload(input);
+    const rows = csvRows(body || input, ',');
+    if (rows.length < 2) {
+      throw new Error('CSV duplicate row finder expects a header row and at least one data row.');
+    }
+    const headers = rows[0].map((item) => item.trim());
+    const dataRows = rows.slice(1);
+    const column = values.column;
+    if (column) {
+      const numericIndex = /^\d+$/.test(column) ? Number(column) - 1 : -1;
+      const index = numericIndex >= 0 ? numericIndex : headers.findIndex((header) => header.toLowerCase() === column.toLowerCase());
+      if (index < 0 || index >= headers.length) {
+        throw new Error(`CSV duplicate row finder could not find column: ${column}.`);
+      }
+      const counts = new Map<string, number>();
+      dataRows.forEach((row) => {
+        const value = String(row[index] ?? '');
+        counts.set(value, (counts.get(value) ?? 0) + 1);
+      });
+      const duplicates = [...counts.entries()].filter(([, count]) => count > 1);
+      if (!duplicates.length) {
+        return result('No duplicate values found.', { duplicates: 0, checkedRows: dataRows.length, column: headers[index] });
+      }
+      return result(
+        duplicates.map(([value, count]) => `${value || '(empty)'}: ${count}`).join('\n'),
+        { duplicates: duplicates.length, checkedRows: dataRows.length, column: headers[index] }
+      );
+    }
+
+    const counts = new Map<string, number>();
+    dataRows.forEach((row) => {
+      const key = row.join('\u001f');
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+    const duplicates = [...counts.entries()].filter(([, count]) => count > 1);
+    if (!duplicates.length) {
+      return result('No duplicate rows found.', { duplicates: 0, checkedRows: dataRows.length });
+    }
+    return result(
+      duplicates
+        .map(([value, count]) => `${value.split('\u001f').join(' | ')} => ${count}`)
+        .join('\n'),
+      { duplicates: duplicates.length, checkedRows: dataRows.length }
+    );
+  },
+
+  rgbToHexWithAlpha(input) {
+    const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+    if (!lines.length) {
+      throw new Error('RGB to HEX with alpha expects red, green, blue and alpha values.');
+    }
+    const values = lines.join(',').split(',').map((item) => item.trim()).filter(Boolean);
+    if (values.length < 4) {
+      throw new Error('RGB to HEX with alpha expects four values: red, green, blue, alpha.');
+    }
+    const [red, green, blue] = values.slice(0, 3).map((item) => Number(item));
+    if ([red, green, blue].some((value) => !Number.isFinite(value) || value < 0 || value > 255)) {
+      throw new Error('Invalid RGB values: use red, green and blue from 0 to 255.');
+    }
+    const alpha = parseAlphaValue(values[3]);
+    const hex = `#${[red, green, blue, Math.round(alpha * 255)].map((item) => Math.round(item).toString(16).padStart(2, '0')).join('')}`;
+    return result(hex.toLowerCase(), { alpha: formatNumber(alpha, 2), alphaPercent: Math.round(alpha * 100) }, undefined, colorPreview('HEX with alpha', hex.toLowerCase(), { alpha: `${Math.round(alpha * 100)}%` }));
+  },
+
+  calorieMacroCalculator(input) {
+    const { values } = parseKeyValuePayload(input);
+    const calories = Number(values.calories);
+    const proteinPercent = Number(values.proteinpercent ?? values.protein);
+    const fatPercent = Number(values.fatpercent ?? values.fat);
+    const carbsPercent = Number(values.carbspercent ?? values.carbs);
+    if (![calories, proteinPercent, fatPercent, carbsPercent].every((value) => Number.isFinite(value) && value >= 0)) {
+      throw new Error('Calorie macro calculator expects calories= plus proteinPercent=, fatPercent= and carbsPercent= values.');
+    }
+    const totalPercent = proteinPercent + fatPercent + carbsPercent;
+    if (Math.abs(totalPercent - 100) > 0.5) {
+      throw new Error(`Macro percentages must add up to 100. Current total: ${formatNumber(totalPercent, 2)}.`);
+    }
+    const proteinGrams = (calories * (proteinPercent / 100)) / 4;
+    const fatGrams = (calories * (fatPercent / 100)) / 9;
+    const carbsGrams = (calories * (carbsPercent / 100)) / 4;
+    return result([
+      `Calories: ${formatNumber(calories, 0)}`,
+      `Protein: ${formatNumber(proteinGrams, 1)} g`,
+      `Fat: ${formatNumber(fatGrams, 1)} g`,
+      `Carbs: ${formatNumber(carbsGrams, 1)} g`
+    ].join('\n'), { calories, proteinGrams: formatNumber(proteinGrams, 1), fatGrams: formatNumber(fatGrams, 1), carbsGrams: formatNumber(carbsGrams, 1) }, [
+      'Nutrition estimates are informational only and should not replace professional dietary advice.'
+    ]);
+  },
+
+  mortgageAffordabilityCalculator(input) {
+    const { values } = parseKeyValuePayload(input);
+    const monthlyIncome = Number(values.monthlyincome ?? values.income);
+    const monthlyDebts = Number(values.monthlydebts ?? values.debts ?? '0');
+    const annualRate = Number(values.rate);
+    const years = Number(values.years);
+    const maxDti = Number(values.maxdti ?? '36');
+    if (![monthlyIncome, monthlyDebts, annualRate, years, maxDti].every((value) => Number.isFinite(value) && value >= 0)) {
+      throw new Error('Mortgage affordability calculator expects monthlyIncome=, monthlyDebts=, rate=, years= and optional maxDti=.');
+    }
+    if (monthlyIncome <= 0 || years <= 0) {
+      throw new Error('Mortgage affordability calculator requires positive monthly income and years.');
+    }
+    const maxHousingBudget = (monthlyIncome * (maxDti / 100)) - monthlyDebts;
+    if (maxHousingBudget <= 0) {
+      throw new Error('Current debts already exceed the selected debt-to-income threshold.');
+    }
+    const monthlyRate = annualRate / 100 / 12;
+    const payments = years * 12;
+    const principal = monthlyRate === 0
+      ? maxHousingBudget * payments
+      : maxHousingBudget * ((1 - ((1 + monthlyRate) ** -payments)) / monthlyRate);
+    return result([
+      `Max monthly payment: ${formatNumber(maxHousingBudget, 2)}`,
+      `Estimated loan amount: ${formatNumber(principal, 0)}`,
+      `Assumed payments: ${payments}`,
+      `Rate used: ${formatNumber(annualRate, 2)}%`
+    ].join('\n'), { maxMonthlyPayment: formatNumber(maxHousingBudget, 2), estimatedLoan: formatNumber(principal, 0), payments, annualRate }, [
+      'Mortgage affordability is only an estimate. Taxes, insurance, fees, down payment and lender rules can change the real outcome.'
+    ]);
   },
 
   jwtDecoder(input) {

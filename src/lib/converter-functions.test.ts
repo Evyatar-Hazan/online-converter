@@ -285,6 +285,53 @@ describe('converter functions', () => {
     expect(convert('dateToTimestamp', '2026-06-18T12:00:00Z', { outputUnit: 'seconds' }).output).not.toContain('Milliseconds');
   });
 
+  it('supports the eighth demand-focused converter batch', () => {
+    const planner = convert('timezoneMeetingPlanner', 'date=2026-07-01\ntime=14:30\nfrom=Asia/Jerusalem\nto=Europe/London,America/New_York');
+    expect(planner.output).toContain('Base timezone (Asia/Jerusalem):');
+    expect(planner.output).toContain('Europe/London:');
+    expect(planner.metadata?.targets).toBe(2);
+
+    const cron = convert('cronExpressionExplainer', '*/15 9-17 * * 1-5');
+    expect(cron.output).toContain('Minute: every 15 minute');
+    expect(cron.output).toContain('Weekday: weekday range: 1 to 5');
+
+    const dateDiff = convert('dateDifferenceCalculator', '2026-06-01\n2026-06-10');
+    expect(dateDiff.output).toContain('Days difference: 9');
+
+    const caseDetector = convert('textCaseDetector', 'customerAccountNumber');
+    expect(caseDetector.output).toContain('Detected case: camelCase');
+
+    const headerParser = convert('httpHeaderParser', 'GET /api HTTP/1.1\nHost: example.com\nX-Test: one\nX-Test: two');
+    expect(JSON.parse(headerParser.output)).toMatchObject({
+      firstLine: 'GET /api HTTP/1.1',
+      headers: {
+        host: 'example.com',
+        'x-test': ['one', 'two']
+      }
+    });
+
+    const keyCounter = convert('jsonKeyCounter', '{"user":{"name":"Dana","address":{"city":"Jerusalem"}}}');
+    expect(keyCounter.output).toContain('Total keys: 4');
+    expect(keyCounter.output).toContain('Unique keys: 4');
+
+    const duplicateRows = convert('csvDuplicateRowFinder', 'name,city\nDana,Jerusalem\nDana,Jerusalem\nMaya,Tel Aviv');
+    expect(duplicateRows.output).toContain('Dana | Jerusalem => 2');
+
+    const duplicateColumn = convert('csvDuplicateRowFinder', 'column=email\nname,email\nDana,dana@example.com\nAvi,avi@example.com\nNoa,dana@example.com');
+    expect(duplicateColumn.output).toContain('dana@example.com: 2');
+
+    const alphaHex = convert('rgbToHexWithAlpha', '79, 70, 229, 60');
+    expect(alphaHex.output).toBe('#4f46e599');
+
+    const macros = convert('calorieMacroCalculator', 'calories=2200\nproteinPercent=30\nfatPercent=25\ncarbsPercent=45');
+    expect(macros.output).toContain('Protein: 165 g');
+    expect(macros.output).toContain('Fat: 61.1 g');
+
+    const mortgage = convert('mortgageAffordabilityCalculator', 'monthlyIncome=18000\nmonthlyDebts=2500\nrate=5.5\nyears=25\nmaxDti=36');
+    expect(mortgage.output).toContain('Max monthly payment: 3980');
+    expect(mortgage.output).toContain('Assumed payments: 300');
+  });
+
   it('throws useful errors for invalid input', () => {
     expect(() => convert('jsonFormatter', '{bad')).toThrow(/Invalid JSON/i);
     expect(() => convert('csvToJson', '"broken')).toThrow(/Invalid CSV/i);
@@ -345,5 +392,11 @@ describe('converter functions', () => {
     expect(() => convert('uuidValidator', '')).toThrow(/UUID validator/i);
     expect(() => convert('jwtExpirationChecker', 'abc.def')).toThrow(/Invalid JWT/i);
     expect(() => convert('jwtDecoder', 'abc.def')).toThrow(/Invalid JWT/i);
+    expect(() => convert('timezoneMeetingPlanner', 'time=14:30\nfrom=Asia/Jerusalem\nto=Europe/London')).toThrow(/expects date=YYYY-MM-DD/i);
+    expect(() => convert('cronExpressionExplainer', '* * *')).toThrow(/expects 5 parts/i);
+    expect(() => convert('textCaseDetector', '')).toThrow(/expects text/i);
+    expect(() => convert('httpHeaderParser', 'GET / HTTP/1.1\nHost example.com')).toThrow(/Invalid header line/i);
+    expect(() => convert('calorieMacroCalculator', 'calories=2000\nproteinPercent=30\nfatPercent=30\ncarbsPercent=30')).toThrow(/add up to 100/i);
+    expect(() => convert('mortgageAffordabilityCalculator', 'monthlyIncome=1000\nmonthlyDebts=900\nrate=5\nyears=30\nmaxDti=36')).toThrow(/exceed the selected debt-to-income threshold/i);
   });
 });

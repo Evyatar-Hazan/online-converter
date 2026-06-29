@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { JSDOM } from 'jsdom';
+import { converters } from '../src/data/converters.ts';
+import { categoryLabels, locales } from '../src/data/site.ts';
 
 const siteUrl = 'https://online-converter.evyatarhazan.com';
 const distDir = join(process.cwd(), 'dist');
@@ -79,8 +81,9 @@ for (const pathname of publicPaths) {
 }
 
 const locCount = [...sitemap.matchAll(/<loc>/g)].length;
-if (locCount !== 244) {
-  fail(`Expected 244 sitemap URLs, received ${locCount}`);
+const expectedLocCount = locales.length + locales.length * Object.keys(categoryLabels).length + locales.length * converters.length;
+if (locCount !== expectedLocCount) {
+  fail(`Expected ${expectedLocCount} sitemap URLs, received ${locCount}`);
 }
 
 if (sitemap.includes('<loc>https://online-converter.evyatarhazan.com/analytics/</loc>')) {

@@ -29,4 +29,11 @@ Completed in the sixth expansion batch: Markdown table generator, salary calcula
 
 Completed in the seventh expansion batch: reading time calculator, sentence counter, UUID validator, JSON array flattener, CSV row filter, RGB opacity converter, pace calculator, and fuel cost calculator.
 
-Recommended next batch: timezone meeting planner, cron expression explainer, date difference calculator, text case detector, HTTP header parser, JSON key counter, CSV duplicate row finder, RGB to HEX with alpha, calorie macro calculator, and mortgage affordability calculator.
+Completed in the eighth expansion batch: timezone meeting planner, cron expression explainer, date difference calculator, text case detector, HTTP header parser, JSON key counter, CSV duplicate row finder, RGB to HEX with alpha, calorie macro calculator, and mortgage affordability calculator.
+
+Next recommended backlog themes:
+
+1. File and document helpers: CSV header normalizer, HTML table to CSV, JSON file prettifier, PDF page count checker.
+2. SEO and marketing helpers: robots meta tag generator, canonical tag checker, keyword density checker, hreflang tag generator.
+3. Developer diagnostics: SQL formatter, .env parser, JWT claims viewer, curl command formatter.
+4. Business calculators: savings goal calculator, break-even calculator, profit margin calculator, invoice due date calculator.

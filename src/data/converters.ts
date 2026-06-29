@@ -2674,6 +2674,296 @@ export const converters: ConverterTool[] = [
     related: ['unit-price-calculator', 'percentage-calculator', 'discount-calculator']
   },
   {
+    slug: 'timezone-meeting-planner',
+    converterId: 'timezoneMeetingPlanner',
+    category: 'time',
+    inputType: 'meeting time',
+    outputType: 'time zones',
+    new: true,
+    title: { en: 'Timezone Meeting Planner', he: 'מתכנן פגישות לפי אזורי זמן' },
+    shortTitle: { en: 'Meeting Planner', he: 'מתכנן פגישות' },
+    description: { en: 'Convert one meeting time into multiple time zones for distributed teams and client calls.', he: 'המר זמן פגישה אחד למספר אזורי זמן עבור צוותים מבוזרים ושיחות עם לקוחות.' },
+    metaDescription: { en: 'Timezone meeting planner online. Convert one date and time into multiple time zones locally in your browser.', he: 'מתכנן פגישות לפי אזורי זמן אונליין. המרת תאריך ושעה למספר אזורי זמן בדפדפן.' },
+    keywords: { en: ['timezone converter meeting', 'timezone meeting planner'], he: ['מתכנן פגישות אזורי זמן', 'המרת שעה בין אזורי זמן'] },
+    features: { en: ['Multiple time zones', 'UTC output', 'Team scheduling'], he: ['מספר אזורי זמן', 'פלט UTC', 'תזמון צוותים'] },
+    guide: { en: ['Add date=YYYY-MM-DD and time=HH:MM.', 'Set from= with the source timezone.', 'Add to= with comma-separated target zones and convert.'], he: ['הוסף date=YYYY-MM-DD ו־time=HH:MM.', 'הגדר from= עם אזור הזמן המקורי.', 'הוסף to= עם אזורי זמן מופרדים בפסיקים והמר.'] },
+    examples: [{ label: { en: 'Product sync', he: 'סנכרון מוצר' }, input: 'date=2026-07-01\ntime=14:30\nfrom=Asia/Jerusalem\nto=Europe/London,America/New_York,Asia/Tokyo' }],
+    faq: [
+      {
+        question: { en: 'Which timezone names should I use here?', he: 'אילו שמות אזורי זמן צריך להזין כאן?' },
+        answer: { en: 'Use IANA timezone names such as Asia/Jerusalem, Europe/London or America/New_York. These are the most stable names for browser-based conversion.', he: 'השתמש בשמות IANA כמו Asia/Jerusalem, Europe/London או America/New_York. אלה השמות היציבים ביותר להמרה בדפדפן.' }
+      },
+      {
+        question: { en: 'Does the meeting planner handle daylight saving time?', he: 'האם מתכנן הפגישות מתחשב בשעון קיץ?' },
+        answer: { en: 'Yes. The conversion uses browser timezone data, so daylight saving shifts are included for the selected date.', he: 'כן. ההמרה משתמשת בנתוני אזורי הזמן של הדפדפן ולכן כוללת שינויים של שעון קיץ לפי התאריך שנבחר.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['date-to-timestamp', 'timestamp-to-date', 'time-duration-calculator']
+  },
+  {
+    slug: 'cron-expression-explainer',
+    converterId: 'cronExpressionExplainer',
+    category: 'developer',
+    inputType: 'cron',
+    outputType: 'explanation',
+    new: true,
+    title: { en: 'Cron Expression Explainer', he: 'מסביר ביטויי Cron' },
+    shortTitle: { en: 'Cron Explainer', he: 'Cron' },
+    description: { en: 'Explain five-part cron expressions for schedules, jobs and automation tasks.', he: 'הסבר לביטויי Cron בני חמישה חלקים עבור לוחות זמנים, jobs ואוטומציות.' },
+    metaDescription: { en: 'Cron expression explainer online. Understand five-part cron schedules in your browser.', he: 'מסביר ביטויי Cron אונליין. הבן לוחות זמנים של cron בני חמישה חלקים בדפדפן.' },
+    keywords: { en: ['cron expression explainer', 'cron schedule explainer'], he: ['הסבר cron', 'מסביר ביטוי cron'] },
+    features: { en: ['5-field cron', 'Step values', 'Ranges and lists'], he: ['cron בן 5 שדות', 'ערכי step', 'טווחים ורשימות'] },
+    guide: { en: ['Paste a five-part cron expression.', 'Convert to inspect minute, hour, day, month and weekday meaning.', 'Use the summary to catch scheduling mistakes faster.'], he: ['הדבק ביטוי cron בן חמישה חלקים.', 'המר כדי לבדוק את משמעות הדקות, השעות, היום, החודש ויום השבוע.', 'השתמש בסיכום כדי לזהות טעויות תזמון מהר יותר.'] },
+    examples: [{ label: { en: 'Workday quarter hour', he: 'כל רבע שעה בימי עבודה' }, input: '*/15 9-17 * * 1-5' }],
+    faq: [
+      {
+        question: { en: 'Does this cron explainer support six-part cron syntax?', he: 'האם המסביר הזה תומך גם ב־cron בן שישה חלקים?' },
+        answer: { en: 'Not in this version. It currently explains the common five-part minute hour day month weekday format.', he: 'לא בגרסה הזאת. כרגע הוא מסביר את הפורמט הנפוץ של חמישה חלקים: דקות, שעות, יום, חודש ויום בשבוע.' }
+      },
+      {
+        question: { en: 'Why is a cron explainer useful if I already know cron?', he: 'למה צריך מסביר cron אם אני כבר מכיר cron?' },
+        answer: { en: 'It helps when you review unfamiliar schedules, debug a job quickly, or want a readable breakdown before pushing automation changes.', he: 'הוא עוזר כשבודקים לוחות זמנים לא מוכרים, מדבגים job מהר, או רוצים פירוק קריא לפני שמעלים שינויי אוטומציה.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['http-status-code-lookup', 'jwt-expiration-checker', 'robots-txt-tester']
+  },
+  {
+    slug: 'date-difference-calculator',
+    converterId: 'dateDifferenceCalculator',
+    category: 'time',
+    inputType: 'date',
+    outputType: 'difference',
+    new: true,
+    title: { en: 'Date Difference Calculator', he: 'מחשבון הפרש תאריכים' },
+    shortTitle: { en: 'Date Difference', he: 'הפרש תאריכים' },
+    description: { en: 'Calculate the number of days, weeks and remaining days between two calendar dates.', he: 'חשב את מספר הימים, השבועות והימים הנותרים בין שני תאריכים בלוח השנה.' },
+    metaDescription: { en: 'Date difference calculator online. Count days and weeks between two dates locally in your browser.', he: 'מחשבון הפרש תאריכים אונליין. ספירת ימים ושבועות בין שני תאריכים בדפדפן.' },
+    keywords: { en: ['date difference calculator', 'days between dates'], he: ['מחשבון הפרש תאריכים', 'ימים בין תאריכים'] },
+    features: { en: ['Days difference', 'Weeks and days', 'Date summary'], he: ['הפרש ימים', 'שבועות וימים', 'סיכום תאריכים'] },
+    guide: { en: ['Paste the first date on line 1.', 'Paste the second date on line 2.', 'Convert to see the difference in days and weeks.'], he: ['הדבק את התאריך הראשון בשורה 1.', 'הדבק את התאריך השני בשורה 2.', 'המר כדי לראות את ההפרש בימים ובשבועות.'] },
+    examples: [{ label: { en: 'Project window', he: 'חלון פרויקט' }, input: '2026-06-01\n2026-06-10' }],
+    faq: [
+      {
+        question: { en: 'Does the date difference calculator count full days only?', he: 'האם מחשבון הפרש התאריכים סופר רק ימים מלאים?' },
+        answer: { en: 'Yes. It compares two calendar dates at midnight UTC, so the result is a whole-day difference without time-of-day noise.', he: 'כן. הוא משווה שני תאריכים קלנדריים בחצות UTC, ולכן התוצאה היא הפרש ימים שלם בלי רעש של שעות ודקות.' }
+      },
+      {
+        question: { en: 'When should I use this instead of the countdown or business days tool?', he: 'מתי להשתמש בזה במקום countdown או business days?' },
+        answer: { en: 'Use this tool when you want raw calendar distance. Use countdown for future-date framing and business days when weekends should be excluded.', he: 'השתמש בכלי הזה כשצריך מרחק קלנדרי גולמי. השתמש ב־countdown למסגור של תאריך עתידי וב־business days כשצריך להחריג סופי שבוע.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['business-days-calculator', 'countdown-calculator', 'age-calculator']
+  },
+  {
+    slug: 'text-case-detector',
+    converterId: 'textCaseDetector',
+    category: 'text',
+    inputType: 'text',
+    outputType: 'case detection',
+    new: true,
+    title: { en: 'Text Case Detector', he: 'מזהה סוג אותיות בטקסט' },
+    shortTitle: { en: 'Case Detector', he: 'מזהה Case' },
+    description: { en: 'Detect whether text is camelCase, PascalCase, snake_case, kebab-case, lowercase, uppercase or mixed.', he: 'זהה אם הטקסט הוא camelCase, PascalCase, snake_case, kebab-case, lowercase, uppercase או מעורב.' },
+    metaDescription: { en: 'Text case detector online. Detect camelCase, snake_case, kebab-case and more in your browser.', he: 'מזהה סוג אותיות בטקסט אונליין. זיהוי camelCase, snake_case, kebab-case ועוד בדפדפן.' },
+    keywords: { en: ['detect text case', 'text case detector'], he: ['זיהוי סוג אותיות', 'מזהה case בטקסט'] },
+    features: { en: ['camelCase', 'snake_case', 'Mixed detection'], he: ['camelCase', 'snake_case', 'זיהוי טקסט מעורב'] },
+    guide: { en: ['Paste a word, phrase or identifier.', 'Convert to detect the closest case pattern.', 'Use the result before transforming the text into another naming style.'], he: ['הדבק מילה, ביטוי או מזהה.', 'המר לזיהוי דפוס האותיות הקרוב ביותר.', 'השתמש בתוצאה לפני המרה לסגנון שמות אחר.'] },
+    examples: [{ label: { en: 'Frontend key', he: 'מפתח frontend' }, input: 'customerAccountNumber' }],
+    faq: [
+      {
+        question: { en: 'Is text case detection useful outside programming?', he: 'האם זיהוי case בטקסט שימושי גם מחוץ לתכנות?' },
+        answer: { en: 'Yes. It helps with SEO slugs, spreadsheet fields, filenames, CMS keys and content operations where naming consistency matters.', he: 'כן. זה עוזר עם slugs ל־SEO, שדות בגיליונות, שמות קבצים, מפתחות CMS ותפעול תוכן שבו עקביות בשם חשובה.' }
+      },
+      {
+        question: { en: 'What happens if the text is mixed or ambiguous?', he: 'מה קורה אם הטקסט מעורב או לא חד משמעי?' },
+        answer: { en: 'The detector returns Mixed or unknown, which is a useful signal before you normalize the text with one of the case converters.', he: 'המזהה מחזיר Mixed or unknown, וזה אות שימושי לפני שמנרמלים את הטקסט עם אחד מממירי ה־case.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['text-case-converter', 'text-to-camel-case', 'text-to-snake-case']
+  },
+  {
+    slug: 'http-header-parser',
+    converterId: 'httpHeaderParser',
+    category: 'developer',
+    inputType: 'headers',
+    outputType: 'json',
+    new: true,
+    title: { en: 'HTTP Header Parser', he: 'מפרש כותרות HTTP' },
+    shortTitle: { en: 'Header Parser', he: 'מפרש כותרות' },
+    description: { en: 'Parse raw HTTP request or response headers into structured JSON for debugging and inspection.', he: 'פרש כותרות HTTP גולמיות של בקשה או תגובה ל־JSON מובנה לצורך דיבוג ובדיקה.' },
+    metaDescription: { en: 'HTTP header parser online. Parse raw request and response headers into structured JSON locally.', he: 'מפרש כותרות HTTP אונליין. פרש כותרות גולמיות של בקשות ותגובות ל־JSON מקומי.' },
+    keywords: { en: ['parse http headers', 'http header parser'], he: ['פירוש כותרות HTTP', 'מפרש כותרות HTTP'] },
+    features: { en: ['Request line', 'Repeated headers', 'JSON output'], he: ['שורת בקשה', 'כותרות חוזרות', 'פלט JSON'] },
+    guide: { en: ['Paste the request line or status line first.', 'Paste each header on a new line.', 'Convert to inspect normalized header keys and values.'], he: ['הדבק קודם את שורת הבקשה או שורת הסטטוס.', 'הדבק כל כותרת בשורה חדשה.', 'המר כדי לבדוק מפתחות וערכים מנורמלים.'] },
+    examples: [{ label: { en: 'Request headers', he: 'כותרות בקשה' }, input: 'GET /api HTTP/1.1\nHost: example.com\nAuthorization: Bearer token\nX-Test: one\nX-Test: two' }],
+    faq: [
+      {
+        question: { en: 'Does the HTTP header parser preserve repeated headers?', he: 'האם מפרש כותרות HTTP שומר כותרות שחוזרות כמה פעמים?' },
+        answer: { en: 'Yes. Repeated headers are returned as arrays, which is useful for Set-Cookie style responses and debugging duplicated values.', he: 'כן. כותרות שחוזרות מוחזרות כמערכים, וזה שימושי לתגובות בסגנון Set-Cookie ולדיבוג ערכים כפולים.' }
+      },
+      {
+        question: { en: 'Can I use this for both requests and responses?', he: 'אפשר להשתמש בזה גם לבקשות וגם לתגובות?' },
+        answer: { en: 'Yes. The first line is stored as-is, so it works with request lines like GET /path HTTP/1.1 and response lines like HTTP/1.1 200 OK.', he: 'כן. השורה הראשונה נשמרת כפי שהיא, ולכן זה עובד גם עם שורות בקשה כמו GET /path HTTP/1.1 וגם עם שורות תגובה כמו HTTP/1.1 200 OK.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['user-agent-parser', 'http-status-code-lookup', 'query-string-to-json']
+  },
+  {
+    slug: 'json-key-counter',
+    converterId: 'jsonKeyCounter',
+    category: 'data',
+    inputType: 'json',
+    outputType: 'counts',
+    new: true,
+    title: { en: 'JSON Key Counter', he: 'סופר מפתחות JSON' },
+    shortTitle: { en: 'JSON Key Counter', he: 'סופר מפתחות' },
+    description: { en: 'Count total, unique and top-level keys inside JSON objects and arrays.', he: 'ספור מפתחות כוללים, ייחודיים וברמת העל בתוך אובייקטים ומערכים של JSON.' },
+    metaDescription: { en: 'JSON key counter online. Count total and unique keys inside JSON locally in your browser.', he: 'סופר מפתחות JSON אונליין. ספירת מפתחות כוללים וייחודיים בתוך JSON בדפדפן.' },
+    keywords: { en: ['count json keys', 'json key counter'], he: ['ספירת מפתחות JSON', 'סופר מפתחות JSON'] },
+    features: { en: ['Total keys', 'Unique keys', 'Max depth'], he: ['מפתחות כוללים', 'מפתחות ייחודיים', 'עומק מרבי'] },
+    guide: { en: ['Paste a JSON object or array.', 'Convert to count keys and nesting depth.', 'Use the summary to understand payload complexity fast.'], he: ['הדבק אובייקט או מערך JSON.', 'המר לספירת מפתחות ועומק קינון.', 'השתמש בסיכום כדי להבין מהר את מורכבות ה־payload.'] },
+    examples: [{ label: { en: 'Nested object', he: 'אובייקט מקונן' }, input: '{"user":{"name":"Dana","address":{"city":"Jerusalem"}}}' }],
+    faq: [
+      {
+        question: { en: 'Does the JSON key counter work on arrays too?', he: 'האם סופר המפתחות עובד גם על מערכים?' },
+        answer: { en: 'Yes. It walks through objects inside arrays and counts keys across the whole structure, which is useful for API responses and exports.', he: 'כן. הוא עובר על אובייקטים בתוך מערכים וסופר מפתחות בכל המבנה, וזה שימושי לתגובות API ויצואים.' }
+      },
+      {
+        question: { en: 'Why would I count JSON keys before converting data?', he: 'למה לספור מפתחות JSON לפני המרת נתונים?' },
+        answer: { en: 'It helps estimate complexity, compare payload versions and decide whether a structure is simple enough for CSV, reports or schema work.', he: 'זה עוזר להעריך מורכבות, להשוות בין גרסאות של payload ולהחליט אם המבנה פשוט מספיק ל־CSV, דוחות או עבודה עם schema.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['json-formatter', 'json-array-flattener', 'json-path-extractor']
+  },
+  {
+    slug: 'csv-duplicate-row-finder',
+    converterId: 'csvDuplicateRowFinder',
+    category: 'data',
+    inputType: 'csv',
+    outputType: 'duplicate rows',
+    new: true,
+    title: { en: 'CSV Duplicate Row Finder', he: 'מאתר כפילויות CSV' },
+    shortTitle: { en: 'CSV Duplicates', he: 'כפילויות CSV' },
+    description: { en: 'Find duplicate CSV rows or duplicate values in one selected CSV column.', he: 'אתר שורות CSV כפולות או ערכים כפולים בעמודת CSV נבחרת.' },
+    metaDescription: { en: 'CSV duplicate finder online. Detect duplicate rows or duplicate values in one CSV column locally.', he: 'מאתר כפילויות CSV אונליין. זיהוי שורות כפולות או ערכים כפולים בעמודת CSV בדפדפן.' },
+    keywords: { en: ['find duplicate csv rows', 'csv duplicate finder'], he: ['איתור כפילויות CSV', 'שורות כפולות ב־CSV'] },
+    features: { en: ['Full-row duplicates', 'Column mode', 'CSV inspection'], he: ['כפילויות שורה מלאה', 'מצב עמודה', 'בדיקת CSV'] },
+    guide: { en: ['Paste CSV data directly.', 'Optional: add column=name on top to inspect one column only.', 'Convert to list duplicates and their counts.'], he: ['הדבק CSV ישירות.', 'אופציונלי: הוסף למעלה column=name כדי לבדוק רק עמודה אחת.', 'המר כדי לראות כפילויות והספירה שלהן.'] },
+    examples: [{ label: { en: 'Duplicate cities', he: 'כפילויות עיר' }, input: 'column=city\nname,city\nDana,Jerusalem\nAvi,Haifa\nNoa,Jerusalem' }],
+    faq: [
+      {
+        question: { en: 'Can I search for duplicate rows without selecting a column?', he: 'אפשר לחפש שורות כפולות בלי לבחור עמודה?' },
+        answer: { en: 'Yes. If you do not add column=..., the tool checks entire CSV rows and reports rows that appear more than once.', he: 'כן. אם לא מוסיפים column=..., הכלי בודק שורות CSV שלמות ומדווח על שורות שמופיעות יותר מפעם אחת.' }
+      },
+      {
+        question: { en: 'When should I use column mode in the duplicate finder?', he: 'מתי להשתמש במצב עמודה בכלי הכפילויות?' },
+        answer: { en: 'Use column mode when you care about one field such as email, city, order ID or SKU rather than a whole repeated row.', he: 'השתמש במצב עמודה כשאכפת לך משדה אחד כמו email, city, order ID או SKU ולא משורה מלאה שחוזרת.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['csv-row-filter', 'csv-list-sorter', 'csv-column-extractor']
+  },
+  {
+    slug: 'rgb-to-hex-with-alpha',
+    converterId: 'rgbToHexWithAlpha',
+    category: 'color',
+    inputType: 'rgb',
+    outputType: 'hex alpha',
+    new: true,
+    title: { en: 'RGB to HEX with Alpha', he: 'RGB ל־HEX עם Alpha' },
+    shortTitle: { en: 'RGB to HEX Alpha', he: 'RGB ל־HEX Alpha' },
+    description: { en: 'Convert RGB values and alpha into 8-digit HEX color codes for CSS and design tokens.', he: 'המר ערכי RGB ו־alpha לקוד HEX בן 8 ספרות עבור CSS ו־design tokens.' },
+    metaDescription: { en: 'RGB to HEX with alpha online. Convert RGB and transparency into 8-digit HEX locally.', he: 'RGB ל־HEX עם alpha אונליין. המרת RGB ושקיפות ל־HEX בן 8 ספרות בדפדפן.' },
+    keywords: { en: ['rgb alpha to hex', 'rgb to hex with alpha'], he: ['RGB alpha ל HEX', 'RGB ל HEX עם שקיפות'] },
+    features: { en: ['8-digit HEX', '0-1 or 0-100 alpha', 'CSS ready'], he: ['HEX בן 8 ספרות', 'alpha של 0-1 או 0-100', 'מוכן ל־CSS'] },
+    guide: { en: ['Enter red, green, blue and alpha.', 'Use alpha as 0.6 or 60.', 'Convert and copy the 8-digit HEX result.'], he: ['הזן אדום, ירוק, כחול ו־alpha.', 'השתמש ב־alpha כ־0.6 או 60.', 'המר והעתק את תוצאת ה־HEX בת 8 הספרות.'] },
+    examples: [{ label: { en: 'Indigo overlay', he: 'שכבת אינדיגו' }, input: '79, 70, 229, 60' }],
+    faq: [
+      {
+        question: { en: 'Should alpha be written as 0.6 or 60?', he: 'האם alpha צריך להיכתב כ־0.6 או 60?' },
+        answer: { en: 'Both work here. The converter accepts either 0-1 values or 0-100 values and normalizes them into 8-digit HEX output.', he: 'שניהם עובדים כאן. הממיר מקבל גם ערכים בין 0 ל־1 וגם ערכים בין 0 ל־100 ומנרמל אותם לפלט HEX בן 8 ספרות.' }
+      },
+      {
+        question: { en: 'When is 8-digit HEX more useful than rgba()?', he: 'מתי HEX בן 8 ספרות שימושי יותר מ־rgba()?' },
+        answer: { en: 'It is helpful when a design system, theme file or CSS variable expects HEX output instead of rgba() syntax.', he: 'זה שימושי כשמערכת עיצוב, קובץ theme או משתנה CSS מצפים לפלט HEX במקום תחביר rgba().' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['rgb-opacity-converter', 'hex-opacity-converter', 'rgb-to-hex']
+  },
+  {
+    slug: 'calorie-macro-calculator',
+    converterId: 'calorieMacroCalculator',
+    category: 'calculator',
+    inputType: 'nutrition targets',
+    outputType: 'macro grams',
+    new: true,
+    title: { en: 'Calorie Macro Calculator', he: 'מחשבון קלוריות ומאקרו' },
+    shortTitle: { en: 'Macro Calculator', he: 'מאקרו' },
+    description: { en: 'Turn calorie goals and macro percentages into protein, fat and carb gram targets.', he: 'הפוך יעד קלוריות ואחוזי מאקרו ליעדי גרמים של חלבון, שומן ופחמימה.' },
+    metaDescription: { en: 'Calorie macro calculator online. Convert calorie targets and macro percentages into grams.', he: 'מחשבון קלוריות ומאקרו אונליין. המרת יעד קלוריות ואחוזי מאקרו לגרמים.' },
+    keywords: { en: ['macro calculator', 'calorie macro calculator'], he: ['מחשבון מאקרו', 'מחשבון קלוריות ומאקרו'] },
+    features: { en: ['Protein grams', 'Fat grams', 'Carb grams'], he: ['גרמי חלבון', 'גרמי שומן', 'גרמי פחמימה'] },
+    guide: { en: ['Add calories= on the first line.', 'Set proteinPercent=, fatPercent= and carbsPercent=.', 'Convert to get macro grams for the full day.'], he: ['הוסף calories= בשורה הראשונה.', 'הגדר proteinPercent=, fatPercent= ו־carbsPercent=.', 'המר לקבלת גרמי מאקרו לכל היום.'] },
+    examples: [{ label: { en: 'Balanced cut', he: 'חיטוב מאוזן' }, input: 'calories=2200\nproteinPercent=30\nfatPercent=25\ncarbsPercent=45' }],
+    faq: [
+      {
+        question: { en: 'Do the macro percentages need to add up to 100?', he: 'האם אחוזי המאקרו צריכים להסתכם ל־100?' },
+        answer: { en: 'Yes. The calculator expects a full calorie split, so protein, fat and carbs should total 100 percent.', he: 'כן. המחשבון מצפה לחלוקה מלאה של הקלוריות, ולכן חלבון, שומן ופחמימה צריכים להסתכם ל־100 אחוז.' }
+      },
+      {
+        question: { en: 'Is this calorie macro calculator a nutrition recommendation?', he: 'האם מחשבון המאקרו הזה הוא המלצת תזונה?' },
+        answer: { en: 'No. It is a planning helper only. Use it to translate your own macro percentages into grams, not as personal medical advice.', he: 'לא. זה רק כלי עזר לתכנון. השתמש בו כדי לתרגם את אחוזי המאקרו שלך לגרמים, לא כייעוץ רפואי אישי.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['bmi-calculator', 'unit-price-calculator', 'average-calculator']
+  },
+  {
+    slug: 'mortgage-affordability-calculator',
+    converterId: 'mortgageAffordabilityCalculator',
+    category: 'calculator',
+    inputType: 'income and debts',
+    outputType: 'loan estimate',
+    new: true,
+    title: { en: 'Mortgage Affordability Calculator', he: 'מחשבון יכולת משכנתה' },
+    shortTitle: { en: 'Mortgage Affordability', he: 'יכולת משכנתה' },
+    description: { en: 'Estimate an affordable monthly mortgage payment and loan amount from income, debts, rate and loan term.', he: 'חשב הערכה לתשלום משכנתה חודשי ויכולת הלוואה לפי הכנסה, חובות, ריבית ותקופת ההלוואה.' },
+    metaDescription: { en: 'Mortgage affordability calculator online. Estimate monthly payment and loan size from income and debts.', he: 'מחשבון יכולת משכנתה אונליין. הערכת תשלום חודשי וגודל הלוואה לפי הכנסה וחובות.' },
+    keywords: { en: ['mortgage affordability calculator', 'how much mortgage can i afford'], he: ['מחשבון יכולת משכנתה', 'כמה משכנתה אפשר לקחת'] },
+    features: { en: ['Monthly payment', 'Estimated loan size', 'DTI based'], he: ['תשלום חודשי', 'גודל הלוואה משוער', 'מבוסס DTI'] },
+    guide: { en: ['Add monthlyIncome= and monthlyDebts=.', 'Set rate= and years= for the loan assumption.', 'Optional: add maxDti= to change the debt-to-income threshold.'], he: ['הוסף monthlyIncome= ו־monthlyDebts=.', 'הגדר rate= ו־years= להנחת ההלוואה.', 'אופציונלי: הוסף maxDti= כדי לשנות את סף יחס החוב להכנסה.'] },
+    examples: [{ label: { en: 'Family budget', he: 'תקציב משפחתי' }, input: 'monthlyIncome=18000\nmonthlyDebts=2500\nrate=5.5\nyears=25\nmaxDti=36' }],
+    faq: [
+      {
+        question: { en: 'What does the mortgage affordability estimate include?', he: 'מה כוללת הערכת יכולת המשכנתה?' },
+        answer: { en: 'It estimates a maximum monthly payment and an approximate loan amount from your debt-to-income threshold, rate and term.', he: 'היא מחשבת תשלום חודשי מרבי והלוואה משוערת לפי סף יחס חוב להכנסה, ריבית ותקופה.' }
+      },
+      {
+        question: { en: 'What is missing from this mortgage affordability calculator?', he: 'מה חסר במחשבון יכולת המשכנתה הזה?' },
+        answer: { en: 'Real approvals also depend on taxes, insurance, down payment, fees, credit policy and lender-specific underwriting rules.', he: 'אישורים אמיתיים תלויים גם במסים, ביטוח, הון עצמי, עמלות, מדיניות אשראי וכללי חיתום של הגוף המלווה.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['loan-payment-calculator', 'salary-calculator', 'percentage-calculator']
+  },
+  {
     slug: 'jwt-decoder',
     converterId: 'jwtDecoder',
     category: 'developer',

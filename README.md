@@ -4,7 +4,7 @@ A bilingual SEO-first converter hub built with Astro and React islands. The site
 
 ## Features
 
-- 114 converter tools across data formats, text, encoding, dates, colors, calculators and developer utilities.
+- 124 converter tools across data formats, text, encoding, dates, colors, calculators and developer utilities.
 - Static SEO pages for every tool and category in English and Hebrew.
 - Browser-only conversion: pasted input is not uploaded to a server.
 - Canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap and robots.txt.
