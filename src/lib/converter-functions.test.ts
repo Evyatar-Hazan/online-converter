@@ -192,6 +192,7 @@ describe('converter functions', () => {
     expect(convert('redirectMappingGenerator', '/old-page -> /new-page\n/old-json -> /json-to-csv', { format: 'apache' }).output).toContain('Redirect 301 /old-page /new-page');
     expect(convert('htmlHeadingsOutlineExtractor', '<main><h1>Title</h1><h2>Section</h2><h3>Detail</h3></main>').output).toContain('H1: Title');
     expect(convert('sqlFormatter', 'select user_id,count(*) from events where app = \'web\' order by created_at desc').output).toContain('SELECT');
+    expect(convert('regexTester', 'pattern=#(\\d{4})\nflags=g\nOrder #1024\nOrder #2048').output).toContain('Matches: 2');
     expect(convert('envParser', 'NODE_ENV=production\nAPI_URL=https://api.example.com').output).toContain('"NODE_ENV": "production"');
     expect(convert('curlCommandFormatter', 'curl -X POST https://api.example.com/orders -H "Authorization: Bearer token" --data-raw "{\\"id\\":1}"').output).toContain('--request POST');
     expect(convert('htmlTableToCsv', '<table><tr><th>Name</th><th>City</th></tr><tr><td>Dana</td><td>Jerusalem</td></tr></table>').output).toBe('Name,City\nDana,Jerusalem');

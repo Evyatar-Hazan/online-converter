@@ -41,6 +41,7 @@ const batchNineSeoSlugs = [
 
 const batchTenWaveOneSlugs = [
   'sql-formatter',
+  'regex-tester',
   'env-parser',
   'curl-command-formatter',
   'html-table-to-csv',

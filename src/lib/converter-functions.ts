@@ -1545,6 +1545,53 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { escapedCharacters: output.length - input.length, characters: output.length });
   },
 
+  regexTester(input) {
+    const { values, body } = parseKeyValuePayload(input);
+    const pattern = values.pattern ?? '';
+    const flags = (values.flags ?? '').trim();
+    const testText = body.trim();
+
+    if (!pattern || !testText) {
+      throw new Error('Regex tester expects pattern= on one line, optional flags= on the next line, then test text below.');
+    }
+
+    try {
+      new RegExp(pattern, flags);
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : 'Invalid regular expression.';
+      throw new Error(`Invalid regex pattern: ${message}`);
+    }
+
+    const globalFlags = flags.includes('g') ? flags : `${flags}g`;
+    const globalExpression = new RegExp(pattern, globalFlags);
+    const matches = [...testText.matchAll(globalExpression)];
+    const groupCount = matches.reduce((max, match) => Math.max(max, Math.max(0, match.length - 1)), 0);
+
+    if (!matches.length) {
+      return result([
+        'Matches: 0',
+        `Pattern: /${pattern}/${flags}`,
+        'No matches found.'
+      ].join('\n'), { matches: 0, groups: 0, flags: flags || '(none)' }, ['No matches found for the current pattern and flags.']);
+    }
+
+    const output = [
+      `Matches: ${matches.length}`,
+      `Pattern: /${pattern}/${flags}`,
+      '',
+      ...matches.map((match, index) => {
+        const groups = match.slice(1).map((group, groupIndex) => `  Group ${groupIndex + 1}: ${group ?? '(empty)'}`);
+        return [
+          `#${index + 1}: ${match[0]}`,
+          `  Index: ${match.index ?? 0}`,
+          ...groups
+        ].join('\n');
+      })
+    ].join('\n');
+
+    return result(output, { matches: matches.length, groups: groupCount, flags: flags || '(none)' });
+  },
+
   textToUnicodeEscape(input) {
     const output = encodeUnicodeEscapes(input);
     return result(output, { characters: input.length, codePoints: Array.from(input).length });

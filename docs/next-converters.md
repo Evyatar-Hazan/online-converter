@@ -20,6 +20,8 @@ Completed in the eighth expansion batch: timezone meeting planner, cron expressi
 
 Completed in the ninth expansion batch: keyword density checker, hreflang tag generator, canonical tag checker, robots meta tag generator, open graph tag generator, redirect mapping generator, FAQ schema generator, meta tags preview, and HTML headings outline extractor.
 
+Completed in the tenth expansion batch second wave: regex tester.
+
 Completed in the tenth expansion batch first wave: SQL formatter, .env parser, cURL command formatter, HTML table to CSV, HTML table to JSON, and XML formatter.
 
 ## Backlog structure

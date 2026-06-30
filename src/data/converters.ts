@@ -2071,6 +2071,38 @@ export const converters: ConverterTool[] = [
     related: ['json-formatter', 'http-header-parser', 'query-string-to-json']
   },
   {
+    slug: 'regex-tester',
+    converterId: 'regexTester',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'text',
+    new: true,
+    title: { en: 'Regex Tester', he: 'בודק Regex' },
+    shortTitle: { en: 'Regex Tester', he: 'בדיקת Regex' },
+    description: { en: 'Test a regex pattern against sample text, review matches, positions and capture groups directly in the browser.', he: 'בדוק תבנית regex מול טקסט לדוגמה, וראה התאמות, מיקומים וקבוצות לכידה ישירות בדפדפן.' },
+    metaDescription: { en: 'Regex tester online for pattern matching, flags and capture groups. Test regular expressions locally in your browser.', he: 'בודק Regex אונליין להתאמות, flags וקבוצות לכידה. בדיקת ביטויים רגולריים מקומית בדפדפן.' },
+    keywords: { en: ['regex tester', 'regular expression tester'], he: ['בודק regex', 'בדיקת ביטוי רגולרי'] },
+    features: { en: ['Pattern and flags', 'Match positions', 'Capture groups'], he: ['תבנית ו-flags', 'מיקומי התאמות', 'קבוצות לכידה'] },
+    guide: { en: ['Add pattern= on the first line and optional flags= on the second line.', 'Paste the test text below the key-value lines.', 'Convert to inspect matches, indexes and captured groups.'], he: ['הוסף pattern= בשורה הראשונה ו־flags= אופציונלי בשורה השנייה.', 'הדבק את טקסט הבדיקה מתחת לשורות ההגדרות.', 'המר כדי לראות התאמות, אינדקסים וקבוצות לכידה.'] },
+    examples: [
+      { label: { en: 'Email capture', he: 'לכידת אימיילים' }, input: 'pattern=([\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,})\nflags=g\nSupport: team@example.com\nSales: hello@demo.co.il' },
+      { label: { en: 'Hebrew order IDs', he: 'מזהי הזמנות בעברית' }, input: 'pattern=#(\\d{4})\nflags=g\nהזמנה #1024 הושלמה\nהזמנה #2048 ממתינה' }
+    ],
+    faq: [
+      {
+        question: { en: 'Does this regex tester support flags like g and i?', he: 'האם בודק ה-regex תומך ב-flags כמו g ו-i?' },
+        answer: { en: 'Yes. Add flags= with values such as g, i, m or combinations like gi to test the same pattern under different matching rules.', he: 'כן. אפשר להוסיף flags= עם ערכים כמו g, i, m או שילובים כמו gi כדי לבדוק את אותה תבנית תחת כללי התאמה שונים.' }
+      },
+      {
+        question: { en: 'When are capture groups useful in regex testing?', he: 'מתי קבוצות לכידה שימושיות בבדיקת regex?' },
+        answer: { en: 'They help when you need not only the whole match but also the exact inner parts, such as IDs, emails, domains or numbers that should be extracted later.', he: 'הן עוזרות כשצריך לא רק את כל ההתאמה אלא גם את החלקים הפנימיים שלה, כמו מזהים, אימיילים, דומיינים או מספרים שרוצים לחלץ בהמשך.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['regex-escape', 'find-replace', 'text-diff-checker']
+  },
+  {
     slug: 'env-parser',
     converterId: 'envParser',
     category: 'developer',
