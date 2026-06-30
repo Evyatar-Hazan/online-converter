@@ -970,6 +970,42 @@ function parseKeyValuePayload(input: string): { values: Record<string, string>; 
   return { values, body: bodyLines.join('\n').trim() };
 }
 
+function parseBooleanLike(value: string | undefined, fallback: boolean): boolean {
+  if (value === undefined) return fallback;
+  const normalized = value.trim().toLocaleLowerCase();
+  if (['1', 'true', 'yes', 'y', 'on', 'index', 'follow'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'n', 'off', 'noindex', 'nofollow'].includes(normalized)) return false;
+  return fallback;
+}
+
+function isAbsoluteHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function parseRedirectMappingLine(line: string): { source: string; target: string } | null {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith('#')) return null;
+
+  const arrowMatch = trimmed.match(/^(.*?)\s*(?:->|=>)\s*(.*?)$/);
+  if (arrowMatch) {
+    const source = arrowMatch[1].trim();
+    const target = arrowMatch[2].trim();
+    return source && target ? { source, target } : null;
+  }
+
+  const parts = trimmed.split(/\t|,/).map((part) => part.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return { source: parts[0], target: parts[1] };
+  }
+
+  return null;
+}
+
 function parseHtmlDocument(input: string, label: string): Document {
   const trimmed = input.trim();
   if (!trimmed) {
@@ -2212,6 +2248,39 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     });
   },
 
+  hreflangTagGenerator(input) {
+    const { values } = parseKeyValuePayload(input);
+    const canonical = values.canonical?.trim() ?? '';
+    const xDefault = (values.xdefault ?? values['x-default'] ?? '').trim();
+    const alternates = Object.entries(values)
+      .filter(([key, value]) => !['canonical', 'xdefault', 'x-default'].includes(key) && value.trim())
+      .map(([locale, href]) => ({ locale, href: href.trim() }))
+      .sort((left, right) => left.locale.localeCompare(right.locale));
+
+    if (!alternates.length) {
+      throw new Error('Hreflang tag generator expects locale=url lines such as en=https://example.com/en/page and he=https://example.com/he/page.');
+    }
+
+    const warnings = [
+      ...alternates.filter((item) => !isAbsoluteHttpUrl(item.href)).map((item) => `Alternate URL for ${item.locale} is not a full absolute URL.`),
+      ...(canonical && !isAbsoluteHttpUrl(canonical) ? ['Canonical URL is not a full absolute URL.'] : []),
+      ...(xDefault && !isAbsoluteHttpUrl(xDefault) ? ['x-default URL is not a full absolute URL.'] : []),
+      ...(!xDefault ? ['Consider adding x-default for language selectors or global landing pages.'] : [])
+    ];
+
+    const lines = [
+      ...(canonical ? [`<link rel="canonical" href="${canonical}" />`] : []),
+      ...alternates.map((item) => `<link rel="alternate" hreflang="${item.locale}" href="${item.href}" />`),
+      ...(xDefault ? [`<link rel="alternate" hreflang="x-default" href="${xDefault}" />`] : [])
+    ];
+
+    return result(lines.join('\n'), {
+      alternates: alternates.length,
+      canonical: canonical ? 'yes' : 'no',
+      xDefault: xDefault ? 'yes' : 'no'
+    }, warnings.length ? warnings : undefined);
+  },
+
   canonicalTagChecker(input) {
     const document = parseHtmlDocument(input, 'Canonical tag checker');
     const canonicals = Array.from(document.querySelectorAll('link[rel~="canonical"]'))
@@ -2245,6 +2314,46 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     }, warnings.length ? warnings : undefined);
   },
 
+  robotsMetaTagGenerator(input) {
+    const { values } = parseKeyValuePayload(input);
+    const index = parseBooleanLike(values.index, true);
+    const follow = parseBooleanLike(values.follow, true);
+    const archive = parseBooleanLike(values.archive, true);
+    const snippet = parseBooleanLike(values.snippet, true);
+    const imagePreview = (values.imagepreview ?? values['max-image-preview'] ?? 'large').trim().toLocaleLowerCase();
+    const maxSnippet = (values.maxsnippet ?? '').trim();
+    const unavailableAfter = (values.unavailableafter ?? '').trim();
+
+    const directives = [
+      index ? 'index' : 'noindex',
+      follow ? 'follow' : 'nofollow',
+      ...(archive ? [] : ['noarchive']),
+      ...(snippet ? [] : ['nosnippet']),
+      ...(imagePreview && ['none', 'standard', 'large'].includes(imagePreview) ? [`max-image-preview:${imagePreview}`] : []),
+      ...(maxSnippet ? [`max-snippet:${maxSnippet}`] : []),
+      ...(unavailableAfter ? [`unavailable_after:${unavailableAfter}`] : [])
+    ];
+
+    const warnings = [
+      ...(!index && follow ? ['The tag allows following links but blocks indexing the current page. Make sure that matches your goal.'] : []),
+      ...(!snippet ? ['nosnippet hides the page description in search results.'] : []),
+      ...(imagePreview && !['none', 'standard', 'large'].includes(imagePreview) ? ['max-image-preview should usually be none, standard or large.'] : [])
+    ];
+
+    const content = directives.join(', ');
+    return result([
+      `<meta name="robots" content="${content}" />`,
+      '',
+      `Directives: ${content}`,
+      `Indexing: ${index ? 'allowed' : 'blocked'}`,
+      `Following links: ${follow ? 'allowed' : 'blocked'}`
+    ].join('\n'), {
+      directives: directives.length,
+      index: index ? 'yes' : 'no',
+      follow: follow ? 'yes' : 'no'
+    }, warnings.length ? warnings : undefined);
+  },
+
   faqSchemaGenerator(input) {
     const blocks = input
       .split(/\n\s*\n/)
@@ -2267,6 +2376,43 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       mainEntity
     }, null, 2);
     return result(output, { items: mainEntity.length, characters: output.length }, undefined, jsonPreview({ mainEntity }));
+  },
+
+  openGraphTagGenerator(input) {
+    const { values, body } = parseKeyValuePayload(input);
+    const title = values.title?.trim() ?? '';
+    const description = (values.description?.trim() || body).trim();
+    const url = values.url?.trim() ?? '';
+    const image = values.image?.trim() ?? '';
+    const type = values.type?.trim() || 'website';
+    const siteName = values.site?.trim() || values.sitename?.trim() || '';
+    const locale = values.locale?.trim() || '';
+
+    if (!title || !description || !url) {
+      throw new Error('Open Graph tag generator expects title=, description= and url= values.');
+    }
+
+    const warnings = [
+      ...(isAbsoluteHttpUrl(url) ? [] : ['og:url should be a full absolute URL.']),
+      ...(image && !isAbsoluteHttpUrl(image) ? ['og:image should be a full absolute URL.'] : []),
+      ...(image ? [] : ['Adding og:image usually improves social previews.'])
+    ];
+
+    const tags = [
+      `<meta property="og:title" content="${title}" />`,
+      `<meta property="og:description" content="${description}" />`,
+      `<meta property="og:url" content="${url}" />`,
+      `<meta property="og:type" content="${type}" />`,
+      ...(siteName ? [`<meta property="og:site_name" content="${siteName}" />`] : []),
+      ...(locale ? [`<meta property="og:locale" content="${locale}" />`] : []),
+      ...(image ? [`<meta property="og:image" content="${image}" />`] : [])
+    ];
+
+    return result(tags.join('\n'), {
+      tags: tags.length,
+      hasImage: image ? 'yes' : 'no',
+      type
+    }, warnings.length ? warnings : undefined);
   },
 
   metaTagsPreview(input) {
@@ -2294,6 +2440,43 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       titleStatus,
       descriptionStatus
     });
+  },
+
+  redirectMappingGenerator(input, options) {
+    const format = selectOption(options, 'format', 'netlify');
+    const rows = input
+      .split(/\r\n|\r|\n/)
+      .map((line) => parseRedirectMappingLine(line))
+      .filter((item): item is { source: string; target: string } => Boolean(item));
+
+    if (!rows.length) {
+      throw new Error('Redirect mapping generator expects one redirect per line, for example /old-page -> /new-page.');
+    }
+
+    const duplicates = new Set<string>();
+    const seen = new Set<string>();
+    for (const row of rows) {
+      if (seen.has(row.source)) duplicates.add(row.source);
+      seen.add(row.source);
+    }
+
+    const output = rows.map(({ source, target }) => {
+      if (format === 'apache') return `Redirect 301 ${source} ${target}`;
+      if (format === 'nginx') return `rewrite ^${source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$ ${target} permanent;`;
+      if (format === 'csv') return `${source},${target},301`;
+      return `${source} ${target} 301`;
+    }).join('\n');
+
+    const warnings = [
+      ...(duplicates.size ? [`Duplicate source paths found: ${[...duplicates].join(', ')}.`] : []),
+      ...rows.filter((row) => row.source === row.target).map((row) => `Source and target are identical for ${row.source}.`)
+    ];
+
+    return result(output, {
+      redirects: rows.length,
+      format,
+      duplicateSources: duplicates.size
+    }, warnings.length ? warnings : undefined);
   },
 
   htmlHeadingsOutlineExtractor(input) {

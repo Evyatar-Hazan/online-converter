@@ -18,7 +18,7 @@ Completed in the seventh expansion batch: reading time calculator, sentence coun
 
 Completed in the eighth expansion batch: timezone meeting planner, cron expression explainer, date difference calculator, text case detector, HTTP header parser, JSON key counter, CSV duplicate row finder, RGB to HEX with alpha, calorie macro calculator, and mortgage affordability calculator.
 
-Completed in the ninth expansion batch start: keyword density checker, canonical tag checker, FAQ schema generator, meta tags preview, and HTML headings outline extractor.
+Completed in the ninth expansion batch: keyword density checker, hreflang tag generator, canonical tag checker, robots meta tag generator, open graph tag generator, redirect mapping generator, FAQ schema generator, meta tags preview, and HTML headings outline extractor.
 
 ## Backlog structure
 

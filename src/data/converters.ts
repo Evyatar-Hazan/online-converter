@@ -424,6 +424,21 @@ const timestampOutputOptions = [
   }
 ];
 
+const redirectFormatOptions = [
+  {
+    id: 'format',
+    type: 'select' as const,
+    defaultValue: 'netlify',
+    label: { en: 'Output format', he: 'פורמט פלט' },
+    choices: [
+      { value: 'netlify', label: { en: 'Netlify / _redirects', he: 'Netlify / _redirects' } },
+      { value: 'apache', label: { en: 'Apache', he: 'Apache' } },
+      { value: 'nginx', label: { en: 'Nginx', he: 'Nginx' } },
+      { value: 'csv', label: { en: 'CSV', he: 'CSV' } }
+    ]
+  }
+];
+
 export const converters: ConverterTool[] = [
   {
     slug: 'json-to-csv',
@@ -1811,6 +1826,38 @@ export const converters: ConverterTool[] = [
     related: ['word-frequency-counter', 'meta-title-length-checker', 'meta-description-length-checker']
   },
   {
+    slug: 'hreflang-tag-generator',
+    converterId: 'hreflangTagGenerator',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'html',
+    new: true,
+    title: { en: 'Hreflang Tag Generator', he: 'מחולל תגיות Hreflang' },
+    shortTitle: { en: 'Hreflang Tags', he: 'תגיות Hreflang' },
+    description: { en: 'Generate canonical, alternate and x-default hreflang tags for bilingual or multi-language pages.', he: 'צור תגיות canonical, alternate ו־x-default עבור עמודים דו־לשוניים או מרובי שפות.' },
+    metaDescription: { en: 'Hreflang tag generator for bilingual SEO. Build canonical and alternate link tags for English, Hebrew and more directly in your browser.', he: 'מחולל תגיות hreflang ל־SEO דו־לשוני. יצירת canonical ותגיות alternate לעברית, אנגלית ושפות נוספות ישירות בדפדפן.' },
+    keywords: { en: ['hreflang tag generator', 'generate hreflang tags'], he: ['מחולל תגיות hreflang', 'יצירת hreflang'] },
+    features: { en: ['Alternate links', 'x-default support', 'Canonical line'], he: ['תגיות alternate', 'תמיכה ב־x-default', 'שורת canonical'] },
+    guide: { en: ['Add canonical= if you want the canonical line too.', 'Add one locale=url line per localized page such as en= and he=.', 'Optionally add xdefault= and convert to generate ready-to-paste tags.'], he: ['הוסף canonical= אם אתה רוצה גם את שורת ה־canonical.', 'הוסף שורת locale=url לכל גרסה מקומית כמו en= ו־he=.', 'אפשר להוסיף גם xdefault= ואז להמיר כדי לקבל תגיות מוכנות להדבקה.'] },
+    examples: [
+      { label: { en: 'English and Hebrew page', he: 'עמוד בעברית ובאנגלית' }, input: 'canonical=https://example.com/en/json-to-csv/\nen=https://example.com/en/json-to-csv/\nhe=https://example.com/he/json-to-csv/\nxdefault=https://example.com/json-to-csv/' },
+      { label: { en: 'Three-language product page', he: 'עמוד מוצר בשלוש שפות' }, input: 'en=https://example.com/en/product/\nhe=https://example.com/he/product/\nfr=https://example.com/fr/product/\nxdefault=https://example.com/product/' }
+    ],
+    faq: [
+      {
+        question: { en: 'When should I add x-default to hreflang tags?', he: 'מתי כדאי להוסיף x-default לתגיות hreflang?' },
+        answer: { en: 'Use x-default when you have a global selector page or a fallback URL that should be shown when no language match is clear.', he: 'כדאי להשתמש ב־x-default כשיש עמוד בחירת שפה גלובלי או URL ברירת מחדל שצריך להופיע כשאין התאמת שפה ברורה.' }
+      },
+      {
+        question: { en: 'Do hreflang URLs need to be absolute?', he: 'האם כתובות hreflang חייבות להיות מלאות?' },
+        answer: { en: 'Yes. Full absolute URLs are the safer choice for search engines and help avoid ambiguity when pages are audited or syndicated.', he: 'כן. כתובות מלאות הן הבחירה הבטוחה יותר למנועי חיפוש ועוזרות למנוע אי־בהירות בבדיקות או בהפצה של עמודים.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['canonical-tag-checker', 'meta-tags-preview', 'open-graph-tag-generator']
+  },
+  {
     slug: 'canonical-tag-checker',
     converterId: 'canonicalTagChecker',
     category: 'developer',
@@ -1830,6 +1877,38 @@ export const converters: ConverterTool[] = [
     ],
     faq: [faq.private, faq.free],
     related: ['robots-txt-tester', 'meta-tags-preview', 'html-headings-outline-extractor']
+  },
+  {
+    slug: 'robots-meta-tag-generator',
+    converterId: 'robotsMetaTagGenerator',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'html',
+    new: true,
+    title: { en: 'Robots Meta Tag Generator', he: 'מחולל תגית Robots Meta' },
+    shortTitle: { en: 'Robots Meta', he: 'תגית Robots' },
+    description: { en: 'Generate a robots meta tag for index, follow, snippet and preview directives before publishing a page.', he: 'צור תגית robots meta עבור הוראות index, follow, snippet ו־preview לפני פרסום עמוד.' },
+    metaDescription: { en: 'Robots meta tag generator for SEO workflows. Build noindex, nofollow, snippet and preview directives locally in your browser.', he: 'מחולל תגית robots meta לזרימות SEO. יצירת noindex, nofollow, snippet ו־preview ישירות בדפדפן.' },
+    keywords: { en: ['robots meta tag generator', 'generate robots meta tag'], he: ['מחולל תגית robots', 'יצירת robots meta'] },
+    features: { en: ['Index and follow control', 'Snippet directives', 'Preview directives'], he: ['שליטה ב־index ו־follow', 'הוראות snippet', 'הוראות preview'] },
+    guide: { en: ['Add index=yes or no and follow=yes or no.', 'Optionally add archive=, snippet=, imagePreview= or maxSnippet= values.', 'Convert to generate the final meta tag and review the warnings.'], he: ['הוסף index=yes או no ו־follow=yes או no.', 'אפשר להוסיף archive=, snippet=, imagePreview= או maxSnippet=.', 'המר כדי ליצור את תגית ה־meta ולבדוק את האזהרות.'] },
+    examples: [
+      { label: { en: 'Standard indexable page', he: 'עמוד רגיל לאינדוקס' }, input: 'index=yes\nfollow=yes\nimagePreview=large\nmaxSnippet=160' },
+      { label: { en: 'Noindex staging page', he: 'עמוד staging עם noindex' }, input: 'index=no\nfollow=no\narchive=no\nsnippet=no\nimagePreview=none' }
+    ],
+    faq: [
+      {
+        question: { en: 'When should I use noindex in a robots meta tag?', he: 'מתי כדאי להשתמש ב־noindex בתוך תגית robots?' },
+        answer: { en: 'Use noindex for pages that should stay accessible to users but should not appear in search, such as internal dashboards, staging pages or duplicate utility screens.', he: 'כדאי להשתמש ב־noindex עבור עמודים שצריכים להיות זמינים למשתמשים אבל לא להופיע בחיפוש, כמו dashboards פנימיים, עמודי staging או מסכים כפולים.' }
+      },
+      {
+        question: { en: 'What does max-image-preview:large do?', he: 'מה עושה max-image-preview:large?' },
+        answer: { en: 'It allows search engines to show larger image previews when they are eligible, which can help visibility for content pages with strong visuals.', he: 'ההנחיה מאפשרת למנועי חיפוש להציג תצוגות מקדימות גדולות יותר של תמונות כשזה אפשרי, מה שיכול לעזור לחשיפה של עמודי תוכן עם ויזואליה חזקה.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['canonical-tag-checker', 'robots-txt-tester', 'meta-tags-preview']
   },
   {
     slug: 'faq-schema-generator',
@@ -1853,6 +1932,38 @@ export const converters: ConverterTool[] = [
     related: ['json-formatter', 'meta-tags-preview', 'canonical-tag-checker']
   },
   {
+    slug: 'open-graph-tag-generator',
+    converterId: 'openGraphTagGenerator',
+    category: 'developer',
+    inputType: 'meta fields',
+    outputType: 'html',
+    new: true,
+    title: { en: 'Open Graph Tag Generator', he: 'מחולל תגיות Open Graph' },
+    shortTitle: { en: 'Open Graph', he: 'Open Graph' },
+    description: { en: 'Generate Open Graph tags for social previews, link shares and content cards across websites and apps.', he: 'צור תגיות Open Graph עבור תצוגות חברתיות, שיתופי קישורים וכרטיסי תוכן באתרים ובאפליקציות.' },
+    metaDescription: { en: 'Open Graph tag generator for title, description, URL and image tags. Build social preview meta tags locally in your browser.', he: 'מחולל תגיות Open Graph עבור title, description, URL ותמונה. יצירת תגיות social preview מקומית בדפדפן.' },
+    keywords: { en: ['open graph tag generator', 'og tag generator'], he: ['מחולל תגיות Open Graph', 'מחולל תגיות OG'] },
+    features: { en: ['og:title and description', 'og:image support', 'Locale and site name'], he: ['og:title ו־description', 'תמיכה ב־og:image', 'locale ושם אתר'] },
+    guide: { en: ['Add title=, description= and url= lines.', 'Optionally add image=, site=, locale= and type=.', 'Convert to generate the final OG tags for your page head.'], he: ['הוסף שורות title=, description= ו־url=.', 'אפשר להוסיף image=, site=, locale= ו־type=.', 'המר כדי ליצור את תגיות ה־OG עבור head העמוד.'] },
+    examples: [
+      { label: { en: 'Article preview', he: 'תצוגת מאמר' }, input: 'title=JSON to CSV Converter\ndescription=Convert JSON to CSV online with a fast browser-based workflow.\nurl=https://online-converter.evyatarhazan.com/en/json-to-csv/\nimage=https://online-converter.evyatarhazan.com/og/json-to-csv.png\nsite=Online Converter\nlocale=en_US\ntype=article' },
+      { label: { en: 'Hebrew product page', he: 'עמוד מוצר בעברית' }, input: 'title=ממיר JSON ל-CSV\ndescription=המרת JSON ל-CSV בדפדפן עם דוגמאות ותמיכה מלאה בעברית.\nurl=https://online-converter.evyatarhazan.com/he/json-to-csv/\nimage=https://online-converter.evyatarhazan.com/og/he-json-to-csv.png\nsite=Online Converter\nlocale=he_IL' }
+    ],
+    faq: [
+      {
+        question: { en: 'Why should I add Open Graph tags to a page?', he: 'למה כדאי להוסיף תגיות Open Graph לעמוד?' },
+        answer: { en: 'They control how links look when shared on social apps, messaging tools and some collaboration platforms, which usually improves clarity and click-through rate.', he: 'הן שולטות באופן שבו קישורים נראים כאשר משתפים אותם באפליקציות חברתיות, כלי הודעות וחלק מפלטפורמות השיתוף, ובדרך כלל משפרות בהירות ו-CTR.' }
+      },
+      {
+        question: { en: 'Does Open Graph require an image?', he: 'האם Open Graph מחייב תמונה?' },
+        answer: { en: 'Not strictly, but pages with a strong og:image usually get richer previews and look more trustworthy when shared.', he: 'לא באופן מחייב, אבל עמודים עם og:image חזק בדרך כלל מקבלים תצוגה עשירה יותר ונראים אמינים יותר בעת שיתוף.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['meta-tags-preview', 'canonical-tag-checker', 'hreflang-tag-generator']
+  },
+  {
     slug: 'meta-tags-preview',
     converterId: 'metaTagsPreview',
     category: 'developer',
@@ -1872,6 +1983,39 @@ export const converters: ConverterTool[] = [
     ],
     faq: [faq.private, faq.free],
     related: ['meta-title-length-checker', 'meta-description-length-checker', 'canonical-tag-checker']
+  },
+  {
+    slug: 'redirect-mapping-generator',
+    converterId: 'redirectMappingGenerator',
+    category: 'developer',
+    inputType: 'lines',
+    outputType: 'text',
+    new: true,
+    title: { en: 'Redirect Mapping Generator', he: 'מחולל מפת הפניות' },
+    shortTitle: { en: 'Redirect Mapping', he: 'מפת הפניות' },
+    description: { en: 'Turn old-to-new URL pairs into redirect rules for migrations, slug updates and SEO cleanup work.', he: 'הפוך זוגות של URL ישן לחדש לכללי הפניה עבור מיגרציות, עדכוני slug ועבודות SEO.' },
+    metaDescription: { en: 'Redirect mapping generator for SEO migrations. Convert old and new URLs into redirect rules for Netlify, Apache, Nginx or CSV.', he: 'מחולל מפת הפניות למיגרציות SEO. הפיכת URL ישנים וחדשים לכללי redirect עבור Netlify, Apache, Nginx או CSV.' },
+    keywords: { en: ['redirect mapping generator', 'seo redirect generator'], he: ['מחולל מפת הפניות', 'מחולל redirect SEO'] },
+    features: { en: ['Netlify, Apache and Nginx output', 'CSV export option', 'Duplicate source warning'], he: ['פלט ל־Netlify, Apache ו־Nginx', 'אפשרות ייצוא CSV', 'אזהרת מקור כפול'] },
+    guide: { en: ['Add one redirect per line using /old -> /new, /old,/new or tab-separated pairs.', 'Choose the target output format if needed.', 'Convert to generate ready-to-paste redirect rules and review warnings.'], he: ['הוסף הפניה אחת בכל שורה בפורמט /old -> /new, או /old,/new, או זוגות מופרדי טאב.', 'בחר פורמט פלט מתאים אם צריך.', 'המר כדי לקבל כללי redirect מוכנים להדבקה ולבדוק אזהרות.'] },
+    examples: [
+      { label: { en: 'Slug cleanup', he: 'ניקוי slug' }, input: '/json-csv -> /json-to-csv\n/json-xml -> /json-to-xml' },
+      { label: { en: 'Full URL migration list', he: 'רשימת מיגרציה עם URL מלא' }, input: 'https://old.example.com/tools/json-csv, https://new.example.com/en/json-to-csv/\nhttps://old.example.com/tools/xml-json, https://new.example.com/en/xml-to-json/' }
+    ],
+    options: redirectFormatOptions,
+    faq: [
+      {
+        question: { en: 'When should I prepare a redirect mapping file?', he: 'מתי כדאי להכין קובץ מפת הפניות?' },
+        answer: { en: 'Prepare it before URL migrations, slug changes, CMS restructures or content merges so traffic and backlinks can keep flowing to the right destination.', he: 'כדאי להכין אותו לפני מיגרציות URL, שינויי slug, ארגון מחדש של CMS או מיזוגי תוכן, כדי לשמור על תנועה וקישורים נכנסים ליעד הנכון.' }
+      },
+      {
+        question: { en: 'Why are duplicate source paths a problem?', he: 'למה נתיבי מקור כפולים הם בעיה?' },
+        answer: { en: 'A duplicate source usually means conflicting redirect rules. That can create unpredictable behavior and make migrations harder to debug.', he: 'מקור כפול בדרך כלל מעיד על כללי redirect מתנגשים. זה עלול ליצור התנהגות לא צפויה ולהקשות על דיבוג של מיגרציות.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['slug-generator', 'canonical-tag-checker', 'hreflang-tag-generator']
   },
   {
     slug: 'html-headings-outline-extractor',

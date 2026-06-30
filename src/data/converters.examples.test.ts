@@ -27,6 +27,18 @@ const launchReadyFreshSlugs = [
   'mortgage-affordability-calculator'
 ];
 
+const batchNineSeoSlugs = [
+  'keyword-density-checker',
+  'hreflang-tag-generator',
+  'canonical-tag-checker',
+  'robots-meta-tag-generator',
+  'open-graph-tag-generator',
+  'redirect-mapping-generator',
+  'faq-schema-generator',
+  'meta-tags-preview',
+  'html-headings-outline-extractor'
+];
+
 describe('converter examples coverage', () => {
   it('keeps at least two starter examples for priority converters', () => {
     for (const slug of prioritySlugs) {
@@ -39,6 +51,15 @@ describe('converter examples coverage', () => {
 
   it('keeps at least two starter examples for launch-ready fresh tools', () => {
     for (const slug of launchReadyFreshSlugs) {
+      const tool = converters.find((item) => item.slug === slug);
+
+      expect(tool, `Missing converter: ${slug}`).toBeDefined();
+      expect(tool?.examples.length, `${slug} should have at least two examples`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('keeps at least two starter examples for the current Batch 9 SEO tools', () => {
+    for (const slug of batchNineSeoSlugs) {
       const tool = converters.find((item) => item.slug === slug);
 
       expect(tool, `Missing converter: ${slug}`).toBeDefined();
