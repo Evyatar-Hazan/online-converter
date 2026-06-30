@@ -2,7 +2,8 @@
 import ThemeScript from '../components/ThemeScript.astro';
 import Analytics from '../components/Analytics.astro';
 import AdSenseScript from '../components/AdSenseScript.astro';
-import { locales, siteName, siteUrl, ui } from '../data/site';
+import { siteName, ui } from '../data/site';
+import { getAlternateEntries, getAlternateUrls, getCanonicalUrl } from '../lib/page-alternates';
 import { getPriorityHubLinks } from '../lib/site-navigation';
 import type { Locale } from '../types';
 import '../styles/global.css';
@@ -42,7 +43,9 @@ const labels = ui[locale];
 const footerHubLinks = getPriorityHubLinks(locale).slice(0, 4);
 const otherLocale = locale === 'he' ? 'en' : 'he';
 const alternatePath = alternateSlug ? `/${otherLocale}/${alternateSlug}/` : `/${otherLocale}/`;
-const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+const canonicalUrl = getCanonicalUrl(canonicalPath);
+const alternateUrls = getAlternateUrls(alternateSlug);
+const alternateEntries = getAlternateEntries(alternateSlug);
 const pageContext = analyticsContext ?? { pageType: 'home', locale };
 ---
 
@@ -55,8 +58,8 @@ const pageContext = analyticsContext ?? { pageType: 'home', locale };
     <meta name="description" content={description} />
     <meta name="robots" content={indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'} />
     <link rel="canonical" href={canonicalUrl} />
-    {includeAlternates && locales.map((lang) => <link rel="alternate" hreflang={lang} href={`${siteUrl}/${lang}/${alternateSlug ? `${alternateSlug}/` : ''}`} />)}
-    {includeAlternates && <link rel="alternate" hreflang="x-default" href={`${siteUrl}/en/${alternateSlug ? `${alternateSlug}/` : ''}`} />}
+    {includeAlternates && alternateEntries.map((item) => <link rel="alternate" hreflang={item.locale} href={item.href} />)}
+    {includeAlternates && <link rel="alternate" hreflang="x-default" href={alternateUrls.default} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName[locale]} />
     <meta property="og:title" content={title} />

@@ -177,6 +177,41 @@ const assertUniqueIndexableMetadata = () => {
   }
 };
 
+const assertCanonicalAndAlternatesForAllIndexablePages = () => {
+  const htmlFiles = walkDistFiles().filter((file) => file.endsWith('.html'));
+
+  for (const htmlFile of htmlFiles) {
+    const publicPath = normalizePublicPath(toPublicPath(htmlFile));
+    const localeMatch = publicPath.match(/^\/(en|he)\/(.*)$/);
+    if (!localeMatch) {
+      continue;
+    }
+
+    const document = new JSDOM(readDistFile(htmlFile)).window.document;
+    const robots = getAttribute(document, 'meta[name="robots"]', 'content') ?? '';
+    if (!robots.startsWith('index')) {
+      continue;
+    }
+
+    const locale = localeMatch[1];
+    const rest = localeMatch[2];
+    const alternateSlug = rest ? rest.replace(/\/$/, '') : '';
+    const expectedCanonical = `${siteUrl}${publicPath}`;
+    const expectedEn = `${siteUrl}/en/${alternateSlug ? `${alternateSlug}/` : ''}`;
+    const expectedHe = `${siteUrl}/he/${alternateSlug ? `${alternateSlug}/` : ''}`;
+    const expectedDefault = `${siteUrl}/en/${alternateSlug ? `${alternateSlug}/` : ''}`;
+
+    assertEqual(getAttribute(document, 'link[rel="canonical"]', 'href'), expectedCanonical, `${publicPath} canonical`);
+    assertEqual(getAttribute(document, 'link[rel="alternate"][hreflang="en"]', 'href'), expectedEn, `${publicPath} hreflang en`);
+    assertEqual(getAttribute(document, 'link[rel="alternate"][hreflang="he"]', 'href'), expectedHe, `${publicPath} hreflang he`);
+    assertEqual(getAttribute(document, 'link[rel="alternate"][hreflang="x-default"]', 'href'), expectedDefault, `${publicPath} hreflang x-default`);
+
+    if (!publicPath.startsWith(`/${locale}/`)) {
+      fail(`${publicPath} locale does not match canonical namespace`);
+    }
+  }
+};
+
 const assertEqual = (actual, expected, label) => {
   if (actual !== expected) {
     fail(`${label}: expected "${expected}", received "${actual}"`);
@@ -254,5 +289,6 @@ if (!robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`)) {
 
 assertNoBrokenInternalLinks();
 assertUniqueIndexableMetadata();
+assertCanonicalAndAlternatesForAllIndexablePages();
 
 console.log(`SEO build check passed for ${publicPaths.length} representative pages and ${locCount} sitemap URLs.`);
