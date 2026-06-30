@@ -4,6 +4,7 @@ import AdSlot from '../../components/AdSlot.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { categoryLabels, locales, siteName, ui } from '../../data/site';
 import { converters } from '../../data/converters';
+import { getHomeMetaDescription, getHomePageTitle } from '../../lib/home-seo';
 import { getHomepageHighlightTools, getPriorityHubLinks } from '../../lib/site-navigation';
 import type { ConverterCategory, Locale } from '../../types';
 
@@ -16,11 +17,8 @@ const labels = ui[locale];
 const priorityHubs = getPriorityHubLinks(locale);
 const categories = priorityHubs.map((item) => item.category) as ConverterCategory[];
 const homepageHighlights = getHomepageHighlightTools(6);
-const title = locale === 'he' ? 'אונליין קונברטר - ממירים מהירים בעברית ובאנגלית' : 'Online Converter - Fast bilingual converter tools';
-const description =
-  locale === 'he'
-    ? 'מרכז ממירים מהיר בעברית ובאנגלית עבור JSON, CSV, YAML, Base64, טקסט, צבעים, תאריכים וכלי פיתוח.'
-    : 'A fast bilingual converter hub for JSON, CSV, YAML, Base64, text, colors, dates and developer tools.';
+const title = getHomePageTitle(locale);
+const description = getHomeMetaDescription(locale);
 const jsonLd = [
   {
     '@context': 'https://schema.org',

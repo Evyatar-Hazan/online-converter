@@ -127,6 +127,56 @@ const assertNoBrokenInternalLinks = () => {
   }
 };
 
+const assertUniqueIndexableMetadata = () => {
+  const htmlFiles = walkDistFiles().filter((file) => file.endsWith('.html'));
+  const perLocale = new Map([
+    ['en', { titles: new Map(), descriptions: new Map() }],
+    ['he', { titles: new Map(), descriptions: new Map() }]
+  ]);
+
+  for (const htmlFile of htmlFiles) {
+    const publicPath = normalizePublicPath(toPublicPath(htmlFile));
+    const localeMatch = publicPath.match(/^\/(en|he)\//);
+    if (!localeMatch) {
+      continue;
+    }
+
+    const document = new JSDOM(readDistFile(htmlFile)).window.document;
+    const robots = getAttribute(document, 'meta[name="robots"]', 'content') ?? '';
+    if (!robots.startsWith('index')) {
+      continue;
+    }
+
+    const locale = localeMatch[1];
+    const title = document.querySelector('title')?.textContent?.trim();
+    const description = getAttribute(document, 'meta[name="description"]', 'content')?.trim();
+
+    if (!title) {
+      fail(`${publicPath} is missing a title`);
+    }
+
+    if (!description) {
+      fail(`${publicPath} is missing a meta description`);
+    }
+
+    const localeRegistry = perLocale.get(locale);
+    if (!localeRegistry) {
+      fail(`Unexpected locale registry for ${locale}`);
+    }
+
+    if (localeRegistry.titles.has(title)) {
+      fail(`Duplicate ${locale} title detected for ${publicPath} and ${localeRegistry.titles.get(title)}: "${title}"`);
+    }
+
+    if (localeRegistry.descriptions.has(description)) {
+      fail(`Duplicate ${locale} description detected for ${publicPath} and ${localeRegistry.descriptions.get(description)}: "${description}"`);
+    }
+
+    localeRegistry.titles.set(title, publicPath);
+    localeRegistry.descriptions.set(description, publicPath);
+  }
+};
+
 const assertEqual = (actual, expected, label) => {
   if (actual !== expected) {
     fail(`${label}: expected "${expected}", received "${actual}"`);
@@ -203,5 +253,6 @@ if (!robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`)) {
 }
 
 assertNoBrokenInternalLinks();
+assertUniqueIndexableMetadata();
 
 console.log(`SEO build check passed for ${publicPaths.length} representative pages and ${locCount} sitemap URLs.`);
