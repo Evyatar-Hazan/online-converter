@@ -1790,6 +1790,111 @@ export const converters: ConverterTool[] = [
     related: ['meta-title-length-checker', 'word-counter', 'slug-generator']
   },
   {
+    slug: 'keyword-density-checker',
+    converterId: 'keywordDensityChecker',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'count',
+    new: true,
+    title: { en: 'Keyword Density Checker', he: 'בודק צפיפות מילות מפתח' },
+    shortTitle: { en: 'Keyword Density', he: 'צפיפות מילות מפתח' },
+    description: { en: 'Measure repeated keywords in text and see quick word-frequency percentages for SEO reviews.', he: 'מדוד חזרות של מילות מפתח בטקסט וקבל אחוזי שכיחות מהירים לבדיקות SEO.' },
+    metaDescription: { en: 'Free keyword density checker for English and Hebrew text. Count repeated keywords and review simple SEO percentages in your browser.', he: 'בודק צפיפות מילות מפתח חינמי לטקסט עברי ואנגלי. ספירת חזרות ואחוזי SEO פשוטים ישירות בדפדפן.' },
+    keywords: { en: ['keyword density checker', 'keyword frequency checker'], he: ['בודק צפיפות מילות מפתח', 'בודק שכיחות מילות מפתח'] },
+    features: { en: ['Top repeated words', 'Percentages', 'Browser only'], he: ['מילים חוזרות מובילות', 'אחוזים', 'בדפדפן בלבד'] },
+    guide: { en: ['Paste an article, draft or landing-page copy.', 'Convert to count repeated words and percentages.', 'Use the output to spot overused phrases or missing focus terms.'], he: ['הדבק מאמר, טיוטה או טקסט לעמוד נחיתה.', 'המר כדי לספור מילים חוזרות ואחוזים.', 'השתמש בתוצאה כדי לזהות ביטויים שחוזרים יותר מדי או מילות מיקוד חסרות.'] },
+    examples: [
+      { label: { en: 'SEO intro', he: 'פתיח SEO' }, input: 'JSON converter tools help teams convert JSON data into CSV, YAML and XML. This JSON converter guide focuses on fast browser-based workflows.' },
+      { label: { en: 'Hebrew landing copy', he: 'טקסט נחיתה בעברית' }, input: 'ממיר קבצים אונליין עוזר להמיר JSON ל-CSV במהירות. הממיר מתאים למפתחים, אנשי SEO וצוותי תוכן שצריכים ממיר מהיר בדפדפן.' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['word-frequency-counter', 'meta-title-length-checker', 'meta-description-length-checker']
+  },
+  {
+    slug: 'canonical-tag-checker',
+    converterId: 'canonicalTagChecker',
+    category: 'developer',
+    inputType: 'html',
+    outputType: 'text',
+    new: true,
+    title: { en: 'Canonical Tag Checker', he: 'בודק תגית Canonical' },
+    shortTitle: { en: 'Canonical Checker', he: 'בדיקת Canonical' },
+    description: { en: 'Check whether HTML contains a clean canonical tag, and flag missing, duplicate or relative canonical URLs.', he: 'בדוק האם HTML כולל תגית canonical תקינה, וזיהוי canonical חסר, כפול או יחסי.' },
+    metaDescription: { en: 'Canonical tag checker for HTML pages. Detect missing, duplicate or relative canonical URLs directly in your browser.', he: 'בודק תגית canonical לעמודי HTML. זיהוי canonical חסר, כפול או יחסי ישירות בדפדפן.' },
+    keywords: { en: ['canonical tag checker', 'check canonical tag'], he: ['בודק תגית canonical', 'בדיקת canonical'] },
+    features: { en: ['Canonical count', 'Absolute URL check', 'Robots meta context'], he: ['ספירת canonical', 'בדיקת URL מלא', 'הקשר של robots meta'] },
+    guide: { en: ['Paste full HTML or the head section.', 'Convert to inspect canonical tags.', 'Review warnings before publishing or auditing the page.'], he: ['הדבק HTML מלא או את אזור ה-head.', 'המר כדי לבדוק תגיות canonical.', 'בדוק את האזהרות לפני פרסום או audit של העמוד.'] },
+    examples: [
+      { label: { en: 'Single canonical', he: 'Canonical יחיד' }, input: '<html><head><title>SEO Guide</title><link rel="canonical" href="https://example.com/seo-guide" /></head><body></body></html>' },
+      { label: { en: 'Relative canonical', he: 'Canonical יחסי' }, input: '<html><head><title>Product</title><meta name="robots" content="index,follow" /><link rel="canonical" href="/product" /></head><body></body></html>' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['robots-txt-tester', 'meta-tags-preview', 'html-headings-outline-extractor']
+  },
+  {
+    slug: 'faq-schema-generator',
+    converterId: 'faqSchemaGenerator',
+    category: 'developer',
+    inputType: 'faq pairs',
+    outputType: 'json',
+    new: true,
+    title: { en: 'FAQ Schema Generator', he: 'מחולל FAQ Schema' },
+    shortTitle: { en: 'FAQ Schema', he: 'FAQ Schema' },
+    description: { en: 'Turn question and answer pairs into FAQPage JSON-LD for search-friendly structured data.', he: 'הפוך זוגות של שאלות ותשובות ל־FAQPage JSON-LD עבור structured data ידידותי לחיפוש.' },
+    metaDescription: { en: 'Generate FAQ schema JSON-LD online from question and answer pairs. Build FAQPage markup locally in your browser.', he: 'מחולל FAQ schema JSON-LD אונליין משאלות ותשובות. יצירת FAQPage בדפדפן ללא העלאה.' },
+    keywords: { en: ['faq schema generator', 'faqpage json-ld generator'], he: ['מחולל FAQ schema', 'מחולל FAQPage JSON-LD'] },
+    features: { en: ['FAQPage JSON-LD', 'Multiple items', 'Local generation'], he: ['FAQPage JSON-LD', 'מספר פריטים', 'יצירה מקומית'] },
+    guide: { en: ['Add a question on the first line of each block.', 'Write the answer on the next line or lines.', 'Separate each FAQ item with a blank line, then convert.'], he: ['כתוב שאלה בשורה הראשונה של כל בלוק.', 'כתוב את התשובה בשורה או בשורות הבאות.', 'הפרד בין כל פריט FAQ עם שורה ריקה ואז המר.'] },
+    examples: [
+      { label: { en: 'Two FAQ items', he: 'שני פריטי FAQ' }, input: 'What does this converter do?\nIt turns JSON into CSV locally in the browser.\n\nIs my data uploaded?\nNo. The conversion stays on your device.' },
+      { label: { en: 'Hebrew FAQ', he: 'FAQ בעברית' }, input: 'האם הכלי חינמי?\nכן, אפשר להשתמש בכלי בחינם.\n\nהאם הנתונים נשלחים לשרת?\nלא, ההמרה מתבצעת בדפדפן.' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['json-formatter', 'meta-tags-preview', 'canonical-tag-checker']
+  },
+  {
+    slug: 'meta-tags-preview',
+    converterId: 'metaTagsPreview',
+    category: 'developer',
+    inputType: 'meta fields',
+    outputType: 'text',
+    new: true,
+    title: { en: 'Meta Tags Preview', he: 'תצוגה מקדימה ל־Meta Tags' },
+    shortTitle: { en: 'Meta Preview', he: 'תצוגת Meta' },
+    description: { en: 'Preview a simple search snippet from title, description and URL fields before publishing.', he: 'הצג תצוגה מקדימה פשוטה של snippet מחיפוש לפי title, description ו־URL לפני פרסום.' },
+    metaDescription: { en: 'Meta tags preview tool for SEO snippets. Check title and description length and preview a simple Google-style result.', he: 'כלי תצוגה מקדימה ל־meta tags עבור snippets ב־SEO. בדיקת אורך title ו-description עם תצוגת תוצאה פשוטה.' },
+    keywords: { en: ['meta tags preview', 'seo snippet preview'], he: ['תצוגה מקדימה של meta tags', 'תצוגת snippet SEO'] },
+    features: { en: ['Snippet preview', 'Title length', 'Description length'], he: ['תצוגת snippet', 'אורך title', 'אורך description'] },
+    guide: { en: ['Add title= on one line.', 'Add description= and optional url= on the next lines.', 'Convert to preview the snippet and review the lengths.'], he: ['הוסף title= בשורה אחת.', 'הוסף description= ו־url= אופציונלי בשורות הבאות.', 'המר כדי לראות preview ולבדוק את האורכים.'] },
+    examples: [
+      { label: { en: 'Converter snippet', he: 'Snippet של ממיר' }, input: 'title=JSON to CSV Converter | Free Online Tool\ndescription=Convert JSON to CSV online with a fast browser-based converter. No upload, bilingual Hebrew and English UI.\nurl=https://online-converter.evyatarhazan.com/en/json-to-csv/' },
+      { label: { en: 'Hebrew snippet', he: 'Snippet בעברית' }, input: 'title=ממיר JSON ל-CSV אונליין\ndescription=המרת JSON ל-CSV בדפדפן בלי העלאה, עם דוגמאות ותמיכה מלאה בעברית ובאנגלית.\nurl=https://online-converter.evyatarhazan.com/he/json-to-csv/' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['meta-title-length-checker', 'meta-description-length-checker', 'canonical-tag-checker']
+  },
+  {
+    slug: 'html-headings-outline-extractor',
+    converterId: 'htmlHeadingsOutlineExtractor',
+    category: 'developer',
+    inputType: 'html',
+    outputType: 'text',
+    new: true,
+    title: { en: 'HTML Headings Outline Extractor', he: 'מחלץ מבנה כותרות HTML' },
+    shortTitle: { en: 'Headings Outline', he: 'מבנה כותרות' },
+    description: { en: 'Extract the H1-H6 outline from HTML to review heading order, page structure and SEO clarity.', he: 'חלץ את מבנה H1-H6 מתוך HTML כדי לבדוק סדר כותרות, מבנה עמוד ובהירות SEO.' },
+    metaDescription: { en: 'HTML headings outline extractor for SEO reviews. List H1-H6 headings from pasted HTML and spot structure issues fast.', he: 'מחלץ מבנה כותרות HTML לבדיקות SEO. רשימת H1-H6 מתוך HTML והצפת בעיות מבנה במהירות.' },
+    keywords: { en: ['html headings outline extractor', 'extract h1 h2 from html'], he: ['מחלץ מבנה כותרות HTML', 'חילוץ H1 H2 מ-HTML'] },
+    features: { en: ['H1-H6 outline', 'Structure review', 'Local HTML parsing'], he: ['מבנה H1-H6', 'בדיקת מבנה', 'פענוח HTML מקומי'] },
+    guide: { en: ['Paste page HTML or a content block.', 'Convert to list headings in order.', 'Review missing H1 or repeated H1 warnings.'], he: ['הדבק HTML של עמוד או בלוק תוכן.', 'המר כדי לראות את הכותרות לפי הסדר.', 'בדוק אזהרות על H1 חסר או כפול.'] },
+    examples: [
+      { label: { en: 'Simple article', he: 'מאמר פשוט' }, input: '<article><h1>JSON to CSV Converter</h1><p>Intro</p><h2>Why use it</h2><h2>How it works</h2><h3>CSV output tips</h3></article>' },
+      { label: { en: 'Landing section', he: 'סקשן נחיתה' }, input: '<main><h1>Online Converter</h1><section><h2>Popular tools</h2><h3>JSON tools</h3><h3>Text tools</h3></section></main>' }
+    ],
+    faq: [faq.private, faq.free],
+    related: ['canonical-tag-checker', 'meta-tags-preview', 'json-formatter']
+  },
+  {
     slug: 'jwt-expiration-checker',
     converterId: 'jwtExpirationChecker',
     category: 'developer',

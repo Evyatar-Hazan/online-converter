@@ -182,6 +182,11 @@ describe('converter functions', () => {
     expect(convert('removeLineNumbers', '01. Write draft\n02. Review copy').output).toBe('Write draft\nReview copy');
     expect(convert('metaTitleLengthChecker', 'JSON to CSV Converter - Free Online Tool').output).toContain('Status: good');
     expect(convert('metaDescriptionLengthChecker', 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.').output).toContain('Status: good');
+    expect(convert('keywordDensityChecker', 'JSON converter tools help teams convert JSON data. JSON tools stay fast.').output).toContain('json: 3');
+    expect(convert('canonicalTagChecker', '<html><head><title>Page</title><link rel="canonical" href="https://example.com/page" /></head></html>').output).toContain('Status: good');
+    expect(convert('faqSchemaGenerator', 'What does this tool do?\nIt converts JSON to CSV.\n\nIs it local?\nYes, it runs in the browser.').output).toContain('"@type": "FAQPage"');
+    expect(convert('metaTagsPreview', 'title=JSON to CSV Converter\ndescription=Convert JSON to CSV online with a browser-based tool that keeps your data local.\nurl=https://example.com/json-to-csv').output).toContain('Google snippet preview');
+    expect(convert('htmlHeadingsOutlineExtractor', '<main><h1>Title</h1><h2>Section</h2><h3>Detail</h3></main>').output).toContain('H1: Title');
     expect(convert('textToNatoPhonetic', 'OC 2026').output).toBe('Oscar Charlie / Two Zero Two Six');
     expect(convert('textAlphabetizer', 'zebra\nApple\nbanana\n10 tools\n2 tools').output).toBe('2 tools\n10 tools\nApple\nbanana\nzebra');
     expect(convert('rot13Converter', 'Hello online converter').output).toBe('Uryyb bayvar pbairegre');

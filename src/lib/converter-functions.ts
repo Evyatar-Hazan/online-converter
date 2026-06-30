@@ -970,6 +970,31 @@ function parseKeyValuePayload(input: string): { values: Record<string, string>; 
   return { values, body: bodyLines.join('\n').trim() };
 }
 
+function parseHtmlDocument(input: string, label: string): Document {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    throw new Error(`${label} expects HTML input.`);
+  }
+  const parser = new DOMParser();
+  const document = parser.parseFromString(trimmed, 'text/html');
+  const parserError = document.querySelector('parsererror');
+  if (parserError) {
+    throw new Error(`${label} could not parse the HTML input.`);
+  }
+  return document;
+}
+
+function truncateText(value: string, limit: number): string {
+  if (value.length <= limit) return value;
+  return `${value.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
+function seoStatus(length: number, min: number, max: number): 'short' | 'good' | 'long' {
+  if (length < min) return 'short';
+  if (length > max) return 'long';
+  return 'good';
+}
+
 function flattenJsonValue(value: unknown, prefix = ''): Record<string, unknown> {
   if (Array.isArray(value)) {
     return value.reduce<Record<string, unknown>>((acc, item, index) => ({
@@ -2158,6 +2183,135 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       `Remaining to 160: ${Math.max(0, 160 - length)}`,
       `Status: ${status}`
     ].join('\n'), { characters: length, remaining: Math.max(0, 160 - length), status });
+  },
+
+  keywordDensityChecker(input) {
+    const words = textWords(input).map((word) => word.toLocaleLowerCase()).filter((word) => word.length > 1);
+    if (!words.length) {
+      throw new Error('Keyword density checker expects readable text with at least a few words.');
+    }
+    const counts = new Map<string, number>();
+    for (const word of words) {
+      counts.set(word, (counts.get(word) ?? 0) + 1);
+    }
+    const sorted = [...counts.entries()].sort((left, right) => {
+      if (right[1] !== left[1]) return right[1] - left[1];
+      return left[0].localeCompare(right[0]);
+    });
+    const output = [
+      `Total words: ${words.length}`,
+      `Unique words: ${counts.size}`,
+      '',
+      ...sorted.slice(0, 15).map(([word, count]) => `${word}: ${count} (${formatNumber((count / words.length) * 100, 2)}%)`)
+    ].join('\n');
+    return result(output, {
+      words: words.length,
+      uniqueWords: counts.size,
+      topKeyword: sorted[0]?.[0] ?? '',
+      topKeywordCount: sorted[0]?.[1] ?? 0
+    });
+  },
+
+  canonicalTagChecker(input) {
+    const document = parseHtmlDocument(input, 'Canonical tag checker');
+    const canonicals = Array.from(document.querySelectorAll('link[rel~="canonical"]'))
+      .map((element) => element.getAttribute('href')?.trim() ?? '')
+      .filter(Boolean);
+    const robotsContent = document.querySelector('meta[name="robots"]')?.getAttribute('content')?.trim() ?? '';
+    const title = document.querySelector('title')?.textContent?.trim() ?? '';
+    const status = !canonicals.length
+      ? 'missing'
+      : canonicals.length > 1
+        ? 'multiple'
+        : /^https?:\/\//i.test(canonicals[0])
+          ? 'good'
+          : 'relative';
+    const warnings = [
+      ...(canonicals.length > 1 ? ['More than one canonical tag was found. Keep only one canonical URL per page.'] : []),
+      ...(canonicals.length === 1 && !/^https?:\/\//i.test(canonicals[0]) ? ['Canonical URL is relative. Prefer a full absolute URL.'] : []),
+      ...(robotsContent.toLowerCase().includes('noindex') ? ['This page also uses noindex, so the canonical URL may not be used for indexing.'] : [])
+    ];
+
+    return result([
+      `Status: ${status}`,
+      `Canonical tags found: ${canonicals.length}`,
+      `Canonical URL: ${canonicals[0] || 'none'}`,
+      `Title present: ${title ? 'yes' : 'no'}`,
+      `Robots meta: ${robotsContent || 'none'}`
+    ].join('\n'), {
+      canonicalTags: canonicals.length,
+      status,
+      absoluteCanonical: canonicals[0] && /^https?:\/\//i.test(canonicals[0]) ? 'yes' : 'no'
+    }, warnings.length ? warnings : undefined);
+  },
+
+  faqSchemaGenerator(input) {
+    const blocks = input
+      .split(/\n\s*\n/)
+      .map((block) => block.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean))
+      .filter((block) => block.length >= 2);
+    if (!blocks.length) {
+      throw new Error('FAQ schema generator expects question and answer pairs separated by a blank line.');
+    }
+    const mainEntity = blocks.map(([question, ...answerLines]) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: answerLines.join(' ')
+      }
+    }));
+    const output = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity
+    }, null, 2);
+    return result(output, { items: mainEntity.length, characters: output.length }, undefined, jsonPreview({ mainEntity }));
+  },
+
+  metaTagsPreview(input) {
+    const { values, body } = parseKeyValuePayload(input);
+    const title = values.title?.trim() ?? '';
+    const description = (values.description?.trim() || body).trim();
+    const url = values.url?.trim() || 'https://example.com/sample-page';
+    if (!title || !description) {
+      throw new Error('Meta tags preview expects title= and description= values.');
+    }
+    const titleStatus = seoStatus(title.length, 30, 60);
+    const descriptionStatus = seoStatus(description.length, 120, 160);
+    const output = [
+      'Google snippet preview',
+      url,
+      truncateText(title, 60),
+      truncateText(description, 160),
+      '',
+      `Title characters: ${title.length} (${titleStatus})`,
+      `Description characters: ${description.length} (${descriptionStatus})`
+    ].join('\n');
+    return result(output, {
+      titleCharacters: title.length,
+      descriptionCharacters: description.length,
+      titleStatus,
+      descriptionStatus
+    });
+  },
+
+  htmlHeadingsOutlineExtractor(input) {
+    const document = parseHtmlDocument(input, 'HTML headings outline extractor');
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((element) => ({
+      level: element.tagName.toUpperCase(),
+      text: element.textContent?.replace(/\s+/g, ' ').trim() ?? ''
+    })).filter((item) => item.text);
+    if (!headings.length) {
+      throw new Error('No HTML headings were found. Paste HTML with h1-h6 tags.');
+    }
+    const h1Count = headings.filter((item) => item.level === 'H1').length;
+    const warnings = [
+      ...(h1Count === 0 ? ['No H1 heading was found. Most content pages should have one clear H1.'] : []),
+      ...(h1Count > 1 ? ['More than one H1 heading was found. Consider keeping a single primary H1.'] : [])
+    ];
+    const output = headings.map((item) => `${item.level}: ${item.text}`).join('\n');
+    return result(output, { headings: headings.length, h1: h1Count }, warnings.length ? warnings : undefined);
   },
 
   robotsTxtTester(input) {
