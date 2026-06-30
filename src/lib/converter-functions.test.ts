@@ -191,6 +191,12 @@ describe('converter functions', () => {
     expect(convert('metaTagsPreview', 'title=JSON to CSV Converter\ndescription=Convert JSON to CSV online with a browser-based tool that keeps your data local.\nurl=https://example.com/json-to-csv').output).toContain('Google snippet preview');
     expect(convert('redirectMappingGenerator', '/old-page -> /new-page\n/old-json -> /json-to-csv', { format: 'apache' }).output).toContain('Redirect 301 /old-page /new-page');
     expect(convert('htmlHeadingsOutlineExtractor', '<main><h1>Title</h1><h2>Section</h2><h3>Detail</h3></main>').output).toContain('H1: Title');
+    expect(convert('sqlFormatter', 'select user_id,count(*) from events where app = \'web\' order by created_at desc').output).toContain('SELECT');
+    expect(convert('envParser', 'NODE_ENV=production\nAPI_URL=https://api.example.com').output).toContain('"NODE_ENV": "production"');
+    expect(convert('curlCommandFormatter', 'curl -X POST https://api.example.com/orders -H "Authorization: Bearer token" --data-raw "{\\"id\\":1}"').output).toContain('--request POST');
+    expect(convert('htmlTableToCsv', '<table><tr><th>Name</th><th>City</th></tr><tr><td>Dana</td><td>Jerusalem</td></tr></table>').output).toBe('Name,City\nDana,Jerusalem');
+    expect(convert('htmlTableToJson', '<table><tr><th>Name</th><th>City</th></tr><tr><td>Dana</td><td>Jerusalem</td></tr></table>').output).toContain('"Name": "Dana"');
+    expect(convert('xmlFormatter', '<item><title>Online Converter</title><link>https://example.com</link></item>').output).toContain('<title>Online Converter</title>');
     expect(convert('textToNatoPhonetic', 'OC 2026').output).toBe('Oscar Charlie / Two Zero Two Six');
     expect(convert('textAlphabetizer', 'zebra\nApple\nbanana\n10 tools\n2 tools').output).toBe('2 tools\n10 tools\nApple\nbanana\nzebra');
     expect(convert('rot13Converter', 'Hello online converter').output).toBe('Uryyb bayvar pbairegre');

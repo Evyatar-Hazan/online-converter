@@ -1020,6 +1020,133 @@ function parseHtmlDocument(input: string, label: string): Document {
   return document;
 }
 
+function splitShellLike(input: string): string[] {
+  const tokens: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | null = null;
+  let escape = false;
+
+  for (const char of input) {
+    if (escape) {
+      current += char;
+      escape = false;
+      continue;
+    }
+    if (char === '\\') {
+      escape = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      if (current) {
+        tokens.push(current);
+        current = '';
+      }
+      continue;
+    }
+    current += char;
+  }
+
+  if (quote) {
+    throw new Error('Unclosed quote in shell-style input.');
+  }
+  if (current) tokens.push(current);
+  return tokens;
+}
+
+function unquoteEnvValue(value: string): string {
+  const trimmed = value.trim();
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
+function parseHtmlTableRows(input: string): string[][] {
+  const document = parseHtmlDocument(input, 'HTML table extractor');
+  const table = document.querySelector('table');
+  if (!table) {
+    throw new Error('No HTML table found. Paste HTML that contains at least one <table>.');
+  }
+  const rows = Array.from(table.querySelectorAll('tr')).map((row) =>
+    Array.from(row.querySelectorAll('th, td')).map((cell) => cell.textContent?.replace(/\s+/g, ' ').trim() ?? '')
+  ).filter((row) => row.length > 0);
+
+  if (!rows.length) {
+    throw new Error('The HTML table is empty.');
+  }
+
+  const width = Math.max(...rows.map((row) => row.length));
+  return rows.map((row) => Array.from({ length: width }, (_item, index) => row[index] ?? ''));
+}
+
+function xmlNodeToValue(node: Element): unknown {
+  const object: Record<string, unknown> = {};
+  Array.from(node.attributes).forEach((attribute) => {
+    object[`@${attribute.name}`] = attribute.value;
+  });
+
+  const elementChildren = Array.from(node.children);
+  if (!elementChildren.length) {
+    const text = node.textContent?.trim() ?? '';
+    return Object.keys(object).length ? { ...object, '#text': text } : text;
+  }
+
+  elementChildren.forEach((child) => {
+    const value = xmlNodeToValue(child);
+    if (object[child.nodeName]) {
+      object[child.nodeName] = Array.isArray(object[child.nodeName])
+        ? [...(object[child.nodeName] as unknown[]), value]
+        : [object[child.nodeName], value];
+    } else {
+      object[child.nodeName] = value;
+    }
+  });
+
+  return object;
+}
+
+function parseXmlDocument(input: string, label: string): XMLDocument {
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(input, 'application/xml');
+  if (xml.getElementsByTagName('parsererror').length) {
+    throw new Error(`${label}: check that the XML is well formed and has one root element.`);
+  }
+  return xml;
+}
+
+function prettyXmlElement(node: Element, level: number): string {
+  const indent = '  '.repeat(level);
+  const attributes = Array.from(node.attributes).map((attribute) => ` ${attribute.name}="${attribute.value}"`).join('');
+  const children = Array.from(node.children);
+  const textOnly = node.childNodes.length === 1 && node.firstChild?.nodeType === Node.TEXT_NODE
+    ? node.textContent?.trim() ?? ''
+    : '';
+
+  if (!children.length) {
+    return textOnly
+      ? `${indent}<${node.tagName}${attributes}>${textOnly}</${node.tagName}>`
+      : `${indent}<${node.tagName}${attributes} />`;
+  }
+
+  return [
+    `${indent}<${node.tagName}${attributes}>`,
+    ...children.map((child) => prettyXmlElement(child, level + 1)),
+    `${indent}</${node.tagName}>`
+  ].join('\n');
+}
+
 function truncateText(value: string, limit: number): string {
   if (value.length <= limit) return value;
   return `${value.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
@@ -1205,6 +1332,32 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(output, { rows: normalizedRows.length - 1, columns: width });
   },
 
+  sqlFormatter(input) {
+    const trimmed = input.trim();
+    if (!trimmed) {
+      throw new Error('SQL formatter expects a SQL query or statement.');
+    }
+
+    const normalized = trimmed
+      .replace(/\s+/g, ' ')
+      .replace(/\s*,\s*/g, ', ')
+      .trim();
+
+    const breakKeywords = [
+      'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'OFFSET',
+      'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'JOIN', 'ON', 'UNION', 'VALUES', 'SET'
+    ];
+
+    let formatted = normalized;
+    breakKeywords.forEach((keyword) => {
+      const pattern = new RegExp(`\\b${keyword.replace(/\s+/g, '\\s+')}\\b`, 'gi');
+      formatted = formatted.replace(pattern, `\n${keyword}`);
+    });
+
+    formatted = formatted.replace(/\n{2,}/g, '\n').trim();
+    return result(formatted, { characters: trimmed.length, lines: formatted.split('\n').length });
+  },
+
   jsonToXml(input) {
     const data = parseJson(input);
     const body = jsonToXmlValue(data, 1);
@@ -1212,38 +1365,14 @@ export const converterFunctions: Record<string, ConverterFunction> = {
   },
 
   xmlToJson(input) {
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(input, 'application/xml');
-    if (xml.getElementsByTagName('parsererror').length) {
-      throw new Error('Invalid XML: check that tags are closed correctly and the document has one root element.');
-    }
+    const xml = parseXmlDocument(input, 'Invalid XML');
+    const output = JSON.stringify({ [xml.documentElement.nodeName]: xmlNodeToValue(xml.documentElement) }, null, 2);
+    return result(output, countStats(output));
+  },
 
-    const walk = (node: Element): unknown => {
-      const object: Record<string, unknown> = {};
-      Array.from(node.attributes).forEach((attribute) => {
-        object[`@${attribute.name}`] = attribute.value;
-      });
-
-      const elementChildren = Array.from(node.children);
-      if (!elementChildren.length) {
-        return Object.keys(object).length ? { ...object, '#text': node.textContent?.trim() ?? '' } : node.textContent?.trim() ?? '';
-      }
-
-      elementChildren.forEach((child) => {
-        const value = walk(child);
-        if (object[child.nodeName]) {
-          object[child.nodeName] = Array.isArray(object[child.nodeName])
-            ? [...(object[child.nodeName] as unknown[]), value]
-            : [object[child.nodeName], value];
-        } else {
-          object[child.nodeName] = value;
-        }
-      });
-
-      return object;
-    };
-
-    const output = JSON.stringify({ [xml.documentElement.nodeName]: walk(xml.documentElement) }, null, 2);
+  xmlFormatter(input) {
+    const xml = parseXmlDocument(input, 'XML formatter');
+    const output = prettyXmlElement(xml.documentElement, 0);
     return result(output, countStats(output));
   },
 
@@ -2555,6 +2684,30 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     return result(JSON.stringify(parsed, null, 2), { isBot: String(parsed.isBot), device: parsed.device }, undefined, jsonPreview(parsed));
   },
 
+  envParser(input) {
+    const lines = input.split(/\r\n|\r|\n/);
+    const output: Record<string, string> = {};
+    const duplicates = new Set<string>();
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const exportLine = line.replace(/^export\s+/, '');
+      const separatorIndex = exportLine.indexOf('=');
+      if (separatorIndex < 1) {
+        throw new Error(`Invalid .env line: ${rawLine}. Use KEY=value format.`);
+      }
+      const key = exportLine.slice(0, separatorIndex).trim();
+      const value = unquoteEnvValue(exportLine.slice(separatorIndex + 1));
+      if (key in output) duplicates.add(key);
+      output[key] = value;
+    }
+
+    const json = JSON.stringify(output, null, 2);
+    const warnings = duplicates.size ? [`Duplicate keys found: ${[...duplicates].join(', ')}. The last value was kept.`] : undefined;
+    return result(json, { variables: Object.keys(output).length, duplicates: duplicates.size }, warnings, jsonPreview(output));
+  },
+
   utmBuilder(input) {
     const lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
     const [urlLine = '', ...paramLines] = lines;
@@ -2576,6 +2729,66 @@ export const converterFunctions: Record<string, ConverterFunction> = {
     });
     url.search = params.toString();
     return result(url.toString(), { parameters: params.size });
+  },
+
+  curlCommandFormatter(input) {
+    const tokens = splitShellLike(input.trim());
+    if (!tokens.length || tokens[0].toLowerCase() !== 'curl') {
+      throw new Error('cURL command formatter expects a command that starts with curl.');
+    }
+
+    let method = 'GET';
+    let url = '';
+    const headers: string[] = [];
+    const dataFlags: string[] = [];
+    const extraFlags: string[] = [];
+
+    for (let index = 1; index < tokens.length; index += 1) {
+      const token = tokens[index];
+      const next = tokens[index + 1];
+
+      if ((token === '-X' || token === '--request') && next) {
+        method = next.toUpperCase();
+        index += 1;
+        continue;
+      }
+      if ((token === '-H' || token === '--header') && next) {
+        headers.push(next);
+        index += 1;
+        continue;
+      }
+      if (['-d', '--data', '--data-raw', '--data-binary', '--data-urlencode'].includes(token) && next) {
+        dataFlags.push(`${token} ${JSON.stringify(next)}`);
+        if (method === 'GET') method = 'POST';
+        index += 1;
+        continue;
+      }
+      if (!token.startsWith('-') && !url) {
+        url = token;
+        continue;
+      }
+      extraFlags.push(next && token.startsWith('-') && !token.includes('=') && !next.startsWith('-') ? `${token} ${JSON.stringify(next)}` : token);
+      if (next && token.startsWith('-') && !token.includes('=') && !next.startsWith('-')) index += 1;
+    }
+
+    if (!url) {
+      throw new Error('cURL command formatter could not find the request URL.');
+    }
+
+    const lines = [
+      'curl \\',
+      `  --request ${method} \\`,
+      ...headers.map((header) => `  --header ${JSON.stringify(header)} \\`),
+      ...dataFlags.map((entry) => `  ${entry} \\`),
+      ...extraFlags.map((flag) => `  ${flag} \\`),
+      `  ${JSON.stringify(url)}`
+    ];
+
+    return result(lines.join('\n'), {
+      method,
+      headers: headers.length,
+      dataFlags: dataFlags.length
+    });
   },
 
   jsonPathExtractor(input) {
@@ -2696,6 +2909,28 @@ export const converterFunctions: Record<string, ConverterFunction> = {
       title: 'Flattened JSON preview',
       values: { rows: flattened.length },
       rows: flattened.slice(0, 5) as Record<string, string | number | boolean>[]
+    });
+  },
+
+  htmlTableToCsv(input) {
+    const rows = parseHtmlTableRows(input);
+    const output = rows.map((row) => row.map(csvCell).join(',')).join('\n');
+    return result(output, { rows: Math.max(0, rows.length - 1), columns: rows[0]?.length ?? 0 });
+  },
+
+  htmlTableToJson(input) {
+    const rows = parseHtmlTableRows(input);
+    if (rows.length < 2) {
+      throw new Error('HTML table to JSON expects a header row and at least one data row.');
+    }
+    const headers = rows[0].map((header, index) => header || `column_${index + 1}`);
+    const records = rows.slice(1).map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] ?? ''])));
+    const output = JSON.stringify(records, null, 2);
+    return result(output, { rows: records.length, columns: headers.length }, undefined, {
+      type: 'table',
+      title: 'HTML table preview',
+      values: { rows: records.length, columns: headers.length },
+      rows: records.slice(0, 5) as Record<string, string | number | boolean>[]
     });
   },
 

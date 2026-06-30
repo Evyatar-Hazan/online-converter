@@ -2039,6 +2039,198 @@ export const converters: ConverterTool[] = [
     related: ['canonical-tag-checker', 'meta-tags-preview', 'json-formatter']
   },
   {
+    slug: 'sql-formatter',
+    converterId: 'sqlFormatter',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'text',
+    new: true,
+    title: { en: 'SQL Formatter', he: 'מעצב SQL' },
+    shortTitle: { en: 'SQL Formatter', he: 'עיצוב SQL' },
+    description: { en: 'Format SQL queries into a cleaner multiline structure for reviews, debugging and documentation.', he: 'עצב שאילתות SQL למבנה קריא יותר עם שורות מסודרות לצורך review, דיבוג ותיעוד.' },
+    metaDescription: { en: 'SQL formatter online for cleaner query layout. Format SELECT, JOIN, WHERE and ORDER BY blocks directly in your browser.', he: 'מעצב SQL אונליין לפריסת שאילתות קריאה יותר. עיצוב SELECT, JOIN, WHERE ו־ORDER BY ישירות בדפדפן.' },
+    keywords: { en: ['sql formatter', 'format sql query'], he: ['מעצב SQL', 'עיצוב שאילתת SQL'] },
+    features: { en: ['Multiline layout', 'Common clause splitting', 'Local formatting'], he: ['מבנה רב־שורי', 'פיצול clauses נפוצים', 'עיצוב מקומי'] },
+    guide: { en: ['Paste a SQL query or statement.', 'Convert to break major clauses onto separate lines.', 'Copy the result into docs, PR comments or query reviews.'], he: ['הדבק שאילתת SQL או statement.', 'המר כדי לפצל clauses מרכזיים לשורות נפרדות.', 'העתק את התוצאה למסמכים, הערות PR או review של שאילתות.'] },
+    examples: [
+      { label: { en: 'Analytics query', he: 'שאילתת אנליטיקה' }, input: 'select user_id,count(*) as sessions from events where created_at >= current_date - interval 7 day group by user_id order by sessions desc limit 10' },
+      { label: { en: 'Join query', he: 'שאילתת Join' }, input: 'select o.id,o.total,c.name from orders o inner join customers c on c.id = o.customer_id where o.status = \'paid\' order by o.created_at desc' }
+    ],
+    faq: [
+      {
+        question: { en: 'Does this SQL formatter validate the query syntax?', he: 'האם מעצב ה-SQL גם מאמת את התחביר?' },
+        answer: { en: 'No. It focuses on cleaner layout and readability, so it helps reviews and documentation but does not replace a real SQL parser or database engine.', he: 'לא. הוא מתמקד בפריסה קריאה יותר, ולכן עוזר ל-review ולתיעוד אבל לא מחליף parser אמיתי או מנוע מסד נתונים.' }
+      },
+      {
+        question: { en: 'When is a formatted SQL query useful?', he: 'מתי עיצוב SQL מסודר באמת עוזר?' },
+        answer: { en: 'It is especially useful before sharing a query in tickets, PRs, docs or incident notes, because readers can scan the structure much faster.', he: 'זה שימושי במיוחד לפני שיתוף שאילתה בטיקטים, PR, מסמכים או incident notes, כי הרבה יותר קל לסרוק את המבנה שלה.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['json-formatter', 'http-header-parser', 'query-string-to-json']
+  },
+  {
+    slug: 'env-parser',
+    converterId: 'envParser',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'json',
+    new: true,
+    title: { en: '.env Parser', he: 'מפענח קובץ .env' },
+    shortTitle: { en: '.env Parser', he: 'פענוח .env' },
+    description: { en: 'Parse .env variables into JSON so you can inspect keys, duplicates and copied configuration safely in the browser.', he: 'פענח משתני .env ל־JSON כדי לבדוק מפתחות, כפילויות והגדרות שהועתקו ישירות בדפדפן.' },
+    metaDescription: { en: 'Parse .env files into JSON online. Review environment variables, duplicate keys and config values locally in your browser.', he: 'פענוח קבצי .env ל־JSON אונליין. בדיקת משתני סביבה, מפתחות כפולים וערכי קונפיגורציה ישירות בדפדפן.' },
+    keywords: { en: ['env parser', '.env parser'], he: ['מפענח env', 'פענוח קובץ .env'] },
+    features: { en: ['JSON output', 'Duplicate key warning', 'Quoted value support'], he: ['פלט JSON', 'אזהרת מפתחות כפולים', 'תמיכה בערכים במרכאות'] },
+    guide: { en: ['Paste .env lines such as KEY=value.', 'Convert to turn them into JSON.', 'Review duplicate warnings before using the values elsewhere.'], he: ['הדבק שורות .env כמו KEY=value.', 'המר כדי להפוך אותן ל־JSON.', 'בדוק אזהרות על כפילויות לפני שימוש בערכים במקום אחר.'] },
+    examples: [
+      { label: { en: 'Simple app config', he: 'קונפיג אפליקציה בסיסי' }, input: 'NODE_ENV=production\nAPI_URL=https://api.example.com\nFEATURE_FLAG=true' },
+      { label: { en: 'Quoted secrets placeholders', he: 'ערכים במרכאות' }, input: 'export APP_NAME="Online Converter"\nJWT_AUDIENCE=\'users\'\nTIMEOUT=30' }
+    ],
+    faq: [
+      {
+        question: { en: 'Does this .env parser send secrets to a server?', he: 'האם מפענח ה-.env שולח סודות לשרת?' },
+        answer: { en: 'No. The parsing happens in your browser, which is useful when you need to inspect configuration without uploading it anywhere.', he: 'לא. הפענוח קורה בדפדפן, וזה שימושי כשצריך לבדוק קונפיגורציה בלי להעלות אותה לשום מקום.' }
+      },
+      {
+        question: { en: 'What happens if the same env key appears twice?', he: 'מה קורה אם אותו מפתח env מופיע פעמיים?' },
+        answer: { en: 'The tool keeps the last value and warns you that a duplicate key was found, which helps spot accidental overrides.', he: 'הכלי שומר את הערך האחרון ומציג אזהרה על מפתח כפול, כדי לעזור לזהות דריסות לא מכוונות.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['json-formatter', 'jwt-decoder', 'http-header-parser']
+  },
+  {
+    slug: 'curl-command-formatter',
+    converterId: 'curlCommandFormatter',
+    category: 'developer',
+    inputType: 'text',
+    outputType: 'text',
+    new: true,
+    title: { en: 'cURL Command Formatter', he: 'מעצב פקודת cURL' },
+    shortTitle: { en: 'cURL Formatter', he: 'עיצוב cURL' },
+    description: { en: 'Format long curl commands into a readable multiline layout with explicit method, headers and data flags.', he: 'עצב פקודות curl ארוכות למבנה קריא עם method, headers ו־data flags בשורות נפרדות.' },
+    metaDescription: { en: 'Format cURL commands online into a cleaner multiline structure. Split request method, headers and payload flags in your browser.', he: 'עיצוב פקודות cURL אונליין למבנה רב־שורי קריא יותר. פיצול method, headers ו־payload ישירות בדפדפן.' },
+    keywords: { en: ['curl command formatter', 'format curl command'], he: ['מעצב פקודת curl', 'עיצוב curl'] },
+    features: { en: ['Readable multiline curl', 'Method detection', 'Header and data grouping'], he: ['curl רב־שורי קריא', 'זיהוי method', 'קיבוץ headers ו-data'] },
+    guide: { en: ['Paste a curl command exactly as copied from a terminal or docs.', 'Convert to normalize the command into one flag per line.', 'Use the result in debugging notes, docs or API handoff.'], he: ['הדבק פקודת curl כפי שהועתקה מהטרמינל או מהתיעוד.', 'המר כדי לנרמל אותה לשורה נפרדת לכל flag.', 'השתמש בתוצאה בהערות דיבוג, תיעוד או handoff של API.'] },
+    examples: [
+      { label: { en: 'POST request with JSON', he: 'בקשת POST עם JSON' }, input: 'curl -X POST https://api.example.com/orders -H "Authorization: Bearer token" -H "Content-Type: application/json" --data-raw "{\\"status\\":\\"paid\\"}"' },
+      { label: { en: 'GET request with headers', he: 'בקשת GET עם headers' }, input: 'curl https://api.example.com/users -H "Accept: application/json" -H "X-App: converter"' }
+    ],
+    faq: [
+      {
+        question: { en: 'Does this formatter execute the curl command?', he: 'האם המעצב מריץ את פקודת ה-curl?' },
+        answer: { en: 'No. It only reformats the copied command for readability and sharing. Nothing is sent from the browser.', he: 'לא. הוא רק מעצב מחדש את הפקודה שהודבקה לצורך קריאה ושיתוף. שום דבר לא נשלח מהדפדפן.' }
+      },
+      {
+        question: { en: 'Why is a multiline curl command useful?', he: 'למה פקודת cURL רב־שורתית שימושית יותר?' },
+        answer: { en: 'It is easier to review headers, method and payload separately, especially when a command is pasted into docs, issue comments or debugging threads.', he: 'כך קל יותר לבדוק headers, method ו־payload בנפרד, במיוחד כשמדביקים את הפקודה במסמכים, תגובות issue או threads של דיבוג.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['http-header-parser', 'jwt-decoder', 'query-string-to-json']
+  },
+  {
+    slug: 'html-table-to-csv',
+    converterId: 'htmlTableToCsv',
+    category: 'data',
+    inputType: 'html',
+    outputType: 'csv',
+    new: true,
+    title: { en: 'HTML Table to CSV', he: 'HTML Table ל-CSV' },
+    shortTitle: { en: 'Table to CSV', he: 'טבלה ל-CSV' },
+    description: { en: 'Extract the first HTML table into CSV so copied admin tables and CMS snippets become spreadsheet-ready quickly.', he: 'חלץ את טבלת ה-HTML הראשונה ל־CSV כדי להפוך טבלאות שהועתקו ממערכות או CMS לפורמט מוכן לגיליון.' },
+    metaDescription: { en: 'Convert an HTML table to CSV online. Extract copied table markup into spreadsheet-ready CSV directly in your browser.', he: 'המרת HTML table ל־CSV אונליין. חילוץ טבלת HTML שהועתקה ל־CSV מוכן לגיליון ישירות בדפדפן.' },
+    keywords: { en: ['html table to csv', 'convert html table to csv'], he: ['HTML table ל CSV', 'טבלת HTML ל CSV'] },
+    features: { en: ['First table extraction', 'CSV-ready output', 'Header support'], he: ['חילוץ הטבלה הראשונה', 'פלט מוכן ל־CSV', 'תמיכה בכותרות'] },
+    guide: { en: ['Paste HTML that contains a table.', 'Convert to extract the first table into CSV.', 'Copy the CSV into Sheets, Excel or another importer.'], he: ['הדבק HTML שמכיל טבלה.', 'המר כדי לחלץ את הטבלה הראשונה ל־CSV.', 'העתק את ה־CSV ל-Sheets, Excel או לכלי ייבוא אחר.'] },
+    examples: [
+      { label: { en: 'Simple pricing table', he: 'טבלת מחירים פשוטה' }, input: '<table><tr><th>Plan</th><th>Price</th></tr><tr><td>Starter</td><td>19</td></tr><tr><td>Pro</td><td>49</td></tr></table>' },
+      { label: { en: 'Orders table', he: 'טבלת הזמנות' }, input: '<table><tr><th>Order</th><th>Status</th><th>Total</th></tr><tr><td>#1001</td><td>Paid</td><td>125</td></tr><tr><td>#1002</td><td>Pending</td><td>88</td></tr></table>' }
+    ],
+    faq: [
+      {
+        question: { en: 'Which table is used if the HTML contains more than one table?', he: 'איזו טבלה נבחרת אם ב-HTML יש יותר מטבלה אחת?' },
+        answer: { en: 'This tool extracts the first table it finds. If you need another table, paste only that table block.', he: 'הכלי מחלץ את הטבלה הראשונה שהוא מוצא. אם צריך טבלה אחרת, כדאי להדביק רק את בלוק הטבלה הרצוי.' }
+      },
+      {
+        question: { en: 'Can I use this after copying a table from a CMS preview?', he: 'האם אפשר להשתמש בזה אחרי העתקת טבלה מ-CMS או preview?' },
+        answer: { en: 'Yes. It is useful for copied markup from dashboards, admin screens or article editors when you want spreadsheet-friendly output.', he: 'כן. זה שימושי במיוחד עבור markup שהועתק מ-dashboards, מסכי admin או עורכי תוכן כשצריך פלט ידידותי לגיליון.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['html-table-to-json', 'csv-to-json', 'csv-to-markdown-table']
+  },
+  {
+    slug: 'html-table-to-json',
+    converterId: 'htmlTableToJson',
+    category: 'data',
+    inputType: 'html',
+    outputType: 'json',
+    new: true,
+    title: { en: 'HTML Table to JSON', he: 'HTML Table ל-JSON' },
+    shortTitle: { en: 'Table to JSON', he: 'טבלה ל-JSON' },
+    description: { en: 'Convert copied HTML table markup into JSON rows using the table header cells as object keys.', he: 'המר markup של טבלת HTML ל־JSON שורות, תוך שימוש בכותרות הטבלה כמפתחות אובייקט.' },
+    metaDescription: { en: 'Convert an HTML table to JSON online. Turn copied table markup into JSON rows directly in your browser.', he: 'המרת HTML table ל־JSON אונליין. הפיכת טבלת HTML שהועתקה לשורות JSON ישירות בדפדפן.' },
+    keywords: { en: ['html table to json', 'convert html table to json'], he: ['HTML table ל JSON', 'טבלת HTML ל JSON'] },
+    features: { en: ['Header-based keys', 'JSON row output', 'Local parsing'], he: ['מפתחות לפי כותרות', 'פלט שורות JSON', 'פענוח מקומי'] },
+    guide: { en: ['Paste HTML that contains a table with header cells.', 'Convert to map the first row into JSON keys.', 'Use the output in scripts, APIs or spreadsheet imports.'], he: ['הדבק HTML שמכיל טבלה עם כותרות.', 'המר כדי למפות את השורה הראשונה למפתחות JSON.', 'השתמש בפלט בסקריפטים, API או ייבוא גיליונות.'] },
+    examples: [
+      { label: { en: 'Simple user table', he: 'טבלת משתמשים פשוטה' }, input: '<table><tr><th>Name</th><th>City</th></tr><tr><td>Dana</td><td>Jerusalem</td></tr><tr><td>Maya</td><td>Tel Aviv</td></tr></table>' },
+      { label: { en: 'Campaign table', he: 'טבלת קמפיינים' }, input: '<table><tr><th>Campaign</th><th>Clicks</th><th>Status</th></tr><tr><td>Summer</td><td>124</td><td>Active</td></tr><tr><td>Winter</td><td>93</td><td>Paused</td></tr></table>' }
+    ],
+    faq: [
+      {
+        question: { en: 'What if a header cell is empty?', he: 'מה קורה אם אחת מכותרות הטבלה ריקה?' },
+        answer: { en: 'The tool creates a fallback key name like column_1 so the JSON stays usable even when the table markup is imperfect.', he: 'הכלי יוצר מפתח חלופי כמו column_1 כדי שה-JSON יישאר שימושי גם אם ה-markup של הטבלה לא מושלם.' }
+      },
+      {
+        question: { en: 'Is HTML table to JSON useful for automation work?', he: 'האם HTML table ל-JSON שימושי גם לעבודה אוטומטית?' },
+        answer: { en: 'Yes. It helps bridge copied table markup into scripts, QA checks, quick data transformations and API-friendly structures.', he: 'כן. זה עוזר להעביר טבלאות שהועתקו ל-scripts, בדיקות QA, טרנספורמציות נתונים מהירות ומבנים ידידותיים ל-API.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['html-table-to-csv', 'csv-to-json', 'json-formatter']
+  },
+  {
+    slug: 'xml-formatter',
+    converterId: 'xmlFormatter',
+    category: 'data',
+    inputType: 'xml',
+    outputType: 'xml',
+    new: true,
+    title: { en: 'XML Formatter', he: 'מעצב XML' },
+    shortTitle: { en: 'XML Formatter', he: 'עיצוב XML' },
+    description: { en: 'Format raw XML into a cleaner indented structure for debugging feeds, exports and integrations.', he: 'עצב XML גולמי למבנה מוזח וקריא יותר לצורך דיבוג של feeds, exports ואינטגרציות.' },
+    metaDescription: { en: 'Format XML online into a readable indented structure. Clean up raw XML feeds and pasted markup directly in your browser.', he: 'עיצוב XML אונליין למבנה קריא ומוזח. ניקוי feeds של XML ו-markup שהודבק ישירות בדפדפן.' },
+    keywords: { en: ['xml formatter', 'format xml online'], he: ['מעצב XML', 'עיצוב XML אונליין'] },
+    features: { en: ['Indented XML', 'Readable nested structure', 'Local formatting'], he: ['XML מוזח', 'מבנה מקונן קריא', 'עיצוב מקומי'] },
+    guide: { en: ['Paste XML with one root element.', 'Convert to pretty-print nested tags and attributes.', 'Use the result for debugging, docs or comparison before conversion.'], he: ['הדבק XML עם root אחד.', 'המר כדי לעצב תגיות ותכונות מקוננות בצורה קריאה.', 'השתמש בתוצאה לדיבוג, תיעוד או השוואה לפני המרה.'] },
+    examples: [
+      { label: { en: 'Compact feed item', he: 'פריט feed קומפקטי' }, input: '<item><title>Online Converter</title><link>https://example.com</link></item>' },
+      { label: { en: 'Nested export', he: 'ייצוא מקונן' }, input: '<order id="1001"><customer><name>Dana</name></customer><total currency="ILS">125</total></order>' }
+    ],
+    faq: [
+      {
+        question: { en: 'Does XML formatter change the data values?', he: 'האם מעצב ה-XML משנה את ערכי הנתונים?' },
+        answer: { en: 'No. It only restructures the layout so the XML is easier to read. The goal is presentation, not transformation.', he: 'לא. הוא רק משנה את הפריסה כדי שה-XML יהיה קריא יותר. המטרה היא הצגה, לא שינוי נתונים.' }
+      },
+      {
+        question: { en: 'When is formatted XML especially useful?', he: 'מתי XML מעוצב במיוחד עוזר?' },
+        answer: { en: 'It is useful when you copy compact API responses, RSS items or export payloads and need to inspect the nested structure quickly.', he: 'זה שימושי כשמעתיקים תגובות API קומפקטיות, פריטי RSS או payloads של export וצריך לבדוק את המבנה המקונן במהירות.' }
+      },
+      faq.private,
+      faq.free
+    ],
+    related: ['xml-to-json', 'json-to-xml', 'json-formatter']
+  },
+  {
     slug: 'jwt-expiration-checker',
     converterId: 'jwtExpirationChecker',
     category: 'developer',

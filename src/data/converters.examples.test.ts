@@ -39,6 +39,15 @@ const batchNineSeoSlugs = [
   'html-headings-outline-extractor'
 ];
 
+const batchTenWaveOneSlugs = [
+  'sql-formatter',
+  'env-parser',
+  'curl-command-formatter',
+  'html-table-to-csv',
+  'html-table-to-json',
+  'xml-formatter'
+];
+
 describe('converter examples coverage', () => {
   it('keeps at least two starter examples for priority converters', () => {
     for (const slug of prioritySlugs) {
@@ -60,6 +69,15 @@ describe('converter examples coverage', () => {
 
   it('keeps at least two starter examples for the current Batch 9 SEO tools', () => {
     for (const slug of batchNineSeoSlugs) {
+      const tool = converters.find((item) => item.slug === slug);
+
+      expect(tool, `Missing converter: ${slug}`).toBeDefined();
+      expect(tool?.examples.length, `${slug} should have at least two examples`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('keeps at least two starter examples for the first Batch 10 wave', () => {
+    for (const slug of batchTenWaveOneSlugs) {
       const tool = converters.find((item) => item.slug === slug);
 
       expect(tool, `Missing converter: ${slug}`).toBeDefined();
