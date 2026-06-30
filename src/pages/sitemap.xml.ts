@@ -1,13 +1,8 @@
-import { converters } from '../data/converters';
-import { categoryLabels, locales, siteUrl } from '../data/site';
+import { siteUrl } from '../data/site';
+import { getPublicPaths, getSitemapPriority } from '../lib/public-pages';
 
 export function GET() {
-  const categories = Object.keys(categoryLabels);
-  const urls = [
-    ...locales.map((locale) => `/${locale}/`),
-    ...locales.flatMap((locale) => categories.map((category) => `/${locale}/${category}/`)),
-    ...locales.flatMap((locale) => converters.map((tool) => `/${locale}/${tool.slug}/`))
-  ];
+  const urls = getPublicPaths();
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -16,7 +11,7 @@ ${urls
     (path) => `  <url>
     <loc>${siteUrl}${path}</loc>
     <changefreq>weekly</changefreq>
-    <priority>${path.split('/').length <= 3 ? '0.9' : '0.8'}</priority>
+    <priority>${getSitemapPriority(path)}</priority>
   </url>`
   )
   .join('\n')}

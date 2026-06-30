@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { converters } from './converters';
 import { categoryLabels, locales, siteName, siteUrl } from './site';
 import { getCategoryMetaDescription, getCategoryPageTitle } from '../lib/category-seo';
+import { getPublicPaths, getSitemapPriority } from '../lib/public-pages';
+import { converters } from './converters';
 
 const categoryKeys = Object.keys(categoryLabels);
 
@@ -42,11 +43,7 @@ describe('SEO surfaces', () => {
   });
 
   it('can generate sitemap entries for every public page', () => {
-    const urls = [
-      ...locales.map((locale) => `/${locale}/`),
-      ...locales.flatMap((locale) => categoryKeys.map((category) => `/${locale}/${category}/`)),
-      ...locales.flatMap((locale) => converters.map((tool) => `/${locale}/${tool.slug}/`))
-    ];
+    const urls = getPublicPaths();
 
     expect(urls.length).toBe(2 + locales.length * categoryKeys.length + locales.length * converters.length);
     expect(new Set(urls).size).toBe(urls.length);
@@ -56,6 +53,13 @@ describe('SEO surfaces', () => {
     }
 
     expect(urls).not.toContain('/analytics/');
+  });
+
+  it('assigns stable sitemap priorities by page depth', () => {
+    expect(getSitemapPriority('/en/')).toBe('0.9');
+    expect(getSitemapPriority('/he/text/')).toBe('0.9');
+    expect(getSitemapPriority('/en/json-to-csv/')).toBe('0.8');
+    expect(getSitemapPriority('/he/sort-lines/')).toBe('0.8');
   });
 
   it('keeps robots.txt open for indexing and points to the sitemap', () => {

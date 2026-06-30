@@ -71,6 +71,21 @@ const normalizePublicPath = (pathname) => {
   return pathname.endsWith('/') ? pathname : `${pathname}/`;
 };
 
+const categorySegments = new Set(['data', 'text', 'encoding', 'time', 'developer', 'color', 'calculator']);
+
+const getSitemapPriority = (path) => {
+  const segments = path.split('/').filter(Boolean);
+  if (segments.length === 1) {
+    return '0.9';
+  }
+
+  if (segments.length === 2 && categorySegments.has(segments[1])) {
+    return '0.9';
+  }
+
+  return '0.8';
+};
+
 const toPublicPath = (relativeFile) => {
   if (relativeFile === 'index.html') {
     return '/';
@@ -212,6 +227,52 @@ const assertCanonicalAndAlternatesForAllIndexablePages = () => {
   }
 };
 
+const extractSitemapEntries = () => {
+  const entryPattern = /<url>\s*<loc>(.*?)<\/loc>\s*<changefreq>(.*?)<\/changefreq>\s*<priority>(.*?)<\/priority>\s*<\/url>/gs;
+  return [...sitemap.matchAll(entryPattern)].map((match) => ({
+    loc: match[1],
+    changefreq: match[2],
+    priority: match[3]
+  }));
+};
+
+const assertExactSitemapCoverage = () => {
+  const entries = extractSitemapEntries();
+  const expectedPaths = walkDistFiles()
+    .filter((file) => file.endsWith('.html'))
+    .map((file) => normalizePublicPath(toPublicPath(file)))
+    .filter((path) => /^\/(en|he)\//.test(path));
+  const expectedLocs = expectedPaths.map((path) => `${siteUrl}${path}`);
+  const actualLocs = entries.map((entry) => entry.loc);
+
+  if (entries.length !== expectedPaths.length) {
+    fail(`Sitemap entry count mismatch: expected ${expectedPaths.length}, received ${entries.length}`);
+  }
+
+  const missingLocs = expectedLocs.filter((loc) => !actualLocs.includes(loc));
+  const extraLocs = actualLocs.filter((loc) => !expectedLocs.includes(loc));
+
+  if (missingLocs.length > 0) {
+    fail(`Sitemap is missing expected URLs:\n${missingLocs.join('\n')}`);
+  }
+
+  if (extraLocs.length > 0) {
+    fail(`Sitemap includes unexpected URLs:\n${extraLocs.join('\n')}`);
+  }
+
+  for (const entry of entries) {
+    if (entry.changefreq !== 'weekly') {
+      fail(`Sitemap URL ${entry.loc} has unexpected changefreq ${entry.changefreq}`);
+    }
+
+    const path = entry.loc.replace(siteUrl, '');
+    const expectedPriority = getSitemapPriority(path);
+    if (entry.priority !== expectedPriority) {
+      fail(`Sitemap URL ${entry.loc} has priority ${entry.priority}, expected ${expectedPriority}`);
+    }
+  }
+};
+
 const assertEqual = (actual, expected, label) => {
   if (actual !== expected) {
     fail(`${label}: expected "${expected}", received "${actual}"`);
@@ -290,5 +351,6 @@ if (!robots.includes(`Sitemap: ${siteUrl}/sitemap.xml`)) {
 assertNoBrokenInternalLinks();
 assertUniqueIndexableMetadata();
 assertCanonicalAndAlternatesForAllIndexablePages();
+assertExactSitemapCoverage();
 
 console.log(`SEO build check passed for ${publicPaths.length} representative pages and ${locCount} sitemap URLs.`);
