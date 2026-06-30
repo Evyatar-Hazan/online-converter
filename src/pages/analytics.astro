@@ -19,6 +19,7 @@ import {
   indexingChecklistSummary,
   keywordIntentSummary,
   keywordMapSummary,
+  operationsCadence,
   priorityConverterBacklogRows,
   priorityEnglishLongTailRows,
   priorityHebrewOpportunityRows,
@@ -30,7 +31,9 @@ import {
   rankingMonitorSummary,
   rankingWorkflowSteps,
   searchDemandProxySummary,
-  searchConsoleBaseline
+  searchConsoleBaseline,
+  snippetDefinitionOfDone,
+  stabilizationChecklist
 } from '../data/analytics-dashboard';
 import { siteName } from '../data/site';
 
@@ -126,6 +129,25 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
   <section class="analytics-panel analytics-panel-wide">
     <div class="analytics-panel-heading analytics-heading-split">
       <div>
+        <p class="eyebrow">Stabilization now</p>
+        <h2>What to push before adding more converters</h2>
+      </div>
+      <span class="analytics-date">Current execution lane</span>
+    </div>
+    <div class="analytics-event-list">
+      {stabilizationChecklist.map((item) => (
+        <div class="analytics-event-row">
+          <code>{item.area}</code>
+          <span>{item.detail}</span>
+          <small>{item.status}</small>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="analytics-panel analytics-panel-wide">
+    <div class="analytics-panel-heading analytics-heading-split">
+      <div>
         <p class="eyebrow">Search Console</p>
         <h2>Ranking baseline</h2>
       </div>
@@ -152,6 +174,40 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
     <p class="analytics-note">
       {searchConsoleBaseline.note} Visible page: <code>{searchConsoleBaseline.onlyVisiblePage}</code>.
     </p>
+  </section>
+
+  <section class="analytics-grid">
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Snippet guardrail</p>
+        <h2>Definition of done</h2>
+      </div>
+      <div class="analytics-event-list">
+        {snippetDefinitionOfDone.map((item) => (
+          <div class="analytics-event-row">
+            <code>{item.area}</code>
+            <span>{item.rule}</span>
+            <small>{item.owner}</small>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article class="analytics-panel">
+      <div class="analytics-panel-heading">
+        <p class="eyebrow">Operations cadence</p>
+        <h2>Weekly follow-up rhythm</h2>
+      </div>
+      <div class="analytics-event-list">
+        {operationsCadence.map((item) => (
+          <div class="analytics-event-row">
+            <code>{item.area}</code>
+            <span>{item.trigger}</span>
+            <small>{item.owner} · {item.cadence}</small>
+          </div>
+        ))}
+      </div>
+    </article>
   </section>
 
   <section class="analytics-panel analytics-panel-wide">

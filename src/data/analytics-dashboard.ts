@@ -170,6 +170,68 @@ export const searchConsoleBaseline = {
   note: 'Search Console has one homepage impression and no visible converter-page ranking rows yet.'
 } as const;
 
+export const stabilizationChecklist = [
+  {
+    area: 'Snippet quality',
+    detail: 'Keep every public title literal, unique and exact-match friendly, then keep descriptions browser-based, bilingual and no-upload focused.',
+    status: 'ready-now'
+  },
+  {
+    area: 'Content depth',
+    detail: 'Strengthen thin-feeling pages through richer template guidance, practical checks and output-ready usage sections before adding more converters.',
+    status: 'ready-now'
+  },
+  {
+    area: 'Ad layout readiness',
+    detail: 'Reserve stable placements that stay visible without looking like internal placeholders or crowding the workflow.',
+    status: 'ready-now'
+  },
+  {
+    area: 'Data follow-up',
+    detail: 'Wait for Search Console impressions, indexing deltas and live ad fill before pushing CTR experiments or analytics-driven prioritization.',
+    status: 'waiting-for-data'
+  }
+] as const;
+
+export const snippetDefinitionOfDone = [
+  {
+    area: 'Titles',
+    rule: 'Every home, category and tool page keeps a literal, unique title with the exact tool or category name visible.',
+    owner: 'SEO guardrail'
+  },
+  {
+    area: 'Descriptions',
+    rule: 'Every indexable page keeps a unique description that says browser-based, bilingual and no-upload in language-appropriate wording.',
+    owner: 'SEO guardrail'
+  },
+  {
+    area: 'Language style',
+    rule: 'Avoid vague marketing phrases and keep snippet wording practical, specific and easy to verify.',
+    owner: 'Content quality'
+  }
+] as const;
+
+export const operationsCadence = [
+  {
+    area: 'Ranking review',
+    cadence: 'Weekly',
+    owner: 'Search Console',
+    trigger: 'Run when new impressions or indexed pages appear.'
+  },
+  {
+    area: 'CTR watchlist',
+    cadence: 'Weekly',
+    owner: 'Search Console + Content',
+    trigger: 'Promote only pages that already have enough impressions to justify copy changes.'
+  },
+  {
+    area: 'Weekly audit automation',
+    cadence: 'Weekly',
+    owner: 'Codex automation',
+    trigger: 'Run the recurring audit lane to verify local quality gates, deploy health, monetization readiness and open blockers.'
+  }
+] as const;
+
 export const rankingWorkflowSteps = [
   {
     step: 'Collect',
@@ -518,13 +580,13 @@ export const converterSeoAuditChecks: Array<{
   {
     area: 'Title',
     status: 'good',
-    evidence: `${converterSeoAuditSummary.localizedTitles}/${converterSeoAuditSummary.trackedConverters} converters now render localized page titles with intent-aware CTR suffixes while keeping exact-match converter names visible.`,
-    nextStep: 'Monitor impressions and tighten suffixes only where Search Console shows weak CTR.'
+    evidence: `${converterSeoAuditSummary.localizedTitles}/${converterSeoAuditSummary.trackedConverters} converters now render localized page titles with literal browser-based suffixes while keeping exact-match converter names visible.`,
+    nextStep: 'Hold this wording stable until Search Console shows enough impressions to justify tighter experiments.'
   },
   {
     area: 'Meta description',
     status: 'good',
-    evidence: `${converterSeoAuditSummary.localizedMetaDescriptions}/${converterSeoAuditSummary.trackedConverters} converters now render localized meta descriptions that highlight browser-based usage, bilingual support, examples and no-upload privacy cues.`,
+    evidence: `${converterSeoAuditSummary.localizedMetaDescriptions}/${converterSeoAuditSummary.trackedConverters} converters now render localized meta descriptions that stay literal, browser-based, bilingual and no-upload focused.`,
     nextStep: 'Tune wording per page only after impression and CTR data appears in Search Console.'
   },
   {
@@ -562,6 +624,12 @@ export const converterSeoAuditChecks: Array<{
     status: 'good',
     evidence: 'The converter template now emits SoftwareApplication, FAQPage and BreadcrumbList JSON-LD through a shared helper, and dedicated tests enforce schema presence and core fields for every converter in both locales.',
     nextStep: 'Keep the helper as the single source of truth when expanding converter schema depth later.'
+  },
+  {
+    area: 'Thin-page guardrail',
+    status: 'good',
+    evidence: 'The converter template now includes practical use, workflow fit, result checklist, trust checks, examples, FAQ, tips and issue guidance for every localized tool page.',
+    nextStep: 'Use template depth plus launch-ready gates to avoid shipping thin new pages before stabilization is complete.'
   }
 ];
 

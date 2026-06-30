@@ -9,7 +9,13 @@ interface Props {
 
 const { locale, placement } = Astro.props;
 const labels = ui[locale];
-const adText = locale === 'he' ? 'שטח פרסום' : 'Ad space';
+const adText = locale === 'he' ? 'אזור תוכן ממומן' : 'Sponsored placement';
+const helperText = {
+  top: locale === 'he' ? 'מיקום עליון למודעה רחבה' : 'Top placement for a wide sponsored unit',
+  inline: locale === 'he' ? 'מיקום תוכן ממומן בין חלקי העמוד' : 'Inline sponsored placement between content sections',
+  sidebar: locale === 'he' ? 'מיקום צדדי למודעה תומכת' : 'Sidebar placement for a supporting sponsored unit',
+  bottom: locale === 'he' ? 'מיקום תחתון למודעה משלימה' : 'Bottom placement for a supporting sponsored unit'
+} as const;
 const adClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT;
 const adSlots = {
   top: import.meta.env.PUBLIC_GOOGLE_ADSENSE_SLOT_TOP,
@@ -22,22 +28,27 @@ const showRealAd = Boolean(adClient && adSlot);
 ---
 
 <aside class={`ad-slot ad-slot-${placement}`} aria-label={labels.adLabel} data-ad-placement={placement} data-ad-real={showRealAd ? 'true' : 'false'}>
-  <span>{labels.adLabel}</span>
-  {showRealAd ? (
-    <>
-      <ins
-        class="adsbygoogle"
-        style="display:block"
-        data-ad-client={adClient}
-        data-ad-slot={adSlot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
-      <script is:inline>
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </>
-  ) : (
-    <div>{adText}</div>
-  )}
+  <div class="ad-slot-header">
+    <span class="ad-slot-label">{labels.adLabel}</span>
+    {!showRealAd && <small>{helperText[placement]}</small>}
+  </div>
+  <div class="ad-slot-frame">
+    {showRealAd ? (
+      <>
+        <ins
+          class="adsbygoogle"
+          style="display:block"
+          data-ad-client={adClient}
+          data-ad-slot={adSlot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        />
+        <script is:inline>
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </>
+    ) : (
+      <div class="ad-slot-placeholder-text">{adText}</div>
+    )}
+  </div>
 </aside>

@@ -6,7 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { categoryLabels, locales, ui } from '../../data/site';
 import { getPriorityCategoryTools } from '../../lib/category-tools';
-import { getToolUseCases } from '../../lib/converter-content';
+import { getToolDecisionChecks, getToolResultChecklist, getToolUseCases } from '../../lib/converter-content';
 import { getCategoryRelatedConverters, getInverseConverter, getRelatedConverters, getWorkflowRelatedConverters } from '../../lib/related-tools';
 import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
@@ -175,6 +175,8 @@ const categoryTools = converters.filter((item) => item.category === tool.categor
 const priorityCategoryTools = getPriorityCategoryTools(categoryTools, locale, { excludeSlug: tool.slug, limit: 4 });
 const contextualFaq = [...generatedFaq(tool), ...tool.faq];
 const useCases = getToolUseCases(tool, locale);
+const resultChecklist = getToolResultChecklist(tool, locale);
+const decisionChecks = getToolDecisionChecks(tool, locale);
 const tips = conversionTips(tool, locale);
 const issues = commonIssues(tool, locale);
 const title = getConverterPageTitle(tool, locale);
@@ -279,6 +281,23 @@ const linkingCopy = {
       </p>
       <ul class="check-list">
         {tool.guide[locale].slice(0, 3).map((step) => <li>{step}</li>)}
+      </ul>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'מה מקבלים בפלט' : 'What you get from the output'}</p>
+      <h2>{locale === 'he' ? 'איך להשתמש בתוצאה מיד אחרי ההמרה' : 'How to use the result right after conversion'}</h2>
+      <ul class="check-list">
+        {resultChecklist.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{locale === 'he' ? 'לפני שמסתמכים על התוצאה' : 'Before relying on the result'}</p>
+      <h2>{locale === 'he' ? 'בדיקות קצרות ששווה לעשות' : 'Quick checks worth doing first'}</h2>
+      <ul class="check-list">
+        {decisionChecks.map((item) => <li>{item}</li>)}
       </ul>
     </article>
   </section>

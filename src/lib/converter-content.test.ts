@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from '../data/converters';
-import { getToolContentReadiness, getToolUseCases, isLaunchReadyFreshTool } from './converter-content';
+import { getToolContentReadiness, getToolDecisionChecks, getToolResultChecklist, getToolUseCases, isLaunchReadyFreshTool } from './converter-content';
 
 describe('converter content quality helpers', () => {
   it('builds three use cases for every converter in both locales', () => {
@@ -12,6 +12,24 @@ describe('converter content quality helpers', () => {
       expect(hebrew).toHaveLength(3);
       expect(english.every((item) => item.length > 20)).toBe(true);
       expect(hebrew.every((item) => item.length > 10)).toBe(true);
+    }
+  });
+
+  it('builds result and trust checklists for every converter in both locales', () => {
+    for (const tool of converters) {
+      const englishResultChecklist = getToolResultChecklist(tool, 'en');
+      const hebrewResultChecklist = getToolResultChecklist(tool, 'he');
+      const englishDecisionChecks = getToolDecisionChecks(tool, 'en');
+      const hebrewDecisionChecks = getToolDecisionChecks(tool, 'he');
+
+      expect(englishResultChecklist).toHaveLength(3);
+      expect(hebrewResultChecklist).toHaveLength(3);
+      expect(englishDecisionChecks).toHaveLength(3);
+      expect(hebrewDecisionChecks).toHaveLength(3);
+      expect(englishResultChecklist.every((item) => item.length > 20)).toBe(true);
+      expect(hebrewResultChecklist.every((item) => item.length > 12)).toBe(true);
+      expect(englishDecisionChecks.every((item) => item.length > 20)).toBe(true);
+      expect(hebrewDecisionChecks.every((item) => item.length > 12)).toBe(true);
     }
   });
 

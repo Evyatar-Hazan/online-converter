@@ -17,8 +17,11 @@ import {
   keywordIntentSummary,
   keywordMapRows,
   keywordMapSummary,
+  operationsCadence,
   rankingMonitorRows,
   rankingMonitorSummary,
+  snippetDefinitionOfDone,
+  stabilizationChecklist,
   searchDemandProxyRows,
   searchDemandProxySummary,
   searchConsoleBaseline
@@ -59,6 +62,12 @@ describe('analytics dashboard ranking monitor', () => {
     expect(indexingChecklistSteps).toHaveLength(7);
     expect(indexingChecklistSteps.some((step) => step.status === 'automated')).toBe(true);
     expect(indexingChecklistSteps.some((step) => step.label === 'Inspect top 20 converters')).toBe(true);
+  });
+
+  it('defines a stabilization plan for ready-now work versus waiting-for-data work', () => {
+    expect(stabilizationChecklist).toHaveLength(4);
+    expect(stabilizationChecklist.filter((item) => item.status === 'ready-now')).toHaveLength(3);
+    expect(stabilizationChecklist.some((item) => item.status === 'waiting-for-data')).toBe(true);
   });
 
   it('maps bilingual primary and secondary keywords for every converter', () => {
@@ -181,11 +190,19 @@ describe('analytics dashboard ranking monitor', () => {
     expect(converterSeoAuditSummary.convertersWithUniqueIntroCopy).toBe(converters.length);
     expect(converterSeoAuditSummary.convertersWithRelatedLinks).toBe(converters.length);
     expect(converterSeoAuditSummary.convertersWhoseRelatedIncludesReverse).toBe(converterSeoAuditSummary.convertersWithReverseLink);
-    expect(converterSeoAuditChecks).toHaveLength(8);
+    expect(converterSeoAuditChecks).toHaveLength(9);
     expect(converterSeoAuditChecks.find((item) => item.area === 'Intro copy')?.status).toBe('good');
     expect(converterSeoAuditChecks.find((item) => item.area === 'Related tools')?.status).toBe('good');
+    expect(converterSeoAuditChecks.find((item) => item.area === 'Thin-page guardrail')?.status).toBe('good');
     expect(converterSeoAuditSummary.convertersWithMultipleExamples).toBeLessThan(converters.length);
     expect(converterSeoAuditSummary.convertersUsingOnlyGenericFaq).toBeGreaterThan(0);
     expect(converterSeoAuditSummary.convertersUsingOnlyGenericFaq).toBeLessThan(converters.length);
+  });
+
+  it('keeps snippet done conditions and operations cadence explicit', () => {
+    expect(snippetDefinitionOfDone).toHaveLength(3);
+    expect(snippetDefinitionOfDone.map((item) => item.area)).toEqual(['Titles', 'Descriptions', 'Language style']);
+    expect(operationsCadence).toHaveLength(3);
+    expect(operationsCadence.every((item) => item.cadence === 'Weekly')).toBe(true);
   });
 });

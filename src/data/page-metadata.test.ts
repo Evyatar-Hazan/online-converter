@@ -6,6 +6,8 @@ import { getConverterMetaDescription, getConverterPageTitle } from '../lib/conve
 import { getHomeMetaDescription, getHomePageTitle } from '../lib/home-seo';
 
 const categories = Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>;
+const disallowedEnglishPhrases = ['best', 'ultimate', 'perfect', 'powerful', 'seamless'];
+const disallowedHebrewPhrases = ['הכי טוב', 'מושלם', 'עוצמתי במיוחד', 'ללא מאמץ'];
 
 describe('public page metadata', () => {
   it('keeps unique localized titles and descriptions across all public pages', () => {
@@ -39,6 +41,15 @@ describe('public page metadata', () => {
         expect(entry.description.trim().length).toBeGreaterThan(locale === 'he' ? 40 : 55);
         expect(entry.description.trim().length).toBeLessThanOrEqual(180);
         expect(entry.path).toMatch(new RegExp(`^/${locale}/`));
+        if (locale === 'he') {
+          expect(entry.description).toContain('בדפדפן');
+          expect(entry.description).toMatch(/בלי העלא(?:ה|ת מידע)/);
+          expect(disallowedHebrewPhrases.some((phrase) => entry.description.includes(phrase))).toBe(false);
+        } else {
+          expect(entry.description.toLowerCase()).toContain('browser');
+          expect(entry.description.toLowerCase()).toContain('no upload');
+          expect(disallowedEnglishPhrases.some((phrase) => entry.description.toLowerCase().includes(phrase))).toBe(false);
+        }
       }
     }
   });

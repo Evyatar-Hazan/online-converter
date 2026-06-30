@@ -8,72 +8,72 @@ const categoryFocusTerms: Record<
   data: {
     en: {
       titleLead: 'Data Format Converters',
-      titleSuffix: 'JSON, CSV, XML and YAML Online',
+      titleSuffix: 'JSON, CSV, XML and YAML Tools',
       descriptionLead: 'Use browser-based data format converters for JSON, CSV, XML and YAML'
     },
     he: {
       titleLead: 'ממירי פורמטי נתונים',
-      titleSuffix: 'JSON, CSV, XML ו־YAML אונליין',
+      titleSuffix: 'כלי JSON, CSV, XML ו־YAML בדפדפן',
       descriptionLead: 'השתמש בממירי פורמטי נתונים בדפדפן עבור JSON, CSV, XML ו־YAML'
     }
   },
   text: {
     en: {
       titleLead: 'Text Tools',
-      titleSuffix: 'Sort, Clean and Format Text Online',
+      titleSuffix: 'Sort, Clean and Format Text',
       descriptionLead: 'Use browser-based text tools to sort, clean, count and format text'
     },
     he: {
       titleLead: 'כלי טקסט',
-      titleSuffix: 'מיון, ניקוי ועיצוב טקסט אונליין',
+      titleSuffix: 'מיון, ניקוי ועיצוב טקסט בדפדפן',
       descriptionLead: 'השתמש בכלי טקסט בדפדפן כדי למיין, לנקות, לספור ולעצב טקסט'
     }
   },
   encoding: {
     en: {
       titleLead: 'Encoding and Decoding Tools',
-      titleSuffix: 'Base64, URL and Web Text Online',
+      titleSuffix: 'Base64, URL and Web Text',
       descriptionLead: 'Use browser-based encoding and decoding tools for Base64, URL values and web-safe text'
     },
     he: {
       titleLead: 'כלי קידוד ופענוח',
-      titleSuffix: 'Base64, URL וטקסט לרשת אונליין',
+      titleSuffix: 'Base64, URL וטקסט לרשת בדפדפן',
       descriptionLead: 'השתמש בכלי קידוד ופענוח בדפדפן עבור Base64, ערכי URL וטקסט בטוח לרשת'
     }
   },
   time: {
     en: {
       titleLead: 'Date and Time Converters',
-      titleSuffix: 'Timestamps and Dates Online',
+      titleSuffix: 'Timestamps and Dates',
       descriptionLead: 'Use browser-based date and time converters for Unix timestamps, readable dates and UTC checks'
     },
     he: {
       titleLead: 'ממירי תאריך וזמן',
-      titleSuffix: 'טיימסטמפים ותאריכים אונליין',
+      titleSuffix: 'טיימסטמפים ותאריכים בדפדפן',
       descriptionLead: 'השתמש בממירי תאריך וזמן בדפדפן עבור Unix timestamps, תאריכים קריאים ובדיקות UTC'
     }
   },
   developer: {
     en: {
       titleLead: 'Developer Tools',
-      titleSuffix: 'JSON, JWT and Web Utilities Online',
+      titleSuffix: 'JSON, JWT and Web Utilities',
       descriptionLead: 'Use browser-based developer tools for JSON, JWT, HTML, headers and everyday debugging tasks'
     },
     he: {
       titleLead: 'כלי פיתוח',
-      titleSuffix: 'JSON, JWT וכלי Web אונליין',
+      titleSuffix: 'JSON, JWT וכלי Web בדפדפן',
       descriptionLead: 'השתמש בכלי פיתוח בדפדפן עבור JSON, JWT, HTML, headers ומשימות דיבוג יומיומיות'
     }
   },
   color: {
     en: {
       titleLead: 'Color Converters',
-      titleSuffix: 'HEX, RGB, HSL and CMYK Online',
+      titleSuffix: 'HEX, RGB, HSL and CMYK',
       descriptionLead: 'Use browser-based color converters for HEX, RGB, HSL and CMYK values'
     },
     he: {
       titleLead: 'ממירי צבעים',
-      titleSuffix: 'HEX, RGB, HSL ו־CMYK אונליין',
+      titleSuffix: 'HEX, RGB, HSL ו־CMYK בדפדפן',
       descriptionLead: 'השתמש בממירי צבעים בדפדפן עבור ערכי HEX, RGB, HSL ו־CMYK'
     }
   },
@@ -85,7 +85,7 @@ const categoryFocusTerms: Record<
     },
     he: {
       titleLead: 'מחשבונים אונליין',
-      titleSuffix: 'אחוזים, הנחות וחישובים יומיומיים',
+      titleSuffix: 'אחוזים, הנחות וחישובים יומיומיים בדפדפן',
       descriptionLead: 'השתמש במחשבונים בדפדפן עבור אחוזים, הנחות, ממוצעים, יחסים וחישובים יומיומיים'
     }
   }
@@ -101,8 +101,8 @@ export function getCategoryMetaDescription(category: ConverterCategory, locale: 
   const categoryLabel = categoryLabels[category][locale];
 
   if (locale === 'he') {
-    return `${focus.descriptionLead}. הקטגוריה כוללת ${toolCount} כלים בקטגוריית ${categoryLabel}, עם תמיכה בעברית ובאנגלית, בלי העלאות ועם תוצאה מיידית.`;
+    return `${focus.descriptionLead}. הקטגוריה כוללת ${toolCount} כלים בקטגוריית ${categoryLabel}, עם תמיכה בעברית ובאנגלית ובלי העלאה.`;
   }
 
-  return `${focus.descriptionLead}. Includes ${toolCount} ${categoryLabel.toLowerCase()} with Hebrew and English support and no uploads.`;
+  return `${focus.descriptionLead}. Includes ${toolCount} ${categoryLabel.toLowerCase()} with Hebrew and English support and no upload.`;
 }

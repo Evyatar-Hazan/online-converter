@@ -83,6 +83,46 @@ export function getToolUseCases(tool: ConverterTool, locale: Locale) {
   return [intentLead[intent][locale], categoryLead[tool.category][locale], featureText];
 }
 
+export function getToolResultChecklist(tool: ConverterTool, locale: Locale) {
+  const output = formatContentType(tool.outputType);
+  const feature = tool.features[locale][0];
+
+  const resultLead = locale === 'he'
+    ? `${tool.shortTitle.he} מחזיר פלט ${output} שאפשר לבדוק, להעתיק או להוריד מיד אחרי ההמרה.`
+    : `${tool.shortTitle.en} returns ${output} output that is ready to review, copy or download as soon as the conversion finishes.`;
+
+  const workflowLead = locale === 'he'
+    ? 'הפלט מתאים במיוחד לשלב הבא בתהליך כמו הדבקה ל־CMS, בדיקת קוד, ייצוא לגיליון או שיתוף עם צוות.'
+    : 'The result is meant for the next step of the workflow, such as pasting into a CMS, checking code, exporting to a sheet or sharing with a team.';
+
+  const featureLead = feature
+    ? locale === 'he'
+      ? `אפשר להיעזר ב־${feature} כדי לוודא שהתוצאה הסופית באמת מוכנה לשימוש.`
+      : `Use ${feature.toLowerCase()} to verify that the final output is actually ready for use.`
+    : locale === 'he'
+      ? 'הפלט נשאר מקומי בדפדפן, כך שקל לבדוק אותו לפני שימוש נוסף.'
+      : 'The output stays local in the browser, so it is easy to inspect before using it elsewhere.';
+
+  return [resultLead, workflowLead, featureLead];
+}
+
+export function getToolDecisionChecks(tool: ConverterTool, locale: Locale) {
+  const input = formatContentType(tool.inputType);
+  const output = formatContentType(tool.outputType);
+
+  return locale === 'he'
+    ? [
+        `ודא שקלט ה־${input} מלא לפני שמסתמכים על תוצאת ה־${output}.`,
+        'כדאי לבדוק קודם דוגמה קטנה כאשר הפלט ישמש בהמשך בקוד, SEO, דיווח או עבודה תפעולית.',
+        'בצע העתקה או הורדה רק אחרי שהמבנה, המפרידים והתווים תואמים למה שאתה מצפה לקבל.'
+      ]
+    : [
+        `Confirm that the ${input} input is complete before relying on the ${output} result.`,
+        'Compare one small sample first when the converter output will be reused in production, SEO or reporting work.',
+        'Use copy or download only after the result matches the structure, separators and characters you expect.'
+      ];
+}
+
 export function getToolContentReadiness(tool: ConverterTool) {
   const useCases = getToolUseCases(tool, 'en');
   const faqCount = tool.faq.length + 2;

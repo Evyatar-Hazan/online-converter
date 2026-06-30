@@ -22,3 +22,13 @@ Events do not store raw converter input, raw output, or raw search text. They st
 ## Next production step
 
 Add `PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` to Cloudflare Pages production and preview environment variables once Cloudflare API/dashboard access is available.
+
+## Operational use
+
+- Treat `/analytics/` as an internal operations surface, not a public growth page.
+- Use the stabilization section before shipping more converters:
+  - tighten literal titles and descriptions
+  - reduce thin-feeling page sections through stronger template depth
+  - keep ad placements stable and non-disruptive
+- Wait for real Search Console impressions before running CTR experiments or analytics-driven prioritization work.
+- Use the weekly operations cadence in `/analytics/` together with the recurring Codex audit lane for ranking review, CTR watchlist review and production verification.
