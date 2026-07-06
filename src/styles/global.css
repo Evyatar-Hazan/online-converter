@@ -678,6 +678,46 @@ h3 {
   color: var(--danger);
 }
 
+.workspace-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-soft) 40%, var(--surface));
+  padding: 14px 18px;
+}
+
+.summary-card,
+.summary-metric {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 12px;
+}
+
+.summary-card span,
+.summary-metric span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.summary-card strong,
+.summary-metric strong {
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.summary-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .editor-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -707,17 +747,49 @@ h3 {
   padding: 10px 12px;
 }
 
-.panel-header > span {
+.panel-header-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.panel-header-main > span {
   font-weight: 850;
 }
 
-.panel-header small {
+.panel-header-main small {
   overflow: hidden;
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.panel-inline-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.panel-action-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.panel-action-button:disabled {
+  opacity: 0.45;
 }
 
 textarea {
@@ -761,6 +833,15 @@ textarea[aria-invalid='true'] {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 14px 18px;
+}
+
+.output-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  border-block-start: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-soft) 30%, var(--surface));
   padding: 14px 18px;
 }
 
@@ -1556,7 +1637,9 @@ summary {
   .converter-toolbar,
   .example-strip,
   .options-strip,
+  .workspace-summary,
   .converter-actions,
+  .output-summary-grid,
   .preview-panel,
   .converter-status,
   .status-region {
@@ -1585,6 +1668,11 @@ summary {
   .panel-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .panel-inline-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .metadata-strip {

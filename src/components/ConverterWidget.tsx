@@ -311,7 +311,19 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     clearInput: labels.clear,
     inputHelp: inputGuidance(tool, locale),
     outputHelp: locale === 'he' ? 'התוצאה מופיעה כאן אחרי המרה תקינה.' : 'The result appears here after a valid conversion.',
-    fixInput: locale === 'he' ? 'צריך לתקן את הקלט' : 'Input needs attention'
+    fixInput: locale === 'he' ? 'צריך לתקן את הקלט' : 'Input needs attention',
+    mode: locale === 'he' ? 'מצב עבודה' : 'Work mode',
+    autoMode: locale === 'he' ? 'המרה אוטומטית' : 'Auto convert on',
+    manualMode: locale === 'he' ? 'המרה ידנית' : 'Manual convert',
+    selectedExample: locale === 'he' ? 'דוגמה נבחרת' : 'Selected example',
+    noExample: locale === 'he' ? 'ללא דוגמה' : 'No example selected',
+    resultState: locale === 'he' ? 'מצב התוצאה' : 'Result state',
+    resultReady: locale === 'he' ? 'מוכן להעתקה או הורדה' : 'Ready to copy or download',
+    resultWaiting: locale === 'he' ? 'מחכה להמרה תקינה' : 'Waiting for a valid result',
+    convertFirst: locale === 'he' ? 'המר קודם ואז הפלט יהיה מוכן' : 'Convert first and the result will be ready here',
+    inputActions: locale === 'he' ? 'פעולות קלט' : 'Input actions',
+    outputActions: locale === 'he' ? 'פעולות פלט' : 'Output actions',
+    outputSummary: locale === 'he' ? 'סיכום פלט' : 'Output summary'
   };
   const [input, setInput] = useState(initialInput);
   const [output, setOutput] = useState('');
@@ -336,6 +348,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
 
   const status = error ? 'error' : output ? 'success' : 'idle';
   const statusLabel = error ? widgetText.fixInput : output ? widgetText.converted : widgetText.ready;
+  const selectedExampleLabel = selectedExampleIndex >= 0 ? tool.examples[selectedExampleIndex]?.label[locale] ?? widgetText.noExample : widgetText.noExample;
   const downloadExtension = outputExtensions[tool.outputType] ?? 'txt';
   const inputId = `${widgetId}-input`;
   const outputId = `${widgetId}-output`;
@@ -565,13 +578,45 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
         <span>{statusLabel}</span>
       </div>
 
+      <div className="workspace-summary" aria-label={widgetText.outputSummary}>
+        <article className="summary-card">
+          <span>{widgetText.mode}</span>
+          <strong>{autoConvert ? widgetText.autoMode : widgetText.manualMode}</strong>
+          <p>{autoConvert ? widgetText.manualHint : labels.convert}</p>
+        </article>
+        <article className="summary-card">
+          <span>{widgetText.selectedExample}</span>
+          <strong>{selectedExampleLabel}</strong>
+          <p>{tool.examples.length > 0 ? widgetText.sampleName : widgetText.noExample}</p>
+        </article>
+        <article className="summary-card">
+          <span>{widgetText.resultState}</span>
+          <strong>{output ? widgetText.resultReady : widgetText.resultWaiting}</strong>
+          <p>{output ? `${outputStats.characters} ${labels.characters} · ${outputStats.lines} ${labels.lines}` : widgetText.convertFirst}</p>
+        </article>
+      </div>
+
       <div className="editor-grid">
-        <label className="editor-panel" htmlFor={inputId}>
+        <div className="editor-panel">
           <span className="panel-header">
-            <span>{labels.input}</span>
-            <small>
-              {inputStats.characters} {labels.characters} · {inputStats.lines} {labels.lines}
-            </small>
+            <span className="panel-header-main">
+              <label htmlFor={inputId}>{labels.input}</label>
+              <small>
+                {inputStats.characters} {labels.characters} · {inputStats.lines} {labels.lines}
+              </small>
+            </span>
+            <span className="panel-inline-actions" role="toolbar" aria-label={widgetText.inputActions}>
+              {tool.examples.length > 0 && (
+                <button className="panel-action-button" type="button" onClick={loadSelectedExample}>
+                  <Play size={14} aria-hidden="true" />
+                  {widgetText.sampleName}
+                </button>
+              )}
+              <button className="panel-action-button" type="button" onClick={clearInput}>
+                <Eraser size={14} aria-hidden="true" />
+                {widgetText.clearInput}
+              </button>
+            </span>
           </span>
           <span className="sr-only" id={inputHelpId}>{widgetText.inputHelp}</span>
           <textarea
@@ -584,14 +629,26 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
             aria-describedby={inputHelpId}
             aria-errormessage={error ? errorId : undefined}
           />
-        </label>
+        </div>
 
-        <label className="editor-panel" htmlFor={outputId}>
+        <div className="editor-panel">
           <span className="panel-header">
-            <span>{labels.output}</span>
-            <small>
-              {outputStats.characters} {labels.characters} · {outputStats.lines} {labels.lines}
-            </small>
+            <span className="panel-header-main">
+              <label htmlFor={outputId}>{labels.output}</label>
+              <small>
+                {outputStats.characters} {labels.characters} · {outputStats.lines} {labels.lines}
+              </small>
+            </span>
+            <span className="panel-inline-actions" role="toolbar" aria-label={widgetText.outputActions}>
+              <button className="panel-action-button" type="button" onClick={copyOutput} disabled={!output}>
+                <Clipboard size={14} aria-hidden="true" />
+                {copied ? labels.copied : labels.copy}
+              </button>
+              <button className="panel-action-button" type="button" onClick={downloadOutput} disabled={!output}>
+                <Download size={14} aria-hidden="true" />
+                {labels.download}
+              </button>
+            </span>
           </span>
           <span className="sr-only" id={outputHelpId}>{widgetText.outputHelp}</span>
           <textarea id={outputId} value={output} readOnly spellCheck={false} dir="ltr" aria-describedby={outputHelpId} />
@@ -601,35 +658,29 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
               <span>{widgetText.emptyOutput}</span>
             </div>
           )}
-        </label>
+        </div>
       </div>
+
+      {Object.keys(metadata).length > 0 && (
+        <div className="output-summary-grid" aria-label={locale === 'he' ? 'פרטי פלט' : 'Output details'}>
+          {Object.entries(metadata).map(([key, value]) => (
+            <article className="summary-metric" key={key}>
+              <span>{key}</span>
+              <strong>{value}</strong>
+            </article>
+          ))}
+        </div>
+      )}
 
       <div className="converter-actions">
         <button className="primary-action" type="button" onClick={() => runConversion('manual')}>
           <Play size={18} aria-hidden="true" />
           {labels.convert}
         </button>
-        <button className="secondary-action" type="button" onClick={copyOutput} disabled={!output}>
-          <Clipboard size={18} aria-hidden="true" />
-          {copied ? labels.copied : labels.copy}
-        </button>
-        <button className="secondary-action" type="button" onClick={downloadOutput} disabled={!output}>
-          <Download size={18} aria-hidden="true" />
-          {labels.download}
-        </button>
         <button className="secondary-action" type="button" onClick={copyShareLink} disabled={!input.trim() && Object.keys(optionValues).length === 0}>
           <Link size={18} aria-hidden="true" />
           {shareCopied ? widgetText.shared : widgetText.share}
         </button>
-        {Object.keys(metadata).length > 0 && (
-          <div className="metadata-strip" aria-label="Metadata">
-            {Object.entries(metadata).map(([key, value]) => (
-              <span key={key}>
-                {key}: {value}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
       {preview && (
