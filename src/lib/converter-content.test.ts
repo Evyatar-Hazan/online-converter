@@ -10,8 +10,8 @@ describe('converter content quality helpers', () => {
 
       expect(english).toHaveLength(3);
       expect(hebrew).toHaveLength(3);
-      expect(english.every((item) => item.length > 20)).toBe(true);
-      expect(hebrew.every((item) => item.length > 10)).toBe(true);
+      expect(english.every((item: string) => item.length > 20)).toBe(true);
+      expect(hebrew.every((item: string) => item.length > 10)).toBe(true);
     }
   });
 
@@ -26,10 +26,10 @@ describe('converter content quality helpers', () => {
       expect(hebrewResultChecklist).toHaveLength(3);
       expect(englishDecisionChecks).toHaveLength(3);
       expect(hebrewDecisionChecks).toHaveLength(3);
-      expect(englishResultChecklist.every((item) => item.length > 20)).toBe(true);
-      expect(hebrewResultChecklist.every((item) => item.length > 12)).toBe(true);
-      expect(englishDecisionChecks.every((item) => item.length > 20)).toBe(true);
-      expect(hebrewDecisionChecks.every((item) => item.length > 12)).toBe(true);
+      expect(englishResultChecklist.every((item: string) => item.length > 20)).toBe(true);
+      expect(hebrewResultChecklist.every((item: string) => item.length > 12)).toBe(true);
+      expect(englishDecisionChecks.every((item: string) => item.length > 20)).toBe(true);
+      expect(hebrewDecisionChecks.every((item: string) => item.length > 12)).toBe(true);
     }
   });
 
@@ -45,6 +45,42 @@ describe('converter content quality helpers', () => {
       expect(readiness.exampleCount).toBeGreaterThanOrEqual(2);
       expect(readiness.faqCount).toBeGreaterThanOrEqual(4);
       expect(readiness.useCaseCount).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('uses intent-specific copy for priority converters instead of only generic phrasing', () => {
+    const checks = [
+      {
+        converterId: 'jsonToCsv',
+        locale: 'en' as const,
+        getter: getToolUseCases,
+        needle: 'spreadsheet-ready rows'
+      },
+      {
+        converterId: 'sortLines',
+        locale: 'he' as const,
+        getter: getToolUseCases,
+        needle: 'מילות מפתח'
+      },
+      {
+        converterId: 'canonicalTagChecker',
+        locale: 'en' as const,
+        getter: getToolDecisionChecks,
+        needle: 'source HTML'
+      },
+      {
+        converterId: 'metaDescriptionLengthChecker',
+        locale: 'he' as const,
+        getter: getToolResultChecklist,
+        needle: 'תוצאות חיפוש'
+      }
+    ];
+
+    for (const check of checks) {
+      const tool = converters.find((item) => item.converterId === check.converterId);
+
+      expect(tool, `${check.converterId} should exist`).toBeTruthy();
+      expect(check.getter(tool!, check.locale).join(' ')).toContain(check.needle);
     }
   });
 });

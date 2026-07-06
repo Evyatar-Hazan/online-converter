@@ -268,7 +268,7 @@ const linkingCopy = {
       <p class="eyebrow">{locale === 'he' ? 'מקרי שימוש' : 'Use cases'}</p>
       <h2>{locale === 'he' ? `איפה ${tool.shortTitle[locale]} עוזר באמת` : `Where ${tool.shortTitle[locale]} helps most`}</h2>
       <ul class="check-list">
-        {useCases.map((item) => <li>{item}</li>)}
+        {useCases.map((item: string) => <li>{item}</li>)}
       </ul>
     </article>
     <article class="content-panel">
@@ -290,14 +290,14 @@ const linkingCopy = {
       <p class="eyebrow">{locale === 'he' ? 'מה מקבלים בפלט' : 'What you get from the output'}</p>
       <h2>{locale === 'he' ? 'איך להשתמש בתוצאה מיד אחרי ההמרה' : 'How to use the result right after conversion'}</h2>
       <ul class="check-list">
-        {resultChecklist.map((item) => <li>{item}</li>)}
+        {resultChecklist.map((item: string) => <li>{item}</li>)}
       </ul>
     </article>
     <article class="content-panel">
       <p class="eyebrow">{locale === 'he' ? 'לפני שמסתמכים על התוצאה' : 'Before relying on the result'}</p>
       <h2>{locale === 'he' ? 'בדיקות קצרות ששווה לעשות' : 'Quick checks worth doing first'}</h2>
       <ul class="check-list">
-        {decisionChecks.map((item) => <li>{item}</li>)}
+        {decisionChecks.map((item: string) => <li>{item}</li>)}
       </ul>
     </article>
   </section>
