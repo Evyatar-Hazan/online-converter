@@ -489,6 +489,62 @@ export function getToolDecisionChecks(tool: ConverterTool, locale: Locale) {
       ];
 }
 
+export function getToolPageSignals(tool: ConverterTool, locale: Locale) {
+  const exampleCount = tool.examples.length;
+  const optionCount = tool.options?.length ?? 0;
+
+  return [
+    {
+      label: locale === 'he' ? 'מתאים במיוחד ל' : 'Best for',
+      value:
+        locale === 'he'
+          ? `${tool.shortTitle.he} מתאים במיוחד לעבודה מהירה ב${tool.category === 'developer' ? 'פיתוח' : tool.category === 'text' ? 'טקסט' : tool.category === 'data' ? 'נתונים' : tool.category === 'encoding' ? 'קידוד ופענוח' : tool.category === 'time' ? 'תאריכים וזמן' : tool.category === 'color' ? 'צבעים' : 'חישובים'}.`
+          : `${tool.shortTitle.en} is strongest for fast ${tool.category === 'developer' ? 'developer' : tool.category === 'text' ? 'text' : tool.category === 'data' ? 'data' : tool.category === 'encoding' ? 'encoding' : tool.category === 'time' ? 'date and time' : tool.category === 'color' ? 'color' : 'calculator'} work in the browser.`
+    },
+    {
+      label: locale === 'he' ? 'מה יש כאן בפועל' : 'What is built in',
+      value:
+        locale === 'he'
+          ? `${exampleCount} דוגמאות התחלה${optionCount ? `, ${optionCount} אפשרויות המרה` : ''}${tool.reverseSlug ? ', וקישור לכיוון ההפוך' : ''}.`
+          : `${exampleCount} starter examples${optionCount ? `, ${optionCount} conversion options` : ''}${tool.reverseSlug ? ', and a reverse tool path' : ''}.`
+    },
+    {
+      label: locale === 'he' ? 'למה אפשר לסמוך על הדף' : 'Why this page is useful',
+      value:
+        locale === 'he'
+          ? 'העמוד משלב כלי עבודה, דוגמאות, בדיקות לפני שימוש וקישורים לכלים הבאים באותו תהליך.'
+          : 'The page combines the working tool, starter examples, pre-use checks, and links to the next tools in the same workflow.'
+    }
+  ];
+}
+
+export function getToolJumpLinks(tool: ConverterTool, locale: Locale) {
+  return [
+    { id: 'converter', label: locale === 'he' ? 'המרה' : 'Converter' },
+    { id: 'use-cases', label: locale === 'he' ? 'שימושים' : 'Use cases' },
+    { id: 'quality-checks', label: locale === 'he' ? 'בדיקות' : 'Checks' },
+    ...(tool.examples.length > 0 ? [{ id: 'examples', label: locale === 'he' ? 'דוגמאות' : 'Examples' }] : []),
+    { id: 'faq', label: 'FAQ' },
+    { id: 'related-tools', label: locale === 'he' ? 'כלים קשורים' : 'Related tools' }
+  ];
+}
+
+export function getToolWorkflowSummary(tool: ConverterTool, locale: Locale) {
+  const optionCount = tool.options?.length ?? 0;
+  const sampleCount = tool.examples.length;
+  const reverseText = tool.reverseSlug
+    ? locale === 'he'
+      ? 'אפשר גם לחזור בקלות לכיוון ההפוך אם צריך.'
+      : 'You can also step back into the reverse direction when needed.'
+    : locale === 'he'
+      ? 'העמוד מתמקד בכיוון העבודה המרכזי של הכלי.'
+      : 'The page stays focused on the main working direction of the tool.';
+
+  return locale === 'he'
+    ? `${tool.shortTitle.he} כולל ${sampleCount} דוגמאות התחלה${optionCount ? ` ו-${optionCount} אפשרויות התאמה` : ''}, כך שאפשר להבין מהר את מבנה הקלט לפני שמתחילים לעבוד באמת. ${reverseText}`
+    : `${tool.shortTitle.en} includes ${sampleCount} starter examples${optionCount ? ` and ${optionCount} adjustment options` : ''}, so it is easier to understand the expected input before doing real work. ${reverseText}`;
+}
+
 export function getToolContentReadiness(tool: ConverterTool) {
   const useCases = getToolUseCases(tool, 'en');
   const faqCount = tool.faq.length + 2;

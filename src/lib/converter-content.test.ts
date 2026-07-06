@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from '../data/converters';
-import { getToolContentReadiness, getToolDecisionChecks, getToolResultChecklist, getToolUseCases, isLaunchReadyFreshTool } from './converter-content';
+import {
+  getToolContentReadiness,
+  getToolDecisionChecks,
+  getToolJumpLinks,
+  getToolPageSignals,
+  getToolResultChecklist,
+  getToolUseCases,
+  getToolWorkflowSummary,
+  isLaunchReadyFreshTool
+} from './converter-content';
 
 describe('converter content quality helpers', () => {
   it('builds three use cases for every converter in both locales', () => {
@@ -81,6 +90,20 @@ describe('converter content quality helpers', () => {
 
       expect(tool, `${check.converterId} should exist`).toBeTruthy();
       expect(check.getter(tool!, check.locale).join(' ')).toContain(check.needle);
+    }
+  });
+
+  it('builds useful page signals and jump links for every converter', () => {
+    for (const tool of converters) {
+      const signals = getToolPageSignals(tool, 'en');
+      const jumpLinks = getToolJumpLinks(tool, 'he');
+      const workflow = getToolWorkflowSummary(tool, 'en');
+
+      expect(signals).toHaveLength(3);
+      expect(signals.every((item) => item.label.length > 2 && item.value.length > 12)).toBe(true);
+      expect(jumpLinks.some((item) => item.id === 'converter')).toBe(true);
+      expect(jumpLinks.some((item) => item.id === 'related-tools')).toBe(true);
+      expect(workflow.length).toBeGreaterThan(40);
     }
   });
 });

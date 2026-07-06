@@ -678,6 +678,57 @@ h3 {
   color: var(--danger);
 }
 
+.tool-jump-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.tool-jump-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 62%, var(--surface));
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.tool-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 14px 0 0;
+}
+
+.tool-signal-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-soft) 68%, var(--surface));
+  padding: 18px;
+}
+
+.tool-signal-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.tool-signal-card strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .workspace-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1555,6 +1606,7 @@ summary {
   .analytics-hero,
   .analytics-grid,
   .section-heading,
+  .tool-signal-grid,
   .content-grid,
   .examples-grid,
   .strategy-band,
@@ -1687,6 +1739,16 @@ summary {
 
   .tool-card {
     min-height: auto;
+  }
+
+  .tool-jump-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+
+  .tool-jump-nav a {
+    flex: 0 0 auto;
   }
 
   .feature-list li {

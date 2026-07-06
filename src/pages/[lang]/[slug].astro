@@ -6,7 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { categoryLabels, locales, ui } from '../../data/site';
 import { getPriorityCategoryTools } from '../../lib/category-tools';
-import { getToolDecisionChecks, getToolResultChecklist, getToolUseCases } from '../../lib/converter-content';
+import { getToolDecisionChecks, getToolJumpLinks, getToolPageSignals, getToolResultChecklist, getToolUseCases, getToolWorkflowSummary } from '../../lib/converter-content';
 import { getCategoryRelatedConverters, getInverseConverter, getRelatedConverters, getWorkflowRelatedConverters } from '../../lib/related-tools';
 import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
@@ -177,6 +177,9 @@ const contextualFaq = [...generatedFaq(tool), ...tool.faq];
 const useCases = getToolUseCases(tool, locale);
 const resultChecklist = getToolResultChecklist(tool, locale);
 const decisionChecks = getToolDecisionChecks(tool, locale);
+const pageSignals = getToolPageSignals(tool, locale);
+const jumpLinks = getToolJumpLinks(tool, locale);
+const workflowSummary = getToolWorkflowSummary(tool, locale);
 const tips = conversionTips(tool, locale);
 const issues = commonIssues(tool, locale);
 const title = getConverterPageTitle(tool, locale);
@@ -248,11 +251,28 @@ const linkingCopy = {
     <AdSlot locale={locale} placement="sidebar" />
   </section>
 
+  <nav class="tool-jump-nav" aria-label={locale === 'he' ? 'ניווט מהיר בעמוד' : 'Quick page navigation'}>
+    {jumpLinks.map((item) => (
+      <a href={`#${item.id}`}>{item.label}</a>
+    ))}
+  </nav>
+
+  <section class="tool-signal-grid">
+    {pageSignals.map((item) => (
+      <article class="tool-signal-card">
+        <p>{item.label}</p>
+        <strong>{item.value}</strong>
+      </article>
+    ))}
+  </section>
+
   <AdSlot locale={locale} placement="top" />
 
-  <ConverterWidget client:load tool={tool} locale={locale} />
+  <section id="converter">
+    <ConverterWidget client:load tool={tool} locale={locale} />
+  </section>
 
-  <section class="content-grid">
+  <section class="content-grid" id="use-cases">
     <article class="content-panel content-panel-wide">
       <p class="eyebrow">{locale === 'he' ? 'שימוש מעשי' : 'Practical use'}</p>
       <h2>{locale === 'he' ? `מתי להשתמש ב־${tool.shortTitle[locale]}` : `When to use ${tool.shortTitle[locale]}`}</h2>
@@ -274,18 +294,14 @@ const linkingCopy = {
     <article class="content-panel">
       <p class="eyebrow">{locale === 'he' ? 'זרימת עבודה' : 'Workflow fit'}</p>
       <h2>{locale === 'he' ? 'איך לשלב את הכלי בתהליך' : 'How to fit the tool into a real workflow'}</h2>
-      <p>
-        {locale === 'he'
-          ? `${tool.shortTitle[locale]} מתאים במיוחד כשצריך תוצאה מהירה לפני העתקה, הורדה, שיתוף או מעבר לכלי הבא בשרשרת.`
-          : `${tool.shortTitle[locale]} works best when you need a fast result before copying, downloading, sharing or moving into the next tool in the chain.`}
-      </p>
+      <p>{workflowSummary}</p>
       <ul class="check-list">
         {tool.guide[locale].slice(0, 3).map((step) => <li>{step}</li>)}
       </ul>
     </article>
   </section>
 
-  <section class="content-grid">
+  <section class="content-grid" id="quality-checks">
     <article class="content-panel">
       <p class="eyebrow">{locale === 'he' ? 'מה מקבלים בפלט' : 'What you get from the output'}</p>
       <h2>{locale === 'he' ? 'איך להשתמש בתוצאה מיד אחרי ההמרה' : 'How to use the result right after conversion'}</h2>
@@ -303,7 +319,7 @@ const linkingCopy = {
   </section>
 
   {tool.examples.length > 0 && (
-    <section class="content-panel examples-panel">
+    <section class="content-panel examples-panel" id="examples">
       <div class="examples-header">
         <div>
           <p class="eyebrow">{locale === 'he' ? 'דוגמאות התחלה' : 'Starter examples'}</p>
@@ -323,7 +339,7 @@ const linkingCopy = {
     </section>
   )}
 
-  <section class="content-grid">
+  <section class="content-grid" id="faq">
     <article class="content-panel">
       <p class="eyebrow">{labels.guideTitle}</p>
       <h2>{labels.guideTitle}</h2>
@@ -409,7 +425,7 @@ const linkingCopy = {
 
   <AdSlot locale={locale} placement="inline" />
 
-  <section class="section-shell">
+  <section class="section-shell" id="related-tools">
     <div class="section-heading">
       <p class="eyebrow">{labels.relatedTitle}</p>
       <h2>{labels.relatedTitle}</h2>
