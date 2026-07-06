@@ -82,6 +82,14 @@ npm audit --omit=dev
 npm run smoke:prod
 ```
 
+## מסמכי ניהול והפעלה
+
+- מסמך מעקב ראשי: `docs/project-tracker-he.md`
+- מסמך משימות: `docs/project-tasks-he.md`
+- תצורת AdSense: `docs/adsense-setup.md`
+- לוח analytics פנימי: `docs/analytics-dashboard.md`
+- רעיונות עתידיים לממירים: `docs/next-converters.md`
+
 ## הוספת ממיר חדש
 
 1. מוסיפים את פונקציית ההמרה ב־`src/lib/converter-functions.ts`.
