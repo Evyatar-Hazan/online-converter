@@ -323,7 +323,24 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     convertFirst: locale === 'he' ? 'המר קודם ואז הפלט יהיה מוכן' : 'Convert first and the result will be ready here',
     inputActions: locale === 'he' ? 'סרגל פעולות לשדה המקור' : 'Source field actions toolbar',
     outputActions: locale === 'he' ? 'סרגל פעולות לשדה התוצאה' : 'Output field actions toolbar',
-    outputSummary: locale === 'he' ? 'סיכום פלט' : 'Output summary'
+    outputSummary: locale === 'he' ? 'סיכום פלט' : 'Output summary',
+    inputState: locale === 'he' ? 'מצב קלט' : 'Input state',
+    outputState: locale === 'he' ? 'מצב פלט' : 'Output state',
+    nextAction: locale === 'he' ? 'הפעולה הבאה' : 'Next action',
+    inputEmpty: locale === 'he' ? 'מחכה לקלט' : 'Waiting for input',
+    inputReady: locale === 'he' ? 'קלט מוכן' : 'Input ready',
+    paste: locale === 'he' ? 'הדבק מהלוח' : 'Paste from clipboard',
+    pasted: locale === 'he' ? 'הודבק' : 'Pasted',
+    useOutputAsInput: locale === 'he' ? 'העבר פלט לקלט' : 'Use output as input',
+    useInputCopy: locale === 'he' ? 'העתק קלט' : 'Copy input',
+    inputCopied: locale === 'he' ? 'קלט הועתק' : 'Input copied',
+    runNow: locale === 'he' ? 'הרץ עכשיו' : 'Run now',
+    loadSampleFirst: locale === 'he' ? 'טען דוגמה או הדבק קלט' : 'Load a sample or paste input',
+    outputNextStep: locale === 'he' ? 'העתק, הורד או המשך לכלי הבא' : 'Copy, download, or keep refining',
+    manualNextStep: locale === 'he' ? 'המר ידנית כשאתה רוצה לשלוט על התוצאה' : 'Run a manual conversion when you want a fresh result',
+    autoNextStep: locale === 'he' ? 'הפלט יתעדכן אוטומטית אחרי כל שינוי' : 'Output updates automatically after each change',
+    pasteFailed: locale === 'he' ? 'לא הצלחנו לקרוא מהלוח. אפשר להדביק ידנית.' : 'Could not read the clipboard. You can still paste manually.',
+    shareSetup: locale === 'he' ? 'שתף הגדרה' : 'Share setup'
   };
   const [input, setInput] = useState(initialInput);
   const [output, setOutput] = useState('');
@@ -335,6 +352,8 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
   const [autoConvert, setAutoConvert] = useState(true);
   const [copied, setCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [inputCopied, setInputCopied] = useState(false);
+  const [pasted, setPasted] = useState(false);
 
   const inputStats = useMemo(() => {
     const lines = input ? input.split(/\r\n|\r|\n/).length : 0;
@@ -348,7 +367,6 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
 
   const status = error ? 'error' : output ? 'success' : 'idle';
   const statusLabel = error ? widgetText.fixInput : output ? widgetText.converted : widgetText.ready;
-  const selectedExampleLabel = selectedExampleIndex >= 0 ? tool.examples[selectedExampleIndex]?.label[locale] ?? widgetText.noExample : widgetText.noExample;
   const downloadExtension = outputExtensions[tool.outputType] ?? 'txt';
   const inputId = `${widgetId}-input`;
   const outputId = `${widgetId}-output`;
@@ -418,6 +436,29 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     window.setTimeout(() => setCopied(false), 1200);
   };
 
+  const copyInput = async () => {
+    if (!input) return;
+    await navigator.clipboard.writeText(input);
+    trackEvent('copy_input', { inputCharacters: input.length });
+    setInputCopied(true);
+    window.setTimeout(() => setInputCopied(false), 1200);
+  };
+
+  const pasteInput = async () => {
+    try {
+      const pastedText = await navigator.clipboard.readText();
+      if (!pastedText) return;
+      setInput(pastedText);
+      setSelectedExampleIndex(-1);
+      trackEvent('paste_input', { inputCharacters: pastedText.length });
+      setPasted(true);
+      window.setTimeout(() => setPasted(false), 1200);
+    } catch {
+      setError(widgetText.pasteFailed);
+      trackEvent('paste_input_error');
+    }
+  };
+
   const copyShareLink = async () => {
     const url = new URL(window.location.href);
     url.search = '';
@@ -475,6 +516,14 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     setMetadata({});
     setPreview(null);
     trackEvent('clear_input', { hadInput: Boolean(input.trim()), hadOutput: Boolean(output.trim()) });
+  };
+
+  const useOutputAsInput = () => {
+    if (!output) return;
+    setInput(output);
+    setSelectedExampleIndex(-1);
+    setCopied(false);
+    trackEvent('reuse_output_as_input', { outputCharacters: output.length });
   };
 
   const toggleAutoConvert = () => {
@@ -580,19 +629,51 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
 
       <div className="workspace-summary" aria-label={widgetText.outputSummary}>
         <article className="summary-card">
-          <span>{widgetText.mode}</span>
+          <span>{widgetText.inputState}</span>
+          <strong>{input.trim() ? widgetText.inputReady : widgetText.inputEmpty}</strong>
+          <p>{input.trim() ? `${inputStats.characters} ${labels.characters} · ${inputStats.lines} ${labels.lines}` : widgetText.loadSampleFirst}</p>
+          <div className="summary-actions">
+            <button className="summary-action-button" type="button" onClick={pasteInput}>
+              <Clipboard size={14} aria-hidden="true" />
+              {pasted ? widgetText.pasted : widgetText.paste}
+            </button>
+            {tool.examples.length > 0 && (
+              <button className="summary-action-button" type="button" onClick={loadSelectedExample}>
+                <Play size={14} aria-hidden="true" />
+                {widgetText.sampleName}
+              </button>
+            )}
+          </div>
+        </article>
+        <article className="summary-card">
+          <span>{widgetText.nextAction}</span>
           <strong>{autoConvert ? widgetText.autoMode : widgetText.manualMode}</strong>
-          <p>{autoConvert ? widgetText.manualHint : labels.convert}</p>
+          <p>{autoConvert ? widgetText.autoNextStep : widgetText.manualNextStep}</p>
+          <div className="summary-actions">
+            <button className="summary-action-button" type="button" onClick={() => runConversion('manual')} disabled={!input.trim()}>
+              <Play size={14} aria-hidden="true" />
+              {widgetText.runNow}
+            </button>
+            <button className="summary-action-button" type="button" onClick={copyShareLink} disabled={!input.trim() && Object.keys(optionValues).length === 0}>
+              <Link size={14} aria-hidden="true" />
+              {shareCopied ? widgetText.shared : widgetText.shareSetup}
+            </button>
+          </div>
         </article>
         <article className="summary-card">
-          <span>{widgetText.selectedExample}</span>
-          <strong>{selectedExampleLabel}</strong>
-          <p>{tool.examples.length > 0 ? widgetText.sampleName : widgetText.noExample}</p>
-        </article>
-        <article className="summary-card">
-          <span>{widgetText.resultState}</span>
+          <span>{widgetText.outputState}</span>
           <strong>{output ? widgetText.resultReady : widgetText.resultWaiting}</strong>
-          <p>{output ? `${outputStats.characters} ${labels.characters} · ${outputStats.lines} ${labels.lines}` : widgetText.convertFirst}</p>
+          <p>{output ? widgetText.outputNextStep : widgetText.convertFirst}</p>
+          <div className="summary-actions">
+            <button className="summary-action-button" type="button" onClick={copyOutput} disabled={!output}>
+              <Clipboard size={14} aria-hidden="true" />
+              {copied ? labels.copied : labels.copy}
+            </button>
+            <button className="summary-action-button" type="button" onClick={useOutputAsInput} disabled={!output}>
+              <ArrowLeftRight size={14} aria-hidden="true" />
+              {widgetText.useOutputAsInput}
+            </button>
+          </div>
         </article>
       </div>
 
@@ -606,12 +687,20 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
               </small>
             </span>
             <span className="panel-inline-actions" role="toolbar" aria-label={widgetText.inputActions}>
+              <button className="panel-action-button" type="button" onClick={copyInput} disabled={!input}>
+                <Clipboard size={14} aria-hidden="true" />
+                {inputCopied ? widgetText.inputCopied : widgetText.useInputCopy}
+              </button>
               {tool.examples.length > 0 && (
                 <button className="panel-action-button" type="button" onClick={loadSelectedExample}>
                   <Play size={14} aria-hidden="true" />
                   {widgetText.sampleName}
                 </button>
               )}
+              <button className="panel-action-button" type="button" onClick={pasteInput}>
+                <Clipboard size={14} aria-hidden="true" />
+                {pasted ? widgetText.pasted : widgetText.paste}
+              </button>
               <button className="panel-action-button" type="button" onClick={clearInput}>
                 <Eraser size={14} aria-hidden="true" />
                 {widgetText.clearInput}
@@ -643,6 +732,10 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
               <button className="panel-action-button" type="button" onClick={copyOutput} disabled={!output}>
                 <Clipboard size={14} aria-hidden="true" />
                 {copied ? labels.copied : labels.copy}
+              </button>
+              <button className="panel-action-button" type="button" onClick={useOutputAsInput} disabled={!output}>
+                <ArrowLeftRight size={14} aria-hidden="true" />
+                {widgetText.useOutputAsInput}
               </button>
               <button className="panel-action-button" type="button" onClick={downloadOutput} disabled={!output}>
                 <Download size={14} aria-hidden="true" />

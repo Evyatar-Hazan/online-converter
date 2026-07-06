@@ -769,6 +769,32 @@ h3 {
   font-size: 0.82rem;
 }
 
+.summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.summary-action-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 62%, var(--surface));
+  color: var(--ink);
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.summary-action-button:disabled {
+  opacity: 0.45;
+}
+
 .editor-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -804,7 +830,7 @@ h3 {
   min-width: 0;
 }
 
-.panel-header-main > span {
+.panel-header-main > :first-child {
   font-weight: 850;
 }
 
@@ -1719,6 +1745,15 @@ summary {
 
   .option-select select {
     max-width: 100%;
+  }
+
+  .summary-actions {
+    align-items: stretch;
+  }
+
+  .summary-action-button {
+    flex: 1 1 140px;
+    justify-content: center;
   }
 
   .examples-header {

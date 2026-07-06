@@ -75,6 +75,16 @@ test('converter page can load input and options from a share link', async ({ pag
   await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue('cherry\nbanana\nApple');
 });
 
+test('converter page can reuse the output as new input', async ({ page }) => {
+  await page.goto('/en/json-formatter/');
+  await page.getByRole('textbox', { name: 'Input' }).fill('{"name":"Avi","city":"Jerusalem"}');
+  await page.getByRole('button', { name: 'Convert' }).click();
+  const output = page.getByRole('textbox', { name: /Output/ });
+  await expect(output).toHaveValue(/"name": "Avi"/);
+  await page.getByRole('button', { name: 'Use output as input' }).first().click();
+  await expect(page.getByRole('textbox', { name: 'Input' })).toHaveValue(await output.inputValue());
+});
+
 test('converter page applies new format options', async ({ page }) => {
   await page.goto('/en/rgb-to-hex/');
   await page.getByRole('textbox', { name: 'Input' }).fill('rgb(79, 70, 229)');
