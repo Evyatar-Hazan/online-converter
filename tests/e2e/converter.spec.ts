@@ -8,7 +8,7 @@ test('English tool page converts JSON to CSV', async ({ page }) => {
   await page.goto('/en/json-to-csv/');
   await expect(page).toHaveTitle(/JSON to CSV Converter/);
   await expect(page.locator('h1')).toContainText('JSON to CSV');
-  await page.getByLabel('Input').fill('[{"name":"Avi","city":"Jerusalem"}]');
+  await page.getByRole('textbox', { name: 'Input' }).fill('[{"name":"Avi","city":"Jerusalem"}]');
   await page.getByRole('button', { name: 'Convert' }).click();
   await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue(/name,city/);
 });
@@ -47,7 +47,7 @@ test('all English category pages expose tool cards and SEO content', async ({ pa
 
 test('converter page exposes useful options', async ({ page }) => {
   await page.goto('/en/sort-lines/');
-  await page.getByLabel('Input').fill('banana\nApple\ncherry');
+  await page.getByRole('textbox', { name: 'Input' }).fill('banana\nApple\ncherry');
   await page.getByLabel('Sort order').selectOption('desc');
   await page.getByLabel('Case sensitive').uncheck();
   await page.getByRole('button', { name: 'Convert' }).click();
@@ -56,7 +56,7 @@ test('converter page exposes useful options', async ({ page }) => {
 
 test('converter page shows a quick preview', async ({ page }) => {
   await page.goto('/en/rgb-to-hex/');
-  await page.getByLabel('Input').fill('rgb(79, 70, 229)');
+  await page.getByRole('textbox', { name: 'Input' }).fill('rgb(79, 70, 229)');
   await page.getByRole('button', { name: 'Convert' }).click();
   await expect(page.getByLabel('Quick preview')).toContainText('#4f46e5');
 });
@@ -64,7 +64,7 @@ test('converter page shows a quick preview', async ({ page }) => {
 test('converter page can load input and options from a share link', async ({ page }) => {
   const options = encodeURIComponent(JSON.stringify({ direction: 'desc', caseSensitive: false }));
   await page.goto(`/en/sort-lines/?input=banana%0AApple%0Acherry&options=${options}`);
-  await expect(page.getByLabel('Input')).toHaveValue('banana\nApple\ncherry');
+  await expect(page.getByRole('textbox', { name: 'Input' })).toHaveValue('banana\nApple\ncherry');
   await expect(page.getByLabel('Sort order')).toHaveValue('desc');
   await expect(page.getByLabel('Case sensitive')).not.toBeChecked();
   await page.getByRole('button', { name: 'Convert' }).click();
@@ -73,7 +73,7 @@ test('converter page can load input and options from a share link', async ({ pag
 
 test('converter page applies new format options', async ({ page }) => {
   await page.goto('/en/rgb-to-hex/');
-  await page.getByLabel('Input').fill('rgb(79, 70, 229)');
+  await page.getByRole('textbox', { name: 'Input' }).fill('rgb(79, 70, 229)');
   await page.getByLabel('HEX case').selectOption('upper');
   await page.getByLabel('Include #').uncheck();
   await page.getByRole('button', { name: 'Convert' }).click();
@@ -91,7 +91,7 @@ test('representative converters work across major categories', async ({ page }) 
 
   for (const item of cases) {
     await page.goto(item.path);
-    await page.getByLabel('Input').fill(item.input);
+    await page.getByRole('textbox', { name: 'Input' }).fill(item.input);
     await page.getByRole('button', { name: 'Convert' }).click();
     await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue(new RegExp(item.output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
@@ -99,7 +99,7 @@ test('representative converters work across major categories', async ({ page }) 
 
 test('invalid input exposes an accessible error state', async ({ page }) => {
   await page.goto('/en/json-to-csv/');
-  const input = page.getByLabel('Input');
+  const input = page.getByRole('textbox', { name: 'Input' });
   await input.fill('{bad json');
   await page.getByRole('button', { name: 'Convert' }).click();
 
@@ -119,7 +119,7 @@ test('primary converter flow has no browser console errors', async ({ page }) =>
   page.on('pageerror', (error) => errors.push(error.message));
 
   await page.goto('/en/json-to-csv/');
-  await page.getByLabel('Input').fill('[{"name":"Avi","city":"Jerusalem"}]');
+  await page.getByRole('textbox', { name: 'Input' }).fill('[{"name":"Avi","city":"Jerusalem"}]');
   await page.getByRole('button', { name: 'Convert' }).click();
   await expect(page.getByRole('textbox', { name: /Output/ })).toHaveValue(/name,city/);
   expect(errors).toEqual([]);
@@ -131,7 +131,7 @@ test('tool pages emit privacy-safe analytics events', async ({ page }) => {
     .poll(() => page.evaluate(() => (window as Window & { dataLayer?: Array<Record<string, unknown>> }).dataLayer?.some((event) => event.event === 'view_tool')))
     .toBe(true);
 
-  await page.getByLabel('Input').fill('[{"name":"Avi","city":"Jerusalem"}]');
+  await page.getByRole('textbox', { name: 'Input' }).fill('[{"name":"Avi","city":"Jerusalem"}]');
   await page.getByRole('button', { name: 'Convert' }).click();
   await expect
     .poll(() =>
@@ -186,6 +186,27 @@ test('analytics dashboard is internal and summarizes tracking readiness', async 
 test('mobile layout keeps the converter usable', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'mobile project only');
   await page.goto('/en/base64-encode/');
-  await expect(page.getByLabel('Input')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Input' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: /Output/ })).toBeVisible();
+  await expect(page.locator('.tool-jump-nav')).toBeVisible();
+  await expect(page.locator('.tool-jump-nav a').first()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Convert' })).toBeVisible();
+});
+
+test('mobile sort-lines keeps options and actions readable', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'mobile project only');
+  await page.goto('/en/sort-lines/');
+  await expect(page.getByLabel('Sort order')).toBeVisible();
+  await expect(page.getByLabel('Case sensitive')).toBeVisible();
+  await expect(page.getByLabel('Source field actions toolbar').getByRole('button', { name: 'Load sample' })).toBeVisible();
+  await expect(page.getByLabel('Source field actions toolbar').getByRole('button', { name: 'Clear' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Copy share link' })).toBeVisible();
+});
+
+test('Hebrew tool pages keep RTL chrome while textareas stay content-aware', async ({ page }) => {
+  await page.goto('/he/sort-lines/');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('.tool-jump-nav')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'קלט' })).toHaveAttribute('dir', 'auto');
+  await expect(page.getByRole('textbox', { name: /פלט/ })).toHaveAttribute('dir', 'auto');
 });

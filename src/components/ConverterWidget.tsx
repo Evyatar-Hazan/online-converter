@@ -321,8 +321,8 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
     resultReady: locale === 'he' ? 'מוכן להעתקה או הורדה' : 'Ready to copy or download',
     resultWaiting: locale === 'he' ? 'מחכה להמרה תקינה' : 'Waiting for a valid result',
     convertFirst: locale === 'he' ? 'המר קודם ואז הפלט יהיה מוכן' : 'Convert first and the result will be ready here',
-    inputActions: locale === 'he' ? 'פעולות קלט' : 'Input actions',
-    outputActions: locale === 'he' ? 'פעולות פלט' : 'Output actions',
+    inputActions: locale === 'he' ? 'סרגל פעולות לשדה המקור' : 'Source field actions toolbar',
+    outputActions: locale === 'he' ? 'סרגל פעולות לשדה התוצאה' : 'Output field actions toolbar',
     outputSummary: locale === 'he' ? 'סיכום פלט' : 'Output summary'
   };
   const [input, setInput] = useState(initialInput);
@@ -624,7 +624,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             spellCheck={false}
-            dir="ltr"
+            dir="auto"
             aria-invalid={Boolean(error)}
             aria-describedby={inputHelpId}
             aria-errormessage={error ? errorId : undefined}
@@ -651,7 +651,7 @@ export function ConverterWidget({ tool, locale }: ConverterWidgetProps) {
             </span>
           </span>
           <span className="sr-only" id={outputHelpId}>{widgetText.outputHelp}</span>
-          <textarea id={outputId} value={output} readOnly spellCheck={false} dir="ltr" aria-describedby={outputHelpId} />
+          <textarea id={outputId} value={output} readOnly spellCheck={false} dir="auto" aria-describedby={outputHelpId} />
           {!output && (
             <div className="empty-output">
               <FileText size={22} />

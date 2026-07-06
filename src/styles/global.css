@@ -1704,6 +1704,23 @@ summary {
     flex-direction: column;
   }
 
+  .example-actions,
+  .option-actions {
+    width: 100%;
+  }
+
+  .option-select,
+  .option-toggle {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 14px;
+    padding: 8px 12px;
+  }
+
+  .option-select select {
+    max-width: 100%;
+  }
+
   .examples-header {
     flex-direction: column;
   }
@@ -1727,6 +1744,11 @@ summary {
     justify-content: flex-start;
   }
 
+  .panel-action-button {
+    flex: 1 1 140px;
+    justify-content: center;
+  }
+
   .metadata-strip {
     width: 100%;
     margin-inline-start: 0;
@@ -1745,10 +1767,13 @@ summary {
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 
   .tool-jump-nav a {
     flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .feature-list li {
