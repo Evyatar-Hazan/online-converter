@@ -4,7 +4,7 @@ import ToolCard from '../../../components/ToolCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { converters } from '../../../data/converters';
 import { categoryContent, categoryLabels, locales, siteName, siteUrl, ui } from '../../../data/site';
-import { getCategoryAudience, getCategorySelectionChecks } from '../../../lib/page-content';
+import { getCategoryAudience, getCategoryPageSignals, getCategorySelectionChecks, getCategoryWorkflowPaths } from '../../../lib/page-content';
 import { getCategoryToolBuckets } from '../../../lib/category-tools';
 import { getCategoryMetaDescription, getCategoryPageTitle } from '../../../lib/category-seo';
 import type { ConverterCategory, Locale } from '../../../types';
@@ -26,6 +26,8 @@ const popularTools = buckets.popular.slice(0, 4);
 const newTools = buckets.fresh.slice(0, 4);
 const audience = getCategoryAudience(category, locale);
 const selectionChecks = getCategorySelectionChecks(category, locale);
+const pageSignals = getCategoryPageSignals(category, locale);
+const workflowPaths = getCategoryWorkflowPaths(category, locale);
 const canonicalPath = `/${locale}/${category}/`;
 const title = `${getCategoryPageTitle(category, locale)} | ${siteName[locale]}`;
 const description = getCategoryMetaDescription(category, locale, tools.length);
@@ -69,6 +71,13 @@ const copy = {
   audienceTitle: locale === 'he' ? 'צוותים ומשימות שבדרך כלל מרוויחים כאן' : 'Teams and tasks that usually benefit here',
   checksEyebrow: locale === 'he' ? 'איך לבחור נכון' : 'How to choose the right tool',
   checksTitle: locale === 'he' ? 'שלוש בדיקות קצרות לפני שפותחים כלי' : 'Three quick checks before opening a tool',
+  workflowEyebrow: locale === 'he' ? 'זרימת עבודה מומלצת' : 'Suggested workflow',
+  workflowTitle: locale === 'he' ? 'איך בדרך כלל מתקדמים נכון בתוך הקטגוריה' : 'How people usually move through this category',
+  workflowDescription:
+    locale === 'he'
+      ? 'הקטגוריה הזאת עובדת הכי טוב כשמשתמשים בה כמו רצף קצר של החלטות, ולא כעמוד מעבר אקראי.'
+      : 'This category works best as a short decision path instead of a random list of tools.',
+  quickNavLabel: locale === 'he' ? 'ניווט מהיר בקטגוריה' : 'Quick category navigation',
   emptyPopular:
     locale === 'he'
       ? 'כרגע אין סימון פופולריים בקטגוריה הזו, אבל כל הכלים כאן זמינים לשימוש מלא.'
@@ -144,6 +153,23 @@ const jsonLd = [
     <AdSlot locale={locale} placement="sidebar" />
   </section>
 
+  <nav class="tool-jump-nav" aria-label={copy.quickNavLabel}>
+    <a href="#featured-tools">{copy.featuredTitle}</a>
+    <a href="#workflow">{copy.workflowTitle}</a>
+    <a href="#audience">{copy.audienceTitle}</a>
+    <a href="#faq">{labels.faqTitle}</a>
+    <a href="#all-tools">{labels.allTools}</a>
+  </nav>
+
+  <section class="tool-signal-grid">
+    {pageSignals.map((item) => (
+      <article class="tool-signal-card">
+        <p>{item.label}</p>
+        <strong>{item.value}</strong>
+      </article>
+    ))}
+  </section>
+
   <AdSlot locale={locale} placement="top" />
 
   <section class="content-grid">
@@ -154,7 +180,7 @@ const jsonLd = [
         {content.useCases.map((item) => <li>{item}</li>)}
       </ul>
     </article>
-    <article class="content-panel">
+    <article class="content-panel" id="featured-tools">
       <p class="eyebrow">{copy.featuredEyebrow}</p>
       <h2>{copy.featuredTitle}</h2>
       <p>{copy.featuredDescription}</p>
@@ -166,6 +192,24 @@ const jsonLd = [
               <p>{tool.description[locale]}</p>
             </div>
             <a href={`/${locale}/${tool.slug}/`}>{copy.browseLabel}</a>
+          </li>
+        ))}
+      </ol>
+    </article>
+  </section>
+
+  <section class="content-grid" id="workflow">
+    <article class="content-panel content-panel-wide">
+      <p class="eyebrow">{copy.workflowEyebrow}</p>
+      <h2>{copy.workflowTitle}</h2>
+      <p>{copy.workflowDescription}</p>
+      <ol class="feature-list">
+        {workflowPaths.map((item) => (
+          <li>
+            <div>
+              <strong>{item.title}</strong>
+              <p>{item.description}</p>
+            </div>
           </li>
         ))}
       </ol>
@@ -213,7 +257,7 @@ const jsonLd = [
     </article>
   </section>
 
-  <section class="content-grid">
+  <section class="content-grid" id="audience">
     <article class="content-panel">
       <p class="eyebrow">{copy.audienceEyebrow}</p>
       <h2>{copy.audienceTitle}</h2>
@@ -230,7 +274,7 @@ const jsonLd = [
     </article>
   </section>
 
-  <section class="content-grid">
+  <section class="content-grid" id="faq">
     <article class="content-panel content-panel-wide">
       <p class="eyebrow">{labels.faqTitle}</p>
       <h2>{labels.faqTitle}</h2>
@@ -271,7 +315,7 @@ const jsonLd = [
     </section>
   )}
 
-  <section class="section-shell">
+  <section class="section-shell" id="all-tools">
     <div class="section-heading">
       <div>
         <p class="eyebrow">{categoryLabels[category][locale]}</p>

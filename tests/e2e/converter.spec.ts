@@ -28,6 +28,8 @@ test('Hebrew category page lists matching tools', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('כלי טקסט');
   await expect(page.getByText('מה אפשר לעשות כאן')).toBeVisible();
   await expect(page.getByText('האם הכלים עובדים טוב עם עברית?')).toBeVisible();
+  await expect(page.locator('.tool-jump-nav')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'איך בדרך כלל מתקדמים נכון בתוך הקטגוריה' })).toBeVisible();
   await expect(page.locator('[data-category-tools-grid] [data-tool-card]')).toHaveCount(textToolCount);
   await expect(page.locator('[data-category-tools-grid]').getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
 });
@@ -41,6 +43,8 @@ test('all English category pages expose tool cards and SEO content', async ({ pa
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`/en/${category}/$`));
     await expect(page.locator('link[hreflang="he"]')).toHaveAttribute('href', new RegExp(`/he/${category}/$`));
     await expect(page.locator('[data-category-tools-grid] [data-tool-card]').first()).toBeVisible();
+    await expect(page.locator('.tool-jump-nav')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'How people usually move through this category' })).toBeVisible();
     await expect(page.getByText('FAQ').first()).toBeVisible();
   }
 });
