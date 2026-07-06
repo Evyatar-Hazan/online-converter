@@ -167,34 +167,75 @@ function getTitleSuffix(locale: Locale) {
 }
 
 export function getConverterPageTitle(tool: ConverterTool, locale: Locale) {
-  return `${tool.title[locale]} | ${getTitleSuffix(locale)}`;
+  const intent = getSearchIntent(tool);
+  const titleSuffixes: Record<SearchIntent, Record<Locale, string>> = {
+    convert: {
+      en: 'Fast Browser Converter',
+      he: 'ממיר מהיר בדפדפן'
+    },
+    calculate: {
+      en: 'Instant Browser Calculator',
+      he: 'מחשבון מהיר בדפדפן'
+    },
+    validate: {
+      en: 'Browser Validation Tool',
+      he: 'בדיקה מהירה בדפדפן'
+    },
+    format: {
+      en: 'Browser Formatting Tool',
+      he: 'סידור מהיר בדפדפן'
+    },
+    decode: {
+      en: 'Readable Output in Browser',
+      he: 'פענוח מהיר בדפדפן'
+    },
+    clean: {
+      en: 'Clean Text in Browser',
+      he: 'ניקוי מהיר בדפדפן'
+    },
+    generate: {
+      en: 'Create It in Browser',
+      he: 'יצירה מהירה בדפדפן'
+    },
+    explain: {
+      en: 'Inspect It in Browser',
+      he: 'פירוק מהיר בדפדפן'
+    }
+  };
+
+  const suffix = titleSuffixes[intent][locale] ?? getTitleSuffix(locale);
+  return `${tool.title[locale]} | ${suffix}`;
 }
 
 export function getConverterMetaDescription(tool: ConverterTool, locale: Locale) {
   const intent = getSearchIntent(tool);
   const input = formatContentType(tool.inputType);
   const output = formatContentType(tool.outputType);
+  const firstFeature = tool.features[locale][0]?.toLowerCase();
+
+  const englishFeatureTail = firstFeature ? `, ${firstFeature}` : '';
+  const hebrewFeatureTail = firstFeature ? `, ${firstFeature}` : '';
 
   const englishTemplates: Record<SearchIntent, string> = {
-    convert: `${tool.title.en}. Convert ${input} to ${output} in your browser with Hebrew and English support, examples, copy/download actions, and no upload.`,
-    calculate: `${tool.title.en}. Calculate ${output} in your browser with Hebrew and English support, examples, copy/download actions, and no upload.`,
-    validate: `${tool.title.en}. Check ${input} in your browser with Hebrew and English support, examples, clear results, and no upload.`,
-    format: `${tool.title.en}. Format ${input} into cleaner ${output} output in your browser with Hebrew and English support, examples, and no upload.`,
-    decode: `${tool.title.en}. Decode ${input} into readable ${output} in your browser with Hebrew and English support, examples, and no upload.`,
-    clean: `${tool.title.en}. Clean ${input} in your browser with Hebrew and English support, examples, copy/download actions, and no upload.`,
-    generate: `${tool.title.en}. Generate ${output} in your browser with Hebrew and English support, examples, copy/download actions, and no upload.`,
-    explain: `${tool.title.en}. Inspect ${input} in your browser with Hebrew and English support, examples, clear output, and no upload.`
+    convert: `${tool.title.en}. Convert ${input} to ${output} in your browser with Hebrew and English support${englishFeatureTail}, instant results, and no upload.`,
+    calculate: `${tool.title.en}. Calculate ${output} in your browser with Hebrew and English support${englishFeatureTail}, fast results, and no upload.`,
+    validate: `${tool.title.en}. Validate ${input} in your browser with clear results, Hebrew and English support${englishFeatureTail}, and no upload.`,
+    format: `${tool.title.en}. Format ${input} into cleaner ${output} output in your browser with Hebrew and English support${englishFeatureTail} and no upload.`,
+    decode: `${tool.title.en}. Decode ${input} into readable ${output} in your browser with Hebrew and English support${englishFeatureTail} and no upload.`,
+    clean: `${tool.title.en}. Clean ${input} in your browser with Hebrew and English support${englishFeatureTail}, clear output, and no upload.`,
+    generate: `${tool.title.en}. Generate ${output} in your browser with Hebrew and English support${englishFeatureTail}, ready output, and no upload.`,
+    explain: `${tool.title.en}. Inspect ${input} in your browser with readable output, Hebrew and English support${englishFeatureTail}, and no upload.`
   };
 
   const hebrewTemplates: Record<SearchIntent, string> = {
-    convert: `${tool.title.he}. המרת ${input} ל־${output} בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות, העתקה או הורדה ובלי העלאת מידע.`,
-    calculate: `${tool.title.he}. חישוב ${output} בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות, העתקה או הורדה ובלי העלאת מידע.`,
-    validate: `${tool.title.he}. בדיקת ${input} בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות, תוצאה ברורה ובלי העלאת מידע.`,
-    format: `${tool.title.he}. עיצוב ${input} לפלט ${output} נקי יותר בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות ובלי העלאת מידע.`,
-    decode: `${tool.title.he}. פענוח ${input} לפלט ${output} קריא בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות ובלי העלאת מידע.`,
-    clean: `${tool.title.he}. ניקוי ${input} בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות, העתקה או הורדה ובלי העלאת מידע.`,
-    generate: `${tool.title.he}. יצירת ${output} בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות, העתקה או הורדה ובלי העלאת מידע.`,
-    explain: `${tool.title.he}. פירוק ${input} בדפדפן עם תמיכה בעברית ובאנגלית, דוגמאות, תוצאה ברורה ובלי העלאת מידע.`
+    convert: `${tool.title.he}. המרת ${input} ל־${output} בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail}, תוצאה מיידית ובלי העלאת מידע.`,
+    calculate: `${tool.title.he}. חישוב ${output} בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail}, תוצאה מהירה ובלי העלאת מידע.`,
+    validate: `${tool.title.he}. בדיקת ${input} בדפדפן עם תוצאה ברורה, תמיכה בעברית ובאנגלית${hebrewFeatureTail}, ובלי העלאת מידע.`,
+    format: `${tool.title.he}. סידור ${input} לפלט ${output} נקי יותר בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail} ובלי העלאת מידע.`,
+    decode: `${tool.title.he}. פענוח ${input} לפלט ${output} קריא בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail} ובלי העלאת מידע.`,
+    clean: `${tool.title.he}. ניקוי ${input} בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail}, פלט ברור ובלי העלאת מידע.`,
+    generate: `${tool.title.he}. יצירת ${output} בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail}, פלט מוכן ובלי העלאת מידע.`,
+    explain: `${tool.title.he}. פירוק ${input} לתוצאה קריאה בדפדפן עם תמיכה בעברית ובאנגלית${hebrewFeatureTail}, ובלי העלאת מידע.`
   };
 
   return locale === 'he' ? hebrewTemplates[intent] : englishTemplates[intent];
