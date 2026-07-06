@@ -3,6 +3,7 @@ import ToolCard from '../../components/ToolCard.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { categoryLabels, locales, siteName, ui } from '../../data/site';
+import { getHomeAudienceList, getHomeTrustBlocks } from '../../lib/page-content';
 import { converters } from '../../data/converters';
 import { getHomeMetaDescription, getHomePageTitle } from '../../lib/home-seo';
 import { getHomepageHighlightTools, getPriorityHubLinks } from '../../lib/site-navigation';
@@ -19,6 +20,8 @@ const categories = priorityHubs.map((item) => item.category) as ConverterCategor
 const homepageHighlights = getHomepageHighlightTools(6);
 const title = getHomePageTitle(locale);
 const description = getHomeMetaDescription(locale);
+const trustBlocks = getHomeTrustBlocks(locale);
+const audienceList = getHomeAudienceList(locale);
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -44,7 +47,15 @@ const copy = {
   newDescription:
     locale === 'he'
       ? 'הכלים החדשים עוזרים להרחיב כיסוי חיפושים ולחבר משתמשים לעמודים שעוד צריכים לצבור authority.'
-      : 'Fresh tools expand search coverage and help route users toward pages that still need to build authority.'
+      : 'Fresh tools expand search coverage and help route users toward pages that still need to build authority.',
+  trustEyebrow: locale === 'he' ? 'איך האתר בנוי לעבודה אמיתית' : 'How the site is built for real work',
+  trustTitle: locale === 'he' ? 'מה מקבלים מעבר להמרה עצמה' : 'What you get beyond the conversion itself',
+  audienceEyebrow: locale === 'he' ? 'למי זה מתאים' : 'Who this helps',
+  audienceTitle: locale === 'he' ? 'צוותים ומשימות שהאתר הזה מכסה טוב' : 'Teams and tasks the site covers well',
+  audienceDescription:
+    locale === 'he'
+      ? 'האתר לא מיועד רק למפתחים. הוא מכסה גם עבודה על תוכן, שיווק, אופרציה וניתוח כשצריך תוצאה מהירה בלי לעבור לכלי כבד יותר.'
+      : 'The site is not just for developers. It also covers content, marketing, operations and analysis when you need a fast result without jumping into a heavier tool.'
 };
 ---
 
@@ -128,6 +139,32 @@ const copy = {
       </div>
     </section>
   )}
+
+  <section class="content-grid">
+    <article class="content-panel content-panel-wide">
+      <p class="eyebrow">{copy.trustEyebrow}</p>
+      <h2>{copy.trustTitle}</h2>
+      <ul class="feature-list">
+        {trustBlocks.map((block) => (
+          <li>
+            <strong>{block.title}</strong>
+            <p>{block.description}</p>
+          </li>
+        ))}
+      </ul>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel content-panel-wide">
+      <p class="eyebrow">{copy.audienceEyebrow}</p>
+      <h2>{copy.audienceTitle}</h2>
+      <p>{copy.audienceDescription}</p>
+      <ul class="check-list">
+        {audienceList.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+  </section>
 
   <section class="strategy-band">
     <div>

@@ -4,6 +4,7 @@ import ToolCard from '../../../components/ToolCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { converters } from '../../../data/converters';
 import { categoryContent, categoryLabels, locales, siteName, siteUrl, ui } from '../../../data/site';
+import { getCategoryAudience, getCategorySelectionChecks } from '../../../lib/page-content';
 import { getCategoryToolBuckets } from '../../../lib/category-tools';
 import { getCategoryMetaDescription, getCategoryPageTitle } from '../../../lib/category-seo';
 import type { ConverterCategory, Locale } from '../../../types';
@@ -23,6 +24,8 @@ const featuredTools = buckets.ordered.slice(0, 3);
 const quickLinks = buckets.ordered.slice(0, 6);
 const popularTools = buckets.popular.slice(0, 4);
 const newTools = buckets.fresh.slice(0, 4);
+const audience = getCategoryAudience(category, locale);
+const selectionChecks = getCategorySelectionChecks(category, locale);
 const canonicalPath = `/${locale}/${category}/`;
 const title = `${getCategoryPageTitle(category, locale)} | ${siteName[locale]}`;
 const description = getCategoryMetaDescription(category, locale, tools.length);
@@ -62,6 +65,10 @@ const copy = {
     locale === 'he'
       ? 'קישורים ישירים לכלים בולטים כדי להגיע מהר להמרה המתאימה.'
       : 'Direct links to standout tools so you can jump straight to the right converter.',
+  audienceEyebrow: locale === 'he' ? 'למי הקטגוריה הזאת מתאימה' : 'Who this category helps',
+  audienceTitle: locale === 'he' ? 'צוותים ומשימות שבדרך כלל מרוויחים כאן' : 'Teams and tasks that usually benefit here',
+  checksEyebrow: locale === 'he' ? 'איך לבחור נכון' : 'How to choose the right tool',
+  checksTitle: locale === 'he' ? 'שלוש בדיקות קצרות לפני שפותחים כלי' : 'Three quick checks before opening a tool',
   emptyPopular:
     locale === 'he'
       ? 'כרגע אין סימון פופולריים בקטגוריה הזו, אבל כל הכלים כאן זמינים לשימוש מלא.'
@@ -203,6 +210,23 @@ const jsonLd = [
       <div class="link-cloud">
         {quickLinks.map((tool) => <a href={`/${locale}/${tool.slug}/`}>{tool.shortTitle[locale]}</a>)}
       </div>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-panel">
+      <p class="eyebrow">{copy.audienceEyebrow}</p>
+      <h2>{copy.audienceTitle}</h2>
+      <ul class="check-list">
+        {audience.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="content-panel">
+      <p class="eyebrow">{copy.checksEyebrow}</p>
+      <h2>{copy.checksTitle}</h2>
+      <ul class="check-list">
+        {selectionChecks.map((item) => <li>{item}</li>)}
+      </ul>
     </article>
   </section>
 
