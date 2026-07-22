@@ -8,6 +8,7 @@ import {
   getToolResultChecklist,
   getToolUseCases,
   getToolWorkflowSummary,
+  isEditoriallyReviewedTool,
   isLaunchReadyFreshTool
 } from './converter-content';
 
@@ -91,6 +92,17 @@ describe('converter content quality helpers', () => {
       expect(tool, `${check.converterId} should exist`).toBeTruthy();
       expect(check.getter(tool!, check.locale).join(' ')).toContain(check.needle);
     }
+  });
+
+  it('limits monetization eligibility to tool-specific editorial content', () => {
+    const reviewed = converters.filter(isEditoriallyReviewedTool);
+    const unreviewed = converters.find((tool) => tool.converterId === 'aspectRatioCalculator');
+
+    expect(reviewed.length).toBeGreaterThanOrEqual(8);
+    expect(reviewed.every((tool) => getToolUseCases(tool, 'en').join(' ').length > 150)).toBe(true);
+    expect(reviewed.some((tool) => tool.converterId === 'jsonToCsv')).toBe(true);
+    expect(unreviewed).toBeTruthy();
+    expect(isEditoriallyReviewedTool(unreviewed!)).toBe(false);
   });
 
   it('builds useful page signals and jump links for every converter', () => {

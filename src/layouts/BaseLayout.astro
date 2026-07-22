@@ -24,6 +24,7 @@ interface Props {
   alternateSlug?: string;
   indexable?: boolean;
   includeAlternates?: boolean;
+  monetizable?: boolean;
   jsonLd?: Record<string, unknown>[];
   analyticsContext?: AnalyticsContext;
 }
@@ -36,6 +37,7 @@ const {
   alternateSlug = '',
   indexable = true,
   includeAlternates = true,
+  monetizable = false,
   jsonLd = [],
   analyticsContext
 } = Astro.props;
@@ -69,7 +71,7 @@ const pageContext = analyticsContext ?? { pageType: 'home', locale };
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <ThemeScript />
     <Analytics context={pageContext} />
-    <AdSenseScript />
+    {monetizable && <AdSenseScript />}
     {jsonLd.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
   </head>
   <body>

@@ -32,22 +32,10 @@ const walkDistFiles = (directory = '') => {
   });
 };
 
-const countLocalizedHtmlPages = () => {
-  const countIndexFiles = (directory) => {
-    const entries = readdirSync(join(distDir, directory), { withFileTypes: true });
-
-    return entries.reduce((total, entry) => {
-      if (entry.isDirectory()) {
-        const nested = join(directory, entry.name);
-        return total + (readDistFile(join(nested, 'index.html')) ? 1 : 0);
-      }
-
-      return total;
-    }, 1);
-  };
-
-  return countIndexFiles('en') + countIndexFiles('he');
-};
+const countIndexableLocalizedHtmlPages = () =>
+  walkDistFiles()
+    .filter((file) => /^(en|he)\//.test(file) && file.endsWith('.html'))
+    .filter((file) => readDistFile(file).includes('content="index, follow, max-image-preview:large"')).length;
 
 const getAttribute = (document, selector, attribute) => {
   const element = document.querySelector(selector);
@@ -240,6 +228,7 @@ const assertExactSitemapCoverage = () => {
   const entries = extractSitemapEntries();
   const expectedPaths = walkDistFiles()
     .filter((file) => file.endsWith('.html'))
+    .filter((file) => readDistFile(file).includes('content="index, follow, max-image-preview:large"'))
     .map((file) => normalizePublicPath(toPublicPath(file)))
     .filter((path) => /^\/(en|he)\//.test(path));
   const expectedLocs = expectedPaths.map((path) => `${siteUrl}${path}`);
@@ -324,7 +313,7 @@ for (const pathname of publicPaths) {
 }
 
 const locCount = [...sitemap.matchAll(/<loc>/g)].length;
-const expectedLocCount = countLocalizedHtmlPages();
+const expectedLocCount = countIndexableLocalizedHtmlPages();
 if (locCount !== expectedLocCount) {
   fail(`Expected ${expectedLocCount} sitemap URLs, received ${locCount}`);
 }

@@ -352,6 +352,15 @@ const toolSpecificContent: Partial<Record<string, ToolSpecificContent>> = {
   }
 };
 
+/**
+ * A converter can be indexed and monetized only after it has received a
+ * tool-specific editorial pass. The generic fallback keeps every utility
+ * usable, but does not qualify it as a standalone content page.
+ */
+export function isEditoriallyReviewedTool(tool: ConverterTool) {
+  return Boolean(toolSpecificContent[tool.converterId]);
+}
+
 export function getToolUseCases(tool: ConverterTool, locale: Locale) {
   const specific = toolSpecificContent[tool.converterId]?.useCases?.[locale];
   if (specific) {

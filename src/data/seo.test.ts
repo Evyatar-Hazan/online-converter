@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { categoryLabels, locales, siteName, siteUrl } from './site';
 import { getCategoryMetaDescription, getCategoryPageTitle } from '../lib/category-seo';
+import { isEditoriallyReviewedTool } from '../lib/converter-content';
 import { getPublicPaths, getSitemapPriority } from '../lib/public-pages';
 import { converters } from './converters';
 
@@ -42,10 +43,11 @@ describe('SEO surfaces', () => {
     }
   });
 
-  it('can generate sitemap entries for every public page', () => {
+  it('only includes editorially reviewed tool pages in the sitemap', () => {
     const urls = getPublicPaths();
+    const reviewedToolCount = converters.filter(isEditoriallyReviewedTool).length;
 
-    expect(urls.length).toBe(2 + locales.length * categoryKeys.length + locales.length * converters.length);
+    expect(urls.length).toBe(2 + locales.length * categoryKeys.length + locales.length * reviewedToolCount);
     expect(new Set(urls).size).toBe(urls.length);
 
     for (const path of urls) {
@@ -53,6 +55,8 @@ describe('SEO surfaces', () => {
     }
 
     expect(urls).not.toContain('/analytics/');
+    expect(urls).toContain('/en/json-to-csv/');
+    expect(urls).not.toContain('/en/aspect-ratio-calculator/');
   });
 
   it('assigns stable sitemap priorities by page depth', () => {
