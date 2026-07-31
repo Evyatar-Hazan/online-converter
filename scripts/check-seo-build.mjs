@@ -130,6 +130,21 @@ const assertNoBrokenInternalLinks = () => {
   }
 };
 
+const assertStatic404IsNoindex = () => {
+  const document = new JSDOM(readDistFile('404.html')).window.document;
+  const robots = getAttribute(document, 'meta[name="robots"]', 'content');
+  assertEqual(robots, 'noindex, nofollow', '/404.html robots');
+
+  const title = document.querySelector('title')?.textContent?.trim();
+  if (!title || !title.includes('Page not found')) {
+    fail('/404.html is missing a clear not-found title');
+  }
+
+  if (document.querySelector('script[src*="pagead2.googlesyndication.com"], ins.adsbygoogle')) {
+    fail('/404.html must not include AdSense markup');
+  }
+};
+
 const assertUniqueIndexableMetadata = () => {
   const htmlFiles = walkDistFiles().filter((file) => file.endsWith('.html'));
   const perLocale = new Map([
@@ -341,5 +356,6 @@ assertNoBrokenInternalLinks();
 assertUniqueIndexableMetadata();
 assertCanonicalAndAlternatesForAllIndexablePages();
 assertExactSitemapCoverage();
+assertStatic404IsNoindex();
 
 console.log(`SEO build check passed for ${publicPaths.length} representative pages and ${locCount} sitemap URLs.`);

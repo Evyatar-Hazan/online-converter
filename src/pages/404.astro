@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Page not found - Online Converter';
+const description = 'This converter page is not available. Open the reviewed Online Converter tools in English or Hebrew.';
+---
+
+<BaseLayout
+  locale="en"
+  title={title}
+  description={description}
+  canonicalPath="/404.html"
+  includeAlternates={false}
+  indexable={false}
+  jsonLd={[]}
+  analyticsContext={{ pageType: 'home', locale: 'en' }}
+>
+  <section class="hero-section">
+    <div class="hero-copy">
+      <p class="eyebrow">404</p>
+      <h1>Page not found</h1>
+      <p>{description}</p>
+      <div class="hero-actions">
+        <a class="primary-action" href="/en/">Open English tools</a>
+        <a class="secondary-action" href="/he/">פתח כלים בעברית</a>
+      </div>
+    </div>
+    <div class="hero-panel" aria-label="Available languages">
+      <div>
+        <span>English</span>
+        <strong>EN</strong>
+      </div>
+      <div>
+        <span>עברית</span>
+        <strong>HE</strong>
+      </div>
+      <div>
+        <span>Reviewed tools</span>
+        <strong>16</strong>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
