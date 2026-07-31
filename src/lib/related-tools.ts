@@ -1,6 +1,6 @@
 import { converters } from '../data/converters';
 import type { ConverterTool } from '../types';
-import { isLaunchReadyFreshTool } from './converter-content';
+import { getEditoriallyReviewedTools, isLaunchReadyFreshTool } from './converter-content';
 import { getSearchIntent } from './converter-seo';
 
 interface ScoredRelatedTool {
@@ -63,7 +63,7 @@ function scoreRelatedTool(source: ConverterTool, candidate: ConverterTool) {
 }
 
 function rankRelatedTools(source: ConverterTool, predicate?: (candidate: ConverterTool) => boolean) {
-  return converters
+  return getEditoriallyReviewedTools(converters)
     .map((tool) => ({ tool, score: scoreRelatedTool(source, tool) }))
     .filter((entry) => entry.score > 0 && (!predicate || predicate(entry.tool)))
     .sort((left, right) => {
@@ -91,7 +91,7 @@ function pickRankedTools(source: ConverterTool, limit: number, predicate?: (cand
 }
 
 export function getInverseConverter(source: ConverterTool) {
-  return source.reverseSlug ? converters.find((tool) => tool.slug === source.reverseSlug) : undefined;
+  return source.reverseSlug ? getEditoriallyReviewedTools(converters).find((tool) => tool.slug === source.reverseSlug) : undefined;
 }
 
 export function getWorkflowRelatedConverters(source: ConverterTool, limit = 3, exclude = new Set<string>()) {

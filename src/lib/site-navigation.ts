@@ -1,16 +1,17 @@
 import { converters } from '../data/converters';
 import { categoryLabels } from '../data/site';
-import { isLaunchReadyFreshTool } from './converter-content';
+import { getEditoriallyReviewedTools, isLaunchReadyFreshTool } from './converter-content';
 import type { ConverterCategory, ConverterTool, Locale } from '../types';
 
 export const priorityHubCategories: ConverterCategory[] = ['data', 'text', 'developer', 'calculator', 'color', 'encoding', 'time'];
+const reviewedConverters = getEditoriallyReviewedTools(converters);
 
 export function getPriorityHubLinks(locale: Locale) {
   return priorityHubCategories.map((category) => ({
     category,
     label: categoryLabels[category][locale],
     href: `/${locale}/${category}/`,
-    toolCount: converters.filter((tool) => tool.category === category).length
+    toolCount: reviewedConverters.filter((tool) => tool.category === category).length
   }));
 }
 
@@ -30,7 +31,7 @@ function sortHighlightTools(tools: ConverterTool[]) {
 
 export function getHomepageHighlightTools(limit = 6) {
   return {
-    popular: sortHighlightTools(converters.filter((tool) => tool.popular)).slice(0, limit),
-    fresh: sortHighlightTools(converters.filter((tool) => isLaunchReadyFreshTool(tool) && !tool.popular)).slice(0, limit)
+    popular: sortHighlightTools(reviewedConverters.filter((tool) => tool.popular)).slice(0, limit),
+    fresh: sortHighlightTools(reviewedConverters.filter((tool) => isLaunchReadyFreshTool(tool) && !tool.popular)).slice(0, limit)
   };
 }

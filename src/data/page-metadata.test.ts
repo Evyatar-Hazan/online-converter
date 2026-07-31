@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from './converters';
 import { categoryLabels, locales } from './site';
+import { getEditoriallyReviewedTools } from '../lib/converter-content';
 import { getCategoryMetaDescription, getCategoryPageTitle } from '../lib/category-seo';
 import { getConverterMetaDescription, getConverterPageTitle } from '../lib/converter-seo';
 import { getHomeMetaDescription, getHomePageTitle } from '../lib/home-seo';
 
 const categories = Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>;
+const reviewedConverters = getEditoriallyReviewedTools(converters);
 const disallowedEnglishPhrases = ['best', 'ultimate', 'perfect', 'powerful', 'seamless'];
 const disallowedHebrewPhrases = ['הכי טוב', 'מושלם', 'עוצמתי במיוחד', 'ללא מאמץ'];
 
@@ -23,7 +25,7 @@ describe('public page metadata', () => {
           title: getCategoryPageTitle(category, locale),
           description: getCategoryMetaDescription(category, locale, converters.filter((tool) => tool.category === category).length)
         })),
-        ...converters.map((tool) => ({
+        ...reviewedConverters.map((tool) => ({
           path: `/${locale}/${tool.slug}/`,
           title: getConverterPageTitle(tool, locale),
           description: getConverterMetaDescription(tool, locale)

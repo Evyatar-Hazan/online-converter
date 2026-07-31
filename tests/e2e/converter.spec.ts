@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { converters } from '../../src/data/converters';
+import { getEditoriallyReviewedTools } from '../../src/lib/converter-content';
 
 const categoryCount = 7;
-const expectedPublicSeoPages = 2 + categoryCount * 2 + converters.length * 2;
+const reviewedConverters = getEditoriallyReviewedTools(converters);
+const expectedPublicSeoPages = 2 + categoryCount * 2 + reviewedConverters.length * 2;
 
 test('English tool page converts JSON to CSV', async ({ page }) => {
   await page.goto('/en/json-to-csv/');
@@ -22,7 +24,7 @@ test('Hebrew home page supports RTL and search filtering', async ({ page }) => {
 });
 
 test('Hebrew category page lists matching tools', async ({ page }) => {
-  const textToolCount = converters.filter((tool) => tool.category === 'text').length;
+  const textToolCount = reviewedConverters.filter((tool) => tool.category === 'text').length;
 
   await page.goto('/he/text/');
   await expect(page.locator('h1')).toContainText('כלי טקסט');
@@ -97,7 +99,6 @@ test('converter page applies new format options', async ({ page }) => {
 test('representative converters work across major categories', async ({ page }) => {
   const cases = [
     { path: '/en/base64-encode/', input: 'hello', output: 'aGVsbG8=' },
-    { path: '/en/html-escape/', input: '<strong>Avi</strong>', output: '&lt;strong&gt;Avi&lt;/strong&gt;' },
     { path: '/en/percentage-calculator/', input: '20, 150', output: '20% of 150 = 30' },
     { path: '/en/hex-to-rgb/', input: '#4f46e5', output: 'rgb(79, 70, 229)' },
     { path: '/en/date-to-timestamp/', input: '2026-06-19T00:00:00Z', output: '1781827200' }

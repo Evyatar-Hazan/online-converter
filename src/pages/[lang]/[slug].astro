@@ -6,7 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { converterBySlug, converters } from '../../data/converters';
 import { categoryLabels, locales, ui } from '../../data/site';
 import { getPriorityCategoryTools } from '../../lib/category-tools';
-import { getToolDecisionChecks, getToolJumpLinks, getToolPageSignals, getToolResultChecklist, getToolUseCases, getToolWorkflowSummary, isEditoriallyReviewedTool } from '../../lib/converter-content';
+import { getEditoriallyReviewedTools, getToolDecisionChecks, getToolJumpLinks, getToolPageSignals, getToolResultChecklist, getToolUseCases, getToolWorkflowSummary, isEditoriallyReviewedTool } from '../../lib/converter-content';
 import { getCategoryRelatedConverters, getInverseConverter, getRelatedConverters, getWorkflowRelatedConverters } from '../../lib/related-tools';
 import { formatContentType, getConverterIntro, getConverterMetaDescription, getConverterPageTitle, getConverterStructuredData } from '../../lib/converter-seo';
 import type { ConverterTool, Locale } from '../../types';
@@ -150,7 +150,7 @@ function commonIssues(tool: ConverterTool, locale: Locale) {
 }
 
 export function getStaticPaths() {
-  return locales.flatMap((lang) => converters.map((tool) => ({ params: { lang, slug: tool.slug } })));
+  return locales.flatMap((lang) => getEditoriallyReviewedTools(converters).map((tool) => ({ params: { lang, slug: tool.slug } })));
 }
 
 const locale = Astro.params.lang as Locale;

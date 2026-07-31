@@ -160,6 +160,44 @@ const toolSpecificContent: Partial<Record<string, ToolSpecificContent>> = {
       ]
     }
   },
+  base64Encode: {
+    useCases: {
+      en: [
+        'Encode short text snippets before testing email templates, browser storage values, scripts or safe transport fields.',
+        'Prepare Unicode or Hebrew text for systems that expect Base64 instead of raw readable text.',
+        'Check a small encoded sample before using it in documentation, support replies or developer handoff.'
+      ],
+      he: [
+        'קודד קטעי טקסט קצרים לפני בדיקת תבניות אימייל, ערכי אחסון בדפדפן, סקריפטים או שדות מעבר בטוחים.',
+        'הכן טקסט Unicode או עברית למערכות שמצפות ל־Base64 במקום טקסט קריא רגיל.',
+        'בדוק דוגמה מקודדת קטנה לפני שימוש בתיעוד, תשובת תמיכה או העברה למפתח.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Keep the original text next to the encoded result until the destination system accepts the Base64 value.',
+        'Decode the output once when accuracy matters so special characters and line breaks survived correctly.',
+        'Copy the encoded value only after confirming whether the target expects standard or URL-safe Base64.'
+      ],
+      he: [
+        'שמור את הטקסט המקורי ליד הפלט המקודד עד שמערכת היעד מקבלת את ערך ה־Base64.',
+        'פענח את הפלט פעם אחת כשחשובה דיוק כדי לוודא שתווים מיוחדים ושבירות שורה נשמרו נכון.',
+        'העתק את הערך המקודד רק אחרי שמוודאים אם היעד מצפה ל־Base64 רגיל או בטוח ל־URL.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Confirm that Base64 is the expected transport format and not a security layer.',
+        'Test one representative Hebrew, emoji or special-character sample before using the result in a larger flow.',
+        'Do not encode secrets as a substitute for encryption or access control.'
+      ],
+      he: [
+        'ודא ש־Base64 הוא פורמט המעבר המבוקש ולא שכבת אבטחה.',
+        'בדוק דוגמה מייצגת עם עברית, אימוג׳י או תווים מיוחדים לפני שימוש בפלט בתהליך גדול יותר.',
+        'אל תקודד סודות כתחליף להצפנה או בקרת גישה.'
+      ]
+    }
+  },
   sortLines: {
     useCases: {
       en: [
@@ -312,6 +350,234 @@ const toolSpecificContent: Partial<Record<string, ToolSpecificContent>> = {
       ]
     }
   },
+  percentageOf: {
+    useCases: {
+      en: [
+        'Calculate a percentage of a price, quantity or target before opening a spreadsheet.',
+        'Check quick discount, budget or reporting numbers during planning conversations.',
+        'Verify one small business or consumer calculation before reusing it in a larger estimate.'
+      ],
+      he: [
+        'חשב אחוז מתוך מחיר, כמות או יעד לפני שפותחים גיליון.',
+        'בדוק במהירות מספרי הנחה, תקציב או דיווח בזמן תכנון.',
+        'אמת חישוב עסקי או צרכני קטן לפני שמשתמשים בו בהערכה רחבה יותר.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Confirm the percentage input uses 20 for 20%, not 0.20, unless the tool specifically asks otherwise.',
+        'Check whether the result should be rounded before using it in prices, reports or messages.',
+        'Copy the output only after the base number and percentage match the decision you are making.'
+      ],
+      he: [
+        'ודא שקלט האחוזים נכתב כ־20 עבור 20%, ולא 0.20, אלא אם הכלי מבקש אחרת.',
+        'בדוק אם צריך לעגל את התוצאה לפני שימוש במחירים, דוחות או הודעות.',
+        'העתק את הפלט רק אחרי שמספר הבסיס והאחוז באמת תואמים להחלטה שאתה מקבל.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Use a calculator-specific page when the question is about one focused percentage decision.',
+        'Re-run the calculation with a known sample if the result affects pricing or customer communication.',
+        'Do not treat the output as financial advice; it is a simple arithmetic result.'
+      ],
+      he: [
+        'השתמש בעמוד מחשבון ממוקד כשהשאלה היא החלטת אחוז אחת וברורה.',
+        'הרץ שוב עם דוגמה ידועה אם התוצאה משפיעה על תמחור או תקשורת מול לקוח.',
+        'אל תתייחס לפלט כייעוץ פיננסי; זו תוצאה חשבונית פשוטה.'
+      ]
+    }
+  },
+  discountCalculator: {
+    useCases: {
+      en: [
+        'Calculate a sale price quickly before publishing a promotion, estimate or checkout message.',
+        'Compare discount amounts during pricing checks without opening a spreadsheet.',
+        'Verify a customer-facing percentage discount before copying the final number into content or support replies.'
+      ],
+      he: [
+        'חשב מחיר אחרי הנחה במהירות לפני פרסום מבצע, הערכה או הודעת checkout.',
+        'השווה סכומי הנחה בזמן בדיקות תמחור בלי לפתוח גיליון.',
+        'אמת אחוז הנחה שמוצג ללקוח לפני העתקת המספר הסופי לתוכן או תשובת תמיכה.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Check that the original price and discount percent were entered in the expected order.',
+        'Review both the saved amount and the final price before using the result in public copy.',
+        'Round the number according to the currency or checkout format your destination expects.'
+      ],
+      he: [
+        'בדוק שהמחיר המקורי ואחוז ההנחה הוזנו בסדר הנכון.',
+        'עבור גם על סכום החיסכון וגם על המחיר הסופי לפני שימוש בתוכן ציבורי.',
+        'עגל את המספר לפי המטבע או פורמט ה־checkout שהיעד מצפה לו.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Use one known price sample to confirm the discount math before publishing a campaign.',
+        'Check tax and shipping separately; this calculator only handles the discount arithmetic.',
+        'Keep a source-of-truth price list when the result affects real customer communication.'
+      ],
+      he: [
+        'השתמש בדוגמת מחיר ידועה אחת כדי לאמת את חישוב ההנחה לפני פרסום קמפיין.',
+        'בדוק מס ומשלוח בנפרד; המחשבון הזה מטפל רק בחשבון ההנחה.',
+        'שמור רשימת מחירים מקורית כאשר התוצאה משפיעה על תקשורת אמיתית מול לקוחות.'
+      ]
+    }
+  },
+  timestampToDate: {
+    useCases: {
+      en: [
+        'Turn Unix timestamps from logs, exports or API payloads into readable dates before debugging.',
+        'Check whether a backend value is stored in seconds or milliseconds when dates look wrong.',
+        'Translate event timestamps for QA, analytics reviews or support investigations.'
+      ],
+      he: [
+        'המר Unix timestamps מלוגים, יצואים או payloads של API לתאריכים קריאים לפני דיבוג.',
+        'בדוק אם ערך backend נשמר בשניות או מילישניות כאשר תאריכים נראים שגויים.',
+        'תרגם timestamps של אירועים עבור QA, בדיקות אנליטיקה או חקירות תמיכה.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Compare UTC and local output when timezone context matters.',
+        'Confirm whether the source timestamp was seconds or milliseconds before reporting the date.',
+        'Copy the readable date only after it matches the expected event, log or export window.'
+      ],
+      he: [
+        'השווה בין UTC לזמן מקומי כאשר הקשר אזור הזמן חשוב.',
+        'ודא אם ה־timestamp המקורי היה בשניות או מילישניות לפני שמדווחים על התאריך.',
+        'העתק את התאריך הקריא רק אחרי שהוא תואם לחלון האירוע, הלוג או היצוא הצפוי.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Test one timestamp with a known date before converting a larger log sample.',
+        'Do not mix browser-local display with UTC decisions unless the workflow explicitly allows it.',
+        'Check suspicious future or past dates for a seconds-vs-milliseconds mismatch.'
+      ],
+      he: [
+        'בדוק timestamp אחד עם תאריך ידוע לפני המרת דגימת לוג גדולה יותר.',
+        'אל תערבב תצוגה מקומית של הדפדפן עם החלטות UTC אלא אם התהליך מאפשר זאת במפורש.',
+        'בדוק תאריכים חשודים בעבר או בעתיד כפער אפשרי בין שניות למילישניות.'
+      ]
+    }
+  },
+  dateToTimestamp: {
+    useCases: {
+      en: [
+        'Turn a readable date into a Unix timestamp before testing API requests, scheduled jobs or log filters.',
+        'Compare frontend dates with backend values when systems disagree about time format.',
+        'Prepare a known timestamp sample for documentation, QA checks or analytics debugging.'
+      ],
+      he: [
+        'המר תאריך קריא ל־Unix timestamp לפני בדיקת בקשות API, משימות מתוזמנות או סינון לוגים.',
+        'השווה תאריכי frontend מול ערכי backend כשמערכות לא מסכימות על פורמט הזמן.',
+        'הכן דוגמת timestamp ידועה לתיעוד, בדיקות QA או דיבוג אנליטיקה.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Check whether the destination expects seconds or milliseconds before copying the timestamp.',
+        'Confirm timezone assumptions when the date came from a local calendar or user-facing UI.',
+        'Use one known date sample to verify the conversion before applying the result to automation.'
+      ],
+      he: [
+        'בדוק אם היעד מצפה לשניות או מילישניות לפני העתקת ה־timestamp.',
+        'ודא הנחות אזור זמן כשהתאריך הגיע מלוח שנה מקומי או UI שמוצג למשתמש.',
+        'השתמש בדוגמת תאריך ידועה אחת כדי לאמת את ההמרה לפני שימוש באוטומציה.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Decide whether UTC or local time is the source of truth before relying on the number.',
+        'Compare the timestamp back into a readable date if it will be used in production settings.',
+        'Avoid mixing seconds and milliseconds in the same workflow.'
+      ],
+      he: [
+        'החלט אם UTC או זמן מקומי הם מקור האמת לפני שמסתמכים על המספר.',
+        'המר את ה־timestamp בחזרה לתאריך קריא אם הוא ישמש בהגדרות production.',
+        'הימנע מערבוב שניות ומילישניות באותו תהליך עבודה.'
+      ]
+    }
+  },
+  rgbToHex: {
+    useCases: {
+      en: [
+        'Convert copied RGB values into HEX before updating CSS, design tokens or CMS color fields.',
+        'Check brand colors during handoff between design files and frontend implementation.',
+        'Normalize a color value before comparing it with an existing stylesheet or component library.'
+      ],
+      he: [
+        'המר ערכי RGB שהועתקו ל־HEX לפני עדכון CSS, design tokens או שדות צבע ב־CMS.',
+        'בדוק צבעי מותג בזמן העברה בין קבצי עיצוב למימוש frontend.',
+        'נרמל ערך צבע לפני השוואה מול stylesheet קיים או ספריית רכיבים.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Confirm the RGB input has three valid channels before trusting the HEX result.',
+        'Check uppercase or lowercase output against the style guide used by the project.',
+        'Use the preview to confirm the converted color still visually matches the source.'
+      ],
+      he: [
+        'ודא שקלט ה־RGB כולל שלושה ערוצים תקינים לפני שסומכים על תוצאת ה־HEX.',
+        'בדוק אותיות גדולות או קטנות לפי ה־style guide של הפרויקט.',
+        'השתמש בתצוגה המקדימה כדי לוודא שהצבע המומר עדיין תואם ויזואלית למקור.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Decide whether the destination needs a leading # before copying the color.',
+        'Test one real brand color before converting a larger list.',
+        'Keep opacity separate unless the destination specifically expects alpha in the HEX value.'
+      ],
+      he: [
+        'החלט אם היעד צריך סימן # בתחילת הערך לפני העתקת הצבע.',
+        'בדוק צבע מותג אמיתי אחד לפני המרת רשימה גדולה יותר.',
+        'השאר opacity בנפרד אלא אם היעד מצפה ספציפית ל־alpha בתוך ערך ה־HEX.'
+      ]
+    }
+  },
+  hexToRgb: {
+    useCases: {
+      en: [
+        'Convert HEX colors into RGB before working with CSS functions, design specs or UI previews.',
+        'Translate a brand or theme color into channels that can be reused in rgba or documentation.',
+        'Check copied HEX values before handing color tokens to another teammate or system.'
+      ],
+      he: [
+        'המר צבעי HEX ל־RGB לפני עבודה עם פונקציות CSS, מפרטי עיצוב או תצוגות UI.',
+        'תרגם צבע מותג או theme לערוצים שאפשר להשתמש בהם ב־rgba או בתיעוד.',
+        'בדוק ערכי HEX שהועתקו לפני העברת color tokens לאיש צוות או מערכת אחרת.'
+      ]
+    },
+    resultChecklist: {
+      en: [
+        'Confirm the source HEX value is valid and includes the intended six or three digits.',
+        'Use the preview to catch accidental color changes before copying the RGB result.',
+        'Copy the RGB output only after checking whether the destination expects commas, spaces or a full css function.'
+      ],
+      he: [
+        'ודא שערך ה־HEX המקורי תקין וכולל את שלוש או שש הספרות שהתכוונת אליהן.',
+        'השתמש בתצוגה המקדימה כדי לזהות שינוי צבע לא מכוון לפני העתקת ה־RGB.',
+        'העתק את פלט ה־RGB רק אחרי שבודקים אם היעד מצפה לפסיקים, רווחים או פונקציית CSS מלאה.'
+      ]
+    },
+    decisionChecks: {
+      en: [
+        'Check if the source is a brand color, theme token or one-off value before replacing it elsewhere.',
+        'Keep alpha handling separate unless the workflow includes opacity.',
+        'Validate one color in the actual UI when contrast or accessibility matters.'
+      ],
+      he: [
+        'בדוק אם המקור הוא צבע מותג, theme token או ערך חד־פעמי לפני החלפה במקומות אחרים.',
+        'שמור טיפול ב־alpha בנפרד אלא אם התהליך כולל opacity.',
+        'אמת צבע אחד ב־UI אמיתי כאשר contrast או נגישות חשובים.'
+      ]
+    }
+  },
   regexTester: {
     useCases: {
       en: [
@@ -359,6 +625,10 @@ const toolSpecificContent: Partial<Record<string, ToolSpecificContent>> = {
  */
 export function isEditoriallyReviewedTool(tool: ConverterTool) {
   return Boolean(toolSpecificContent[tool.converterId]);
+}
+
+export function getEditoriallyReviewedTools(tools: ConverterTool[]) {
+  return tools.filter(isEditoriallyReviewedTool);
 }
 
 export function getToolUseCases(tool: ConverterTool, locale: Locale) {

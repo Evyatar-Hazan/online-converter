@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { converters } from './converters';
 import { categoryLabels, locales, siteUrl } from './site';
+import { getEditoriallyReviewedTools } from '../lib/converter-content';
 import { getAlternateUrls, getCanonicalUrl } from '../lib/page-alternates';
 
 const categories = Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>;
+const reviewedConverters = getEditoriallyReviewedTools(converters);
 
 describe('canonical and hreflang parity', () => {
   it('keeps canonical and alternates aligned for every public localized page', () => {
@@ -26,7 +28,7 @@ describe('canonical and hreflang parity', () => {
         expect(alternates.default).toBe(`${siteUrl}/en/${category}/`);
       }
 
-      for (const tool of converters) {
+      for (const tool of reviewedConverters) {
         const toolPath = `/${locale}/${tool.slug}/`;
         const alternates = getAlternateUrls(tool.slug);
 

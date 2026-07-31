@@ -1,4 +1,4 @@
-import { isLaunchReadyFreshTool } from './converter-content';
+import { getEditoriallyReviewedTools, isLaunchReadyFreshTool } from './converter-content';
 import type { ConverterTool, Locale } from '../types';
 
 const scoreTool = (tool: ConverterTool) => Number(Boolean(tool.popular)) * 2 + Number(isLaunchReadyFreshTool(tool));
@@ -18,7 +18,7 @@ export const rankCategoryTools = (tools: ConverterTool[], locale: Locale) =>
   });
 
 export const getCategoryToolBuckets = (tools: ConverterTool[], locale: Locale) => {
-  const ordered = rankCategoryTools(tools, locale);
+  const ordered = rankCategoryTools(getEditoriallyReviewedTools(tools), locale);
   const popular = ordered.filter((tool) => tool.popular);
   const fresh = ordered.filter((tool) => isLaunchReadyFreshTool(tool) && !tool.popular);
   const slugsInHighlights = new Set([...popular, ...fresh].map((tool) => tool.slug));
@@ -37,6 +37,6 @@ export const getPriorityCategoryTools = (
   locale: Locale,
   options?: { excludeSlug?: string; limit?: number }
 ) => {
-  const ordered = rankCategoryTools(tools, locale).filter((tool) => tool.slug !== options?.excludeSlug);
+  const ordered = rankCategoryTools(getEditoriallyReviewedTools(tools), locale).filter((tool) => tool.slug !== options?.excludeSlug);
   return ordered.slice(0, options?.limit ?? 4);
 };

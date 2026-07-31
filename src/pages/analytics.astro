@@ -35,11 +35,14 @@ import {
   snippetDefinitionOfDone,
   stabilizationChecklist
 } from '../data/analytics-dashboard';
+import { converters } from '../data/converters';
 import { siteName } from '../data/site';
+import { getEditoriallyReviewedTools } from '../lib/converter-content';
 
 const title = `Analytics Dashboard | ${siteName.en}`;
 const description = 'Internal analytics readiness dashboard for Online Converter traffic, tool usage, SEO coverage and ad visibility instrumentation.';
 const readyProviders = analyticsProviders.filter((provider) => provider.status === 'ready').length;
+const reviewedSlugSet = new Set(getEditoriallyReviewedTools(converters).map((tool) => tool.slug));
 ---
 
 <BaseLayout
@@ -363,7 +366,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {priorityKeywordRows.map((row) => (
             <tr>
               <td>
-                <a href={row.englishUrl}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={row.englishUrl}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.hebrewUrl}</small>
               </td>
               <td>{row.categoryLabel}</td>
@@ -409,7 +412,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {priorityIntentRows.map((row) => (
             <tr>
               <td>
-                <a href={row.englishUrl}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={row.englishUrl}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.hebrewUrl}</small>
               </td>
               <td>{row.categoryLabel}</td>
@@ -465,7 +468,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {priorityHebrewOpportunityRows.map((row) => (
             <tr>
               <td>
-                <a href={row.englishUrl}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={row.englishUrl}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.hebrewUrl}</small>
               </td>
               <td><strong>{row.intent}</strong></td>
@@ -522,7 +525,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {priorityEnglishLongTailRows.map((row) => (
             <tr>
               <td>
-                <a href={row.englishUrl}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={row.englishUrl}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.hebrewUrl}</small>
               </td>
               <td><strong>{row.intent}</strong></td>
@@ -580,7 +583,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {prioritySearchDemandProxyRows.map((row) => (
             <tr>
               <td>
-                <a href={row.englishUrl}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={row.englishUrl}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.hebrewUrl}</small>
               </td>
               <td><strong>{row.intent}</strong></td>
@@ -822,7 +825,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {priorityConverterSeoAuditRows.map((row) => (
             <tr>
               <td>
-                <a href={`/en/${row.slug}/`}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={`/en/${row.slug}/`}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.title}</small>
               </td>
               <td>{row.hasMultipleExamples ? '2+' : '1'}</td>
@@ -859,7 +862,7 @@ const readyProviders = analyticsProviders.filter((provider) => provider.status =
           {priorityRankingRows.map((row) => (
             <tr>
               <td>
-                <a href={row.englishUrl}>{row.slug}</a>
+                {reviewedSlugSet.has(row.slug) ? <a href={row.englishUrl}>{row.slug}</a> : <span>{row.slug}</span>}
                 <small>{row.hebrewUrl}</small>
               </td>
               <td>{row.categoryLabel}</td>

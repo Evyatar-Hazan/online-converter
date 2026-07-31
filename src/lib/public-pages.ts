@@ -1,6 +1,6 @@
 import { converters } from '../data/converters';
 import { categoryLabels, locales } from '../data/site';
-import { isEditoriallyReviewedTool } from './converter-content';
+import { getEditoriallyReviewedTools } from './converter-content';
 
 export function getPublicPaths() {
   const categories = Object.keys(categoryLabels);
@@ -9,7 +9,7 @@ export function getPublicPaths() {
     ...locales.map((locale) => `/${locale}/`),
     ...locales.flatMap((locale) => categories.map((category) => `/${locale}/${category}/`)),
     ...locales.flatMap((locale) =>
-      converters.filter(isEditoriallyReviewedTool).map((tool) => `/${locale}/${tool.slug}/`)
+      getEditoriallyReviewedTools(converters).map((tool) => `/${locale}/${tool.slug}/`)
     )
   ];
 }

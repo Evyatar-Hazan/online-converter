@@ -1,6 +1,6 @@
 import { converters } from './converters';
 import { categoryLabels, locales, siteUrl } from './site';
-import { getToolContentReadiness, isLaunchReadyFreshTool } from '../lib/converter-content';
+import { getToolContentReadiness, isEditoriallyReviewedTool, isLaunchReadyFreshTool } from '../lib/converter-content';
 import { getConverterIntro, getSearchIntent, searchIntents, type SearchIntent } from '../lib/converter-seo';
 import { getRelatedConverters } from '../lib/related-tools';
 
@@ -137,16 +137,17 @@ export const analyticsProviders = [
 ] as const;
 
 const categoryKeys = Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>;
+const reviewedConverters = converters.filter(isEditoriallyReviewedTool);
 
 export const analyticsSummary = {
   totalConverters: converters.length,
-  publicSeoPages: locales.length + locales.length * categoryKeys.length + locales.length * converters.length,
-  localizedToolPages: locales.length * converters.length,
+  publicSeoPages: locales.length + locales.length * categoryKeys.length + locales.length * reviewedConverters.length,
+  localizedToolPages: locales.length * reviewedConverters.length,
   categoryPages: locales.length * categoryKeys.length,
   locales: locales.length,
   categories: categoryKeys.length,
-  popularTools: converters.filter((tool) => tool.popular).length,
-  newTools: converters.filter((tool) => isLaunchReadyFreshTool(tool)).length,
+  popularTools: reviewedConverters.filter((tool) => tool.popular).length,
+  newTools: reviewedConverters.filter((tool) => isLaunchReadyFreshTool(tool)).length,
   trackedEvents: analyticsEvents.length,
   adPlacements: 4
 };
@@ -541,6 +542,7 @@ const genericFaqQuestions = new Set([
 const seoAuditRows = converters.map((tool) => ({
   slug: tool.slug,
   title: tool.title.en,
+  publicReviewed: isEditoriallyReviewedTool(tool),
   uniqueIntroEn: getConverterIntro(tool, 'en'),
   uniqueIntroHe: getConverterIntro(tool, 'he'),
   hasSingleExample: tool.examples.length === 1,
@@ -553,8 +555,11 @@ const seoAuditRows = converters.map((tool) => ({
   relatedIncludesReverse: Boolean(tool.reverseSlug && getRelatedConverters(tool, 3).some((item) => item.slug === tool.reverseSlug))
 }));
 
+const publicSeoAuditRows = seoAuditRows.filter((row) => row.publicReviewed);
+
 export const converterSeoAuditSummary = {
   trackedConverters: converters.length,
+  publicReviewedConverters: publicSeoAuditRows.length,
   localizedTitles: converters.length,
   localizedMetaDescriptions: converters.length,
   visibleH1: converters.length,
@@ -568,7 +573,10 @@ export const converterSeoAuditSummary = {
   convertersUsingOnlyGenericFaq: seoAuditRows.filter((row) => row.hasOnlyGenericFaq).length,
   convertersWithReverseLink: seoAuditRows.filter((row) => row.hasReverseLink).length,
   convertersWithRelatedLinks: seoAuditRows.filter((row) => row.relatedCount > 0).length,
-  convertersWhoseRelatedIncludesReverse: seoAuditRows.filter((row) => row.relatedIncludesReverse).length
+  convertersWhoseRelatedIncludesReverse: seoAuditRows.filter((row) => row.relatedIncludesReverse).length,
+  publicConvertersWithRelatedLinks: publicSeoAuditRows.filter((row) => row.relatedCount > 0).length,
+  publicConvertersWithReverseLink: publicSeoAuditRows.filter((row) => row.hasReverseLink).length,
+  publicConvertersWhoseRelatedIncludesReverse: publicSeoAuditRows.filter((row) => row.relatedIncludesReverse).length
 };
 
 export const converterSeoAuditChecks: Array<{
@@ -615,9 +623,9 @@ export const converterSeoAuditChecks: Array<{
   },
   {
     area: 'Related tools',
-    status: 'good',
-    evidence: `${converterSeoAuditSummary.convertersWithRelatedLinks}/${converterSeoAuditSummary.trackedConverters} converters now render intent-ranked related tools, and ${converterSeoAuditSummary.convertersWhoseRelatedIncludesReverse}/${converterSeoAuditSummary.convertersWithReverseLink} reverse-capable converters surface the inverse tool inside the related section.`,
-    nextStep: 'Use this intent layer again when expanding category hubs and internal linking in 8.4 and 9.2.'
+    status: 'partial',
+    evidence: `${converterSeoAuditSummary.publicConvertersWithRelatedLinks}/${converterSeoAuditSummary.publicReviewedConverters} public reviewed converters render reviewed related tools, and ${converterSeoAuditSummary.publicConvertersWhoseRelatedIncludesReverse}/${converterSeoAuditSummary.publicConvertersWithReverseLink} public reverse-capable converters surface the inverse tool.`,
+    nextStep: 'Keep related links restricted to reviewed pages until AdSense approval, then expand only after the destination page has a real editorial pass.'
   },
   {
     area: 'Structured data',

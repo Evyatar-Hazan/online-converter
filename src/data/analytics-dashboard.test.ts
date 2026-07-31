@@ -27,6 +27,7 @@ import {
   searchConsoleBaseline
 } from './analytics-dashboard';
 import { converters } from './converters';
+import { getEditoriallyReviewedTools } from '../lib/converter-content';
 
 describe('analytics dashboard ranking monitor', () => {
   it('tracks every converter with bilingual ranking fields', () => {
@@ -51,13 +52,16 @@ describe('analytics dashboard ranking monitor', () => {
   });
 
   it('keeps SEO page totals aligned with the ranking monitor', () => {
-    expect(analyticsSummary.localizedToolPages).toBe(rankingMonitorSummary.trackedLocalizedPages);
+    expect(analyticsSummary.localizedToolPages).toBe(reviewedConverters.length * 2);
+    expect(analyticsSummary.localizedToolPages).toBeLessThan(rankingMonitorSummary.trackedLocalizedPages);
     expect(analyticsSummary.totalConverters).toBe(rankingMonitorSummary.trackedConverters);
   });
 
   it('keeps the weekly indexing checklist aligned with the public SEO surface', () => {
     expect(indexingChecklistSummary.cadence).toBe('Weekly');
     expect(indexingChecklistSummary.sitemapUrls).toBe(analyticsSummary.publicSeoPages);
+    expect(analyticsSummary.localizedToolPages).toBe(reviewedConverters.length * 2);
+    expect(analyticsSummary.publicSeoPages).toBe(2 + 7 * 2 + reviewedConverters.length * 2);
     expect(indexingChecklistSummary.priorityQueue).toBe(20);
     expect(indexingChecklistSteps).toHaveLength(7);
     expect(indexingChecklistSteps.some((step) => step.status === 'automated')).toBe(true);
@@ -188,11 +192,12 @@ describe('analytics dashboard ranking monitor', () => {
     expect(converterSeoAuditSummary.localizedMetaDescriptions).toBe(converters.length);
     expect(converterSeoAuditSummary.visibleH1).toBe(converters.length);
     expect(converterSeoAuditSummary.convertersWithUniqueIntroCopy).toBe(converters.length);
-    expect(converterSeoAuditSummary.convertersWithRelatedLinks).toBe(converters.length);
-    expect(converterSeoAuditSummary.convertersWhoseRelatedIncludesReverse).toBe(converterSeoAuditSummary.convertersWithReverseLink);
+    expect(converterSeoAuditSummary.publicReviewedConverters).toBe(reviewedConverters.length);
+    expect(converterSeoAuditSummary.publicConvertersWithRelatedLinks).toBe(reviewedConverters.length);
+    expect(converterSeoAuditSummary.publicConvertersWhoseRelatedIncludesReverse).toBeLessThanOrEqual(converterSeoAuditSummary.publicConvertersWithReverseLink);
     expect(converterSeoAuditChecks).toHaveLength(9);
     expect(converterSeoAuditChecks.find((item) => item.area === 'Intro copy')?.status).toBe('good');
-    expect(converterSeoAuditChecks.find((item) => item.area === 'Related tools')?.status).toBe('good');
+    expect(converterSeoAuditChecks.find((item) => item.area === 'Related tools')?.status).toBe('partial');
     expect(converterSeoAuditChecks.find((item) => item.area === 'Thin-page guardrail')?.status).toBe('good');
     expect(converterSeoAuditSummary.convertersWithMultipleExamples).toBeLessThan(converters.length);
     expect(converterSeoAuditSummary.convertersUsingOnlyGenericFaq).toBeGreaterThan(0);
@@ -206,3 +211,4 @@ describe('analytics dashboard ranking monitor', () => {
     expect(operationsCadence.every((item) => item.cadence === 'Weekly')).toBe(true);
   });
 });
+const reviewedConverters = getEditoriallyReviewedTools(converters);
