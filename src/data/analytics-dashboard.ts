@@ -3,6 +3,7 @@ import { categoryLabels, locales, siteUrl } from './site';
 import { getToolContentReadiness, isEditoriallyReviewedTool, isLaunchReadyFreshTool } from '../lib/converter-content';
 import { getConverterIntro, getSearchIntent, searchIntents, type SearchIntent } from '../lib/converter-seo';
 import { getRelatedConverters } from '../lib/related-tools';
+import { getPublicPaths } from '../lib/public-pages';
 
 const normalizeQuery = (query: string) => query.replace(/\s+/g, ' ').trim();
 
@@ -141,7 +142,7 @@ const reviewedConverters = converters.filter(isEditoriallyReviewedTool);
 
 export const analyticsSummary = {
   totalConverters: converters.length,
-  publicSeoPages: locales.length + locales.length * categoryKeys.length + locales.length * reviewedConverters.length,
+  publicSeoPages: getPublicPaths().length,
   localizedToolPages: locales.length * reviewedConverters.length,
   categoryPages: locales.length * categoryKeys.length,
   locales: locales.length,
@@ -149,7 +150,7 @@ export const analyticsSummary = {
   popularTools: reviewedConverters.filter((tool) => tool.popular).length,
   newTools: reviewedConverters.filter((tool) => isLaunchReadyFreshTool(tool)).length,
   trackedEvents: analyticsEvents.length,
-  adPlacements: 4
+  adPlacements: 2
 };
 
 export const contentQualitySummary = {

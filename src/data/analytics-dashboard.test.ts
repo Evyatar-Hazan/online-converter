@@ -28,6 +28,7 @@ import {
 } from './analytics-dashboard';
 import { converters } from './converters';
 import { getEditoriallyReviewedTools } from '../lib/converter-content';
+import { getPublicPaths } from '../lib/public-pages';
 
 describe('analytics dashboard ranking monitor', () => {
   it('tracks every converter with bilingual ranking fields', () => {
@@ -61,7 +62,7 @@ describe('analytics dashboard ranking monitor', () => {
     expect(indexingChecklistSummary.cadence).toBe('Weekly');
     expect(indexingChecklistSummary.sitemapUrls).toBe(analyticsSummary.publicSeoPages);
     expect(analyticsSummary.localizedToolPages).toBe(reviewedConverters.length * 2);
-    expect(analyticsSummary.publicSeoPages).toBe(2 + 7 * 2 + reviewedConverters.length * 2);
+    expect(analyticsSummary.publicSeoPages).toBe(getPublicPaths().length);
     expect(indexingChecklistSummary.priorityQueue).toBe(20);
     expect(indexingChecklistSteps).toHaveLength(7);
     expect(indexingChecklistSteps.some((step) => step.status === 'automated')).toBe(true);

@@ -1,5 +1,4 @@
 ---
-import AdSlot from '../../../components/AdSlot.astro';
 import ToolCard from '../../../components/ToolCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { converters } from '../../../data/converters';
@@ -130,7 +129,6 @@ const jsonLd = [
   title={title}
   description={description}
   canonicalPath={canonicalPath}
-  monetizable={true}
   alternateSlug={category}
   jsonLd={jsonLd}
   analyticsContext={{ pageType: 'category', locale, category }}
@@ -152,7 +150,6 @@ const jsonLd = [
         <span>{labels.noUpload}</span>
       </div>
     </div>
-    <AdSlot locale={locale} placement="sidebar" />
   </section>
 
   <nav class="tool-jump-nav" aria-label={copy.quickNavLabel}>
@@ -171,8 +168,6 @@ const jsonLd = [
       </article>
     ))}
   </section>
-
-  <AdSlot locale={locale} placement="top" />
 
   <section class="content-grid">
     <article class="content-panel">

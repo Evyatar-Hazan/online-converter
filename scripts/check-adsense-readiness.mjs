@@ -6,6 +6,7 @@ const siteUrl = 'https://online-converter.evyatarhazan.com';
 const distDir = join(process.cwd(), 'dist');
 const publisherId = 'pub-6696643120887220';
 const adClient = `ca-${publisherId}`;
+const infoSegments = new Set(['about', 'editorial', 'privacy', 'contact']);
 
 const fail = (message) => {
   throw new Error(`AdSense readiness check failed: ${message}`);
@@ -82,6 +83,10 @@ const pageKind = (publicPath) => {
     return 'category';
   }
 
+  if (segments.length === 2 && infoSegments.has(segments[1])) {
+    return 'info';
+  }
+
   if (segments.length === 2 && ['en', 'he'].includes(segments[0])) {
     return 'tool';
   }
@@ -92,12 +97,14 @@ const pageKind = (publicPath) => {
 const requiredSectionsByKind = {
   home: ['#tools'],
   category: ['#featured-tools', '#workflow', '#faq', '#all-tools'],
+  info: ['[data-info-page]', '.info-section'],
   tool: ['#converter', '#use-cases', '#quality-checks', '#examples', '#faq', '#related-tools']
 };
 
 const thresholdsByKind = {
-  home: { minWords: 190, minAdSlots: 1, maxAdSlots: 1, minFaqItems: 0 },
-  category: { minWords: 430, minAdSlots: 2, maxAdSlots: 2, minFaqItems: 4 },
+  home: { minWords: 190, minAdSlots: 0, maxAdSlots: 0, minFaqItems: 0 },
+  category: { minWords: 430, minAdSlots: 0, maxAdSlots: 0, minFaqItems: 4 },
+  info: { minWords: 100, minAdSlots: 0, maxAdSlots: 0, minFaqItems: 0 },
   tool: { minWords: 720, minAdSlots: 2, maxAdSlots: 2, minFaqItems: 4, minExamples: 2 }
 };
 
@@ -112,7 +119,8 @@ const summary = {
   noindex: 0,
   tool: 0,
   category: 0,
-  home: 0
+  home: 0,
+  info: 0
 };
 
 const recordFailure = (message) => failures.push(message);
@@ -188,8 +196,12 @@ const auditIndexablePage = (htmlFile) => {
 
   summary[kind] += 1;
 
-  if (!loader) {
-    recordFailure(`${publicPath} is an indexable public page but is missing the AdSense loader`);
+  if (kind === 'tool' && !loader) {
+    recordFailure(`${publicPath} is a reviewed tool page but is missing the AdSense loader`);
+  }
+
+  if (kind !== 'tool' && loader) {
+    recordFailure(`${publicPath} is a ${kind} page and must not load AdSense`);
   }
 
   if (adSlots > 0) {
@@ -221,6 +233,50 @@ const auditIndexablePage = (htmlFile) => {
     if (examples < thresholds.minExamples) {
       recordFailure(`${publicPath} has ${examples} starter examples; expected at least ${thresholds.minExamples}`);
     }
+
+    if (!document.querySelector('[data-editorial-review]')) {
+      recordFailure(`${publicPath} is missing visible editorial review provenance`);
+    }
+  }
+
+  const locale = publicPath.split('/').filter(Boolean)[0];
+  for (const infoPage of infoSegments) {
+    const expectedHref = `/${locale}/${infoPage}/`;
+    if (!document.querySelector(`footer a[href="${expectedHref}"]`)) {
+      recordFailure(`${publicPath} footer is missing ${expectedHref}`);
+    }
+  }
+
+  const searchFirstPhrases = [
+    'search demand',
+    'build authority',
+    'internal linking hubs',
+    'למשוך עוד חיפושים',
+    'כיסוי חיפושים',
+    'לצבור authority'
+  ];
+  for (const phrase of searchFirstPhrases) {
+    if (text.toLowerCase().includes(phrase.toLowerCase())) {
+      recordFailure(`${publicPath} exposes search-engine-first copy: "${phrase}"`);
+    }
+  }
+
+  if (publicPath.endsWith('/privacy/')) {
+    const privacyText = text.toLowerCase();
+    const privacyPhrases = publicPath.startsWith('/he/')
+      ? ['google adsense', 'cookies', 'web beacons', 'כתובת ip']
+      : ['google adsense', 'cookies', 'web beacons', 'ip address'];
+    for (const phrase of privacyPhrases) {
+      if (!privacyText.includes(phrase)) {
+        recordFailure(`${publicPath} privacy notice is missing disclosure: ${phrase}`);
+      }
+    }
+    if (!document.querySelector('a[href="https://policies.google.com/technologies/partner-sites"]')) {
+      recordFailure(`${publicPath} privacy notice is missing Google partner-sites disclosure link`);
+    }
+    if (!document.querySelector('a[href="https://adssettings.google.com/"]')) {
+      recordFailure(`${publicPath} privacy notice is missing Google Ads Settings link`);
+    }
   }
 };
 
@@ -236,8 +292,8 @@ if (summary.indexable !== sitemapLocs.size) {
   recordFailure(`Indexable page count (${summary.indexable}) does not match sitemap URL count (${sitemapLocs.size})`);
 }
 
-if (summary.monetized !== sitemapLocs.size) {
-  recordFailure(`Monetized public page count (${summary.monetized}) does not match sitemap URL count (${sitemapLocs.size})`);
+if (summary.monetized !== summary.tool) {
+  recordFailure(`Monetized public page count (${summary.monetized}) must match reviewed tool page count (${summary.tool})`);
 }
 
 if (risks.length > 0) {
@@ -257,4 +313,5 @@ console.log(`- ${summary.monetized} monetized public pages`);
 console.log(`- ${summary.home} home pages`);
 console.log(`- ${summary.category} category pages`);
 console.log(`- ${summary.tool} tool pages`);
+console.log(`- ${summary.info} policy and ownership pages`);
 console.log(`- ${summary.noindex} noindex pages checked for ad leakage`);

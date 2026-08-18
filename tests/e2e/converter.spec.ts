@@ -3,8 +3,9 @@ import { converters } from '../../src/data/converters';
 import { getEditoriallyReviewedTools } from '../../src/lib/converter-content';
 
 const categoryCount = 7;
+const infoPageCount = 4;
 const reviewedConverters = getEditoriallyReviewedTools(converters);
-const expectedPublicSeoPages = 2 + categoryCount * 2 + reviewedConverters.length * 2;
+const expectedPublicSeoPages = 2 + categoryCount * 2 + infoPageCount * 2 + reviewedConverters.length * 2;
 
 test('English tool page converts JSON to CSV', async ({ page }) => {
   await page.goto('/en/json-to-csv/');
@@ -34,6 +35,19 @@ test('Hebrew category page lists matching tools', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'איך בדרך כלל מתקדמים נכון בתוך הקטגוריה' })).toBeVisible();
   await expect(page.locator('[data-category-tools-grid] [data-tool-card]')).toHaveCount(textToolCount);
   await expect(page.locator('[data-category-tools-grid]').getByRole('link', { name: 'פתח ממיר' }).first()).toBeVisible();
+});
+
+test('navigation pages stay ad-free and policy pages are reachable', async ({ page }) => {
+  for (const path of ['/en/', '/en/text/', '/en/about/', '/en/editorial/', '/en/privacy/', '/en/contact/']) {
+    await page.goto(path);
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('script[src*="pagead2.googlesyndication.com"]')).toHaveCount(0);
+    await expect(page.locator('[data-ad-real="true"]')).toHaveCount(0);
+  }
+
+  await page.goto('/en/privacy/');
+  await expect(page.getByRole('heading', { name: 'Advertising and Google AdSense' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Google Ads Settings' })).toHaveAttribute('href', 'https://adssettings.google.com/');
 });
 
 test('all English category pages expose tool cards and SEO content', async ({ page }) => {

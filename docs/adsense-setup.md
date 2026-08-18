@@ -1,6 +1,6 @@
 # AdSense Production Checklist
 
-This project already supports AdSense, but real in-page ads need both Google approval and ad unit slot IDs.
+This project supports AdSense only on editorially reviewed tool pages. Real in-page ads need Google approval and ad unit slot IDs.
 
 ## Current Verified State
 
@@ -27,10 +27,12 @@ The rendered ad slots should include `data-ad-real="true"` and the matching `dat
 
 ## Required In AdSense
 
-1. Confirm the site is approved in AdSense.
-2. Confirm policy checks have no blocking issues.
-3. Keep the display ad units active.
-4. If a slot is replaced later, copy the new numeric `data-ad-slot` value into Cloudflare Pages and redeploy.
+1. Review `docs/adsense-approval-tracker.md` and close every pre-submission gate.
+2. Confirm the site is approved in AdSense.
+3. Confirm policy checks have no blocking issues.
+4. Keep the inline and bottom display ad units active for reviewed tool pages only.
+5. Keep home, category, policy, contact, analytics and error pages ad-free.
+6. If a slot is replaced later, copy the new numeric `data-ad-slot` value into Cloudflare Pages and redeploy.
 
 ## Verification Commands
 
@@ -39,10 +41,10 @@ npm run adsense:readiness
 npm run adsense:readiness:dist
 curl -i https://online-converter.evyatarhazan.com/ads.txt
 curl -i https://evyatarhazan.com/ads.txt
-curl -s https://online-converter.evyatarhazan.com/en/ | rg 'ca-pub-6696643120887220|data-ad-real'
+curl -s https://online-converter.evyatarhazan.com/en/json-to-csv/ | rg 'ca-pub-6696643120887220|data-ad-real'
 ```
 
-`npm run adsense:readiness` builds with the public AdSense client and slot IDs, then scans the generated `dist` output. It fails if public indexable pages are missing AdSense, if noindex pages include ads, if backlog routes are generated, if `ads.txt` is wrong, or if reviewed tool pages lose their minimum content, FAQ, examples or expected ad placement shape.
+`npm run adsense:readiness` builds with the public AdSense client and slot IDs, then scans the generated `dist` output. It fails if a reviewed tool page is missing AdSense, if any navigation/info/noindex page includes ads, if ownership and policy footer links disappear, if backlog routes are generated, if `ads.txt` is wrong, or if reviewed tool pages lose their content, FAQ, examples, editorial provenance or expected placement shape.
 
 Use `npm run adsense:readiness:dist` only when the current `dist` artifact was already built with the AdSense environment variables.
 

@@ -9,7 +9,7 @@ import type { Locale } from '../types';
 import '../styles/global.css';
 
 interface AnalyticsContext {
-  pageType: 'home' | 'category' | 'tool' | 'dashboard';
+  pageType: 'home' | 'category' | 'tool' | 'info' | 'dashboard';
   locale: Locale;
   category?: string;
   tool?: string;
@@ -104,6 +104,10 @@ const pageContext = analyticsContext ?? { pageType: 'home', locale };
       <nav aria-label="Footer">
         <a href={`/${locale}/`}>{labels.home}</a>
         {footerHubLinks.map((item) => <a href={item.href}>{item.label}</a>)}
+        <a href={`/${locale}/about/`}>{labels.about}</a>
+        <a href={`/${locale}/editorial/`}>{labels.editorial}</a>
+        <a href={`/${locale}/privacy/`}>{labels.privacyPolicy}</a>
+        <a href={`/${locale}/contact/`}>{labels.contact}</a>
         <a href="/sitemap.xml">{labels.sitemap}</a>
       </nav>
     </footer>

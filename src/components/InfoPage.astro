@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getInfoPage, type InfoPageSlug } from '../data/info-pages';
+import type { Locale } from '../types';
+
+interface Props {
+  locale: Locale;
+  slug: InfoPageSlug;
+}
+
+const { locale, slug } = Astro.props;
+const page = getInfoPage(slug, locale);
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: page.title,
+    description: page.description,
+    url: `https://online-converter.evyatarhazan.com/${locale}/${slug}/`
+  }
+];
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${page.title} | Online Converter`}
+  description={page.description}
+  canonicalPath={`/${locale}/${slug}/`}
+  alternateSlug={slug}
+  jsonLd={jsonLd}
+  analyticsContext={{ pageType: 'info', locale }}
+>
+  <article class="info-page" data-info-page={slug}>
+    <header class="tool-hero">
+      <div>
+        <p class="eyebrow">{page.eyebrow}</p>
+        <h1>{page.title}</h1>
+        <p>{page.description}</p>
+        <p class="info-updated">{page.updatedLabel}</p>
+      </div>
+    </header>
+
+    <div class="info-section-list">
+      {page.sections.map((section) => (
+        <section class="content-panel info-section">
+          <h2>{section.title}</h2>
+          {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+          {section.links && (
+            <div class="link-cloud">
+              {section.links.map((link) => (
+                <a href={link.href} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label}</a>
+              ))}
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
+  </article>
+</BaseLayout>

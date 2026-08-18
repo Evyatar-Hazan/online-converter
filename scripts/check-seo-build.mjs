@@ -60,6 +60,7 @@ const normalizePublicPath = (pathname) => {
 };
 
 const categorySegments = new Set(['data', 'text', 'encoding', 'time', 'developer', 'color', 'calculator']);
+const infoSegments = new Set(['about', 'editorial', 'privacy', 'contact']);
 
 const getSitemapPriority = (path) => {
   const segments = path.split('/').filter(Boolean);
@@ -69,6 +70,10 @@ const getSitemapPriority = (path) => {
 
   if (segments.length === 2 && categorySegments.has(segments[1])) {
     return '0.9';
+  }
+
+  if (segments.length === 2 && infoSegments.has(segments[1])) {
+    return '0.6';
   }
 
   return '0.8';
@@ -116,7 +121,10 @@ const assertNoBrokenInternalLinks = () => {
       const href = anchor.getAttribute('href');
       if (!href) continue;
 
-      const resolved = resolvableInternalHref(href.startsWith('/') ? href : new URL(href, `${siteUrl}${sourcePath}`).pathname);
+      const hrefForResolution = href.startsWith('/') || /^(https?:|mailto:|tel:|javascript:)/i.test(href)
+        ? href
+        : new URL(href, `${siteUrl}${sourcePath}`).pathname;
+      const resolved = resolvableInternalHref(hrefForResolution);
       if (!resolved) continue;
 
       if (!publicTargets.has(resolved)) {
@@ -291,6 +299,8 @@ const publicPaths = [
   '/he/',
   '/en/data/',
   '/he/text/',
+  '/en/privacy/',
+  '/he/editorial/',
   '/en/json-to-csv/',
   '/he/json-to-csv/',
   '/en/sort-lines/',

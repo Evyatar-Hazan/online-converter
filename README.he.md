@@ -1,11 +1,11 @@
 # אונליין קונברטר
 
-מרכז ממירים דו־לשוני וממוקד SEO, בנוי עם Astro ו־React islands. האתר מייצר דפים סטטיים בעברית ובאנגלית, וכל ממיר אינטראקטיבי רץ מקומית בדפדפן לטובת מהירות ופרטיות.
+מרכז ממירים דו־לשוני וממוקד מוצר, בנוי עם Astro ו־React islands. האתר מפרסם דפים שנבדקו בעברית ובאנגלית, וכל ממיר אינטראקטיבי רץ מקומית בדפדפן.
 
 ## יכולות
 
-- 124 ממירים בקטגוריות נתונים, טקסט, קידוד, תאריכים, צבעים, מחשבונים וכלי פיתוח.
-- דפי SEO סטטיים לכל כלי ולכל קטגוריה בעברית ובאנגלית.
+- 140 הגדרות ממירים, שמתוכן 16 כלים שעברו ביקורת מפורסמים בעברית ובאנגלית.
+- דפים סטטיים לכלים שנבדקו, קטגוריות, בעלות, מדיניות עריכה, פרטיות ויצירת קשר.
 - המרה מקומית בדפדפן: הקלט לא נשלח לשרת.
 - canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap ו־robots.txt.
 - תמיכה אופציונלית באנליטיקה פרטיותית דרך Cloudflare Web Analytics או Plausible.
@@ -57,7 +57,7 @@ PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=1234567890
 PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=1234567890
 ```
 
-כאשר `PUBLIC_GOOGLE_ADSENSE_CLIENT` מוגדר, סקריפט AdSense נטען ב־layout ו־`/ads.txt` נוצר מתוך אותו Client ID. אזורי מודעות ידניים יוצגו רק כאשר מוגדרים גם Client ID וגם Slot ID מתאים. Google תציג מודעות אמיתיות רק אחרי שהדומיין יאושר ב־AdSense. ראה `docs/adsense-setup.md` לצ׳קליסט פרודקשן.
+כאשר `PUBLIC_GOOGLE_ADSENSE_CLIENT` מוגדר, סקריפט AdSense נטען רק בעמודי כלים שעברו ביקורת ו־`/ads.txt` נוצר מתוך אותו Client ID. דפי בית, קטגוריה, מידע ועמודים פנימיים נשארים ללא מודעות. Google תציג מודעות אמיתיות רק אחרי שהדומיין יאושר. ראה `docs/adsense-approval-tracker.md` ו־`docs/adsense-setup.md`.
 
 ## פריסה לפרודקשן
 
@@ -87,6 +87,7 @@ npm run smoke:prod
 - מסמך מעקב ראשי: `docs/project-tracker-he.md`
 - מסמך משימות: `docs/project-tasks-he.md`
 - תצורת AdSense: `docs/adsense-setup.md`
+- מעקב אישור AdSense: `docs/adsense-approval-tracker.md`
 - לוח analytics פנימי: `docs/analytics-dashboard.md`
 - רעיונות עתידיים לממירים: `docs/next-converters.md`
 
@@ -98,4 +99,4 @@ npm run smoke:prod
 4. מריצים `npm run test` כדי לבדוק registry, SEO והתנהגות ממירים.
 5. מריצים `npm run build` ו־`npm run test:e2e` לפני push.
 
-רעיונות הממירים הבאים לפי SEO מרוכזים ב־`docs/next-converters.md`.
+רעיונות לממירים עתידיים מרוכזים ב־`docs/next-converters.md`; הימצאות ב־registry אינה מפרסמת עמוד באופן אוטומטי.

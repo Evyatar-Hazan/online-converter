@@ -1084,6 +1084,38 @@ textarea[aria-invalid='true'] {
   padding: 24px;
 }
 
+.info-page,
+.info-section-list {
+  display: grid;
+  gap: 18px;
+}
+
+.info-section-list {
+  margin-top: 18px;
+}
+
+.info-updated {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.editorial-review {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 14px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 14px 18px;
+}
+
+.editorial-review span {
+  color: var(--muted);
+}
+
 .content-panel-wide {
   grid-column: 1 / -1;
   display: grid;

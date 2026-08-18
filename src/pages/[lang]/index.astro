@@ -1,6 +1,5 @@
 ---
 import ToolCard from '../../components/ToolCard.astro';
-import AdSlot from '../../components/AdSlot.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { categoryLabels, locales, siteName, ui } from '../../data/site';
 import { getHomeAudienceList, getHomeTrustBlocks } from '../../lib/page-content';
@@ -29,12 +28,7 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: siteName[locale],
-    url: `https://online-converter.evyatarhazan.com/${locale}/`,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `https://online-converter.evyatarhazan.com/${locale}/?q={search_term_string}`,
-      'query-input': 'required name=search_term_string'
-    }
+    url: `https://online-converter.evyatarhazan.com/${locale}/`
   }
 ];
 const copy = {
@@ -42,14 +36,14 @@ const copy = {
   popularTitle: locale === 'he' ? 'ממירים פופולריים שכדאי להתחיל מהם' : 'Popular converters worth opening first',
   popularDescription:
     locale === 'he'
-      ? 'הכלים האלה כבר מסומנים כעדיפות גבוהה, ולכן הם גם נקודת כניסה טובה למשתמשים חדשים וגם hub חזק לקישורים פנימיים.'
-      : 'These tools are already marked as high-priority pages, so they work well as starting points for new users and as stronger internal linking hubs.',
+      ? 'הכלים האלה פותרים משימות נפוצות ומציעים נקודת התחלה ברורה למשתמשים חדשים.'
+      : 'These tools solve common tasks and offer a clear starting point for new visitors.',
   newEyebrow: locale === 'he' ? 'חדש באתר' : 'New on the site',
-  newTitle: locale === 'he' ? 'כלים חדשים שיכולים למשוך עוד חיפושים' : 'New converters that can win more search demand',
+  newTitle: locale === 'he' ? 'ממירים שנבדקו לאחרונה' : 'Recently reviewed converters',
   newDescription:
     locale === 'he'
-      ? 'הכלים החדשים עוזרים להרחיב כיסוי חיפושים ולחבר משתמשים לעמודים שעוד צריכים לצבור authority.'
-      : 'Fresh tools expand search coverage and help route users toward pages that still need to build authority.',
+      ? 'כלים שנוספו לאחר בדיקת הפונקציה, הדוגמאות וההנחיות הייחודיות שלהם.'
+      : 'Tools added after their function, examples, and page-specific guidance were reviewed.',
   trustEyebrow: locale === 'he' ? 'איך האתר בנוי לעבודה אמיתית' : 'How the site is built for real work',
   trustTitle: locale === 'he' ? 'מה מקבלים מעבר להמרה עצמה' : 'What you get beyond the conversion itself',
   audienceEyebrow: locale === 'he' ? 'למי זה מתאים' : 'Who this helps',
@@ -66,7 +60,6 @@ const copy = {
   title={title}
   description={description}
   canonicalPath={`/${locale}/`}
-  monetizable={true}
   jsonLd={jsonLd}
   analyticsContext={{ pageType: 'home', locale }}
 >
@@ -83,20 +76,18 @@ const copy = {
     <div class="hero-panel" aria-label={labels.privacy}>
       <div>
         <span>{labels.privacy}</span>
-        <strong>100%</strong>
+        <strong>{locale === 'he' ? 'בדפדפן' : 'Browser-side'}</strong>
       </div>
       <div>
         <span>{labels.noUpload}</span>
-        <strong>0</strong>
+        <strong>{locale === 'he' ? 'בלי שרת המרה' : 'No conversion server'}</strong>
       </div>
       <div>
         <span>{labels.instant}</span>
-        <strong>&lt;1s</strong>
+        <strong>{locale === 'he' ? 'עברית + אנגלית' : 'English + Hebrew'}</strong>
       </div>
     </div>
   </section>
-
-  <AdSlot locale={locale} placement="top" />
 
   <section class="section-shell" id="tools">
     <div class="section-heading">

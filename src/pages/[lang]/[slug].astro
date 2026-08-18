@@ -211,7 +211,7 @@ const linkingCopy = {
   workflowDescription:
     locale === 'he'
       ? 'הכלים כאן נבחרו לפי כוונת שימוש וזרימת עבודה, כדי שתוכל להמשיך לניקוי, בדיקה, חילוץ או פרסום בלי לחפש מחדש.'
-      : 'These tools are picked by workflow fit and search intent so you can keep moving into cleanup, validation, extraction or publishing without starting a new search.',
+      : 'These tools are picked for the next practical step so you can keep moving into cleanup, validation, extraction or publishing.',
   categoryRelatedEyebrow: locale === 'he' ? 'עוד כלים דומים' : 'More similar tools',
   categoryRelatedTitle: locale === 'he' ? `עוד אפשרויות מתוך ${categoryLabel}` : `More options from ${categoryLabel}`,
   categoryRelatedDescription:
@@ -252,6 +252,14 @@ const linkingCopy = {
       </div>
     </div>
   </section>
+
+  {editoriallyReviewed && (
+    <aside class="editorial-review" data-editorial-review>
+      <strong>{locale === 'he' ? 'עבר ביקורת עריכה' : 'Editorially reviewed'}</strong>
+      <span>{locale === 'he' ? 'הפונקציה, הדוגמאות וההנחיות הייחודיות נבדקו ב־18 באוגוסט 2026.' : 'Function, examples, and page-specific guidance reviewed on August 18, 2026.'}</span>
+      <a href={`/${locale}/editorial/`}>{locale === 'he' ? 'איך מתבצעת הבדיקה' : 'How the review works'}</a>
+    </aside>
+  )}
 
   <nav class="tool-jump-nav" aria-label={locale === 'he' ? 'ניווט מהיר בעמוד' : 'Quick page navigation'}>
     {jumpLinks.map((item) => (

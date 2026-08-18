@@ -2,7 +2,7 @@
 import type { Locale } from '../types';
 
 interface AnalyticsContext {
-  pageType: 'home' | 'category' | 'tool' | 'dashboard';
+  pageType: 'home' | 'category' | 'tool' | 'info' | 'dashboard';
   locale: Locale;
   category?: string;
   tool?: string;
@@ -21,6 +21,8 @@ const initialEvent =
     ? 'view_tool'
     : context.pageType === 'category'
       ? 'view_category'
+      : context.pageType === 'info'
+        ? 'view_info'
       : context.pageType === 'dashboard'
         ? 'view_dashboard'
         : 'view_home';

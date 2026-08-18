@@ -6,6 +6,7 @@ import { getCategoryMetaDescription, getCategoryPageTitle } from '../lib/categor
 import { isEditoriallyReviewedTool } from '../lib/converter-content';
 import { getPublicPaths, getSitemapPriority } from '../lib/public-pages';
 import { converters } from './converters';
+import { infoPageSlugs } from './info-pages';
 
 const categoryKeys = Object.keys(categoryLabels);
 
@@ -47,7 +48,7 @@ describe('SEO surfaces', () => {
     const urls = getPublicPaths();
     const reviewedToolCount = converters.filter(isEditoriallyReviewedTool).length;
 
-    expect(urls.length).toBe(2 + locales.length * categoryKeys.length + locales.length * reviewedToolCount);
+    expect(urls.length).toBe(2 + locales.length * categoryKeys.length + locales.length * infoPageSlugs.length + locales.length * reviewedToolCount);
     expect(new Set(urls).size).toBe(urls.length);
 
     for (const path of urls) {
@@ -56,6 +57,7 @@ describe('SEO surfaces', () => {
 
     expect(urls).not.toContain('/analytics/');
     expect(urls).toContain('/en/json-to-csv/');
+    expect(urls).toContain('/en/privacy/');
     expect(urls).not.toContain('/en/aspect-ratio-calculator/');
   });
 
@@ -64,6 +66,7 @@ describe('SEO surfaces', () => {
     expect(getSitemapPriority('/he/text/')).toBe('0.9');
     expect(getSitemapPriority('/en/json-to-csv/')).toBe('0.8');
     expect(getSitemapPriority('/he/sort-lines/')).toBe('0.8');
+    expect(getSitemapPriority('/en/privacy/')).toBe('0.6');
   });
 
   it('keeps robots.txt open for indexing and points to the sitemap', () => {

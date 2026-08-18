@@ -1,11 +1,11 @@
 # Online Converter
 
-A bilingual SEO-first converter hub built with Astro and React islands. The site generates static pages for English and Hebrew, while each converter runs locally in the browser for speed and privacy.
+A bilingual, product-focused converter hub built with Astro and React islands. The site publishes reviewed static pages in English and Hebrew, while each converter runs locally in the browser.
 
 ## Features
 
-- 124 converter tools across data formats, text, encoding, dates, colors, calculators and developer utilities.
-- Static SEO pages for every tool and category in English and Hebrew.
+- 140 converter definitions, with 16 editorially reviewed tools published in English and Hebrew.
+- Static pages for reviewed tools, categories, ownership, editorial policy, privacy and contact.
 - Browser-only conversion: pasted input is not uploaded to a server.
 - Canonical URLs, hreflang, OpenGraph, JSON-LD, FAQ schema, sitemap and robots.txt.
 - Optional privacy-friendly analytics through Cloudflare Web Analytics or Plausible.
@@ -57,7 +57,7 @@ PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=1234567890
 PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=1234567890
 ```
 
-When `PUBLIC_GOOGLE_ADSENSE_CLIENT` is set, the AdSense script loads in the site layout and `/ads.txt` is generated from that client ID. Manual ad placements render only when both the client ID and the matching slot ID are configured. Google will serve real ads only after the domain is approved in AdSense. See `docs/adsense-setup.md` for the production checklist.
+When `PUBLIC_GOOGLE_ADSENSE_CLIENT` is set, the AdSense script loads only on editorially reviewed tool pages and `/ads.txt` is generated from that client ID. Home, category, information and internal pages remain ad-free. Google will serve real ads only after the domain is approved in AdSense. See `docs/adsense-approval-tracker.md` and `docs/adsense-setup.md`.
 
 ## Production Deployment
 
@@ -90,4 +90,4 @@ npm run smoke:prod
 4. Run `npm run test` to verify registry, SEO and converter behavior.
 5. Run `npm run build` and `npm run test:e2e` before pushing.
 
-The next SEO-focused converter ideas are tracked in `docs/next-converters.md`.
+Future converter ideas are tracked in `docs/next-converters.md`; registry membership alone does not publish a page.
