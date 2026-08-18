@@ -1412,7 +1412,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['timestamp to date', 'unix timestamp converter'], he: ['timestamp לתאריך', 'חותמת יוניקס'] },
     features: { en: ['Seconds or ms', 'UTC output', 'Local output'], he: ['שניות או מילישניות', 'פלט UTC', 'פלט מקומי'] },
     guide: { en: ['Paste a Unix timestamp.', 'Convert it.', 'Use UTC or local date output.'], he: ['הדבק timestamp של Unix.', 'המר אותו.', 'השתמש בפלט UTC או מקומי.'] },
-    examples: [{ label: { en: 'Unix timestamp', he: 'חותמת Unix' }, input: '1704067200' }],
+    examples: [
+      { label: { en: 'Unix timestamp', he: 'חותמת Unix' }, input: '1704067200' },
+      { label: { en: 'Milliseconds timestamp', he: 'חותמת במילישניות' }, input: '1893456000000' }
+    ],
     options: timestampInputOptions,
     faq: [faq.private, faq.free],
     related: ['date-to-timestamp']
@@ -1431,7 +1434,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['date to timestamp', 'unix timestamp'], he: ['תאריך לטיימסטמפ', 'תאריך ל Unix'] },
     features: { en: ['Seconds', 'Milliseconds', 'ISO date'], he: ['שניות', 'מילישניות', 'תאריך ISO'] },
     guide: { en: ['Paste a date string.', 'Convert it.', 'Copy the timestamp format you need.'], he: ['הדבק מחרוזת תאריך.', 'המר אותה.', 'העתק את פורמט הזמן הרצוי.'] },
-    examples: [{ label: { en: 'ISO date', he: 'תאריך ISO' }, input: '2026-06-18T12:00:00Z' }],
+    examples: [
+      { label: { en: 'ISO date', he: 'תאריך ISO' }, input: '2026-06-18T12:00:00Z' },
+      { label: { en: 'Readable date', he: 'תאריך קריא' }, input: 'January 1, 2030 09:30 UTC' }
+    ],
     options: timestampOutputOptions,
     faq: [faq.private, faq.free],
     related: ['timestamp-to-date']
@@ -1800,7 +1806,10 @@ export const converters: ConverterTool[] = [
     keywords: { en: ['meta description length checker', 'description length checker'], he: ['בדיקת אורך מטא דיסקריפשן', 'Meta Description SEO'] },
     features: { en: ['Character count', 'SEO recommendation', 'Local only'], he: ['ספירת תווים', 'המלצת SEO', 'מקומי בלבד'] },
     guide: { en: ['Paste the meta description.', 'Convert to count characters.', 'Shorten or expand the copy if needed.'], he: ['הדבק Meta Description.', 'המר לספירת תווים.', 'קצר או הרחב את הטקסט לפי הצורך.'] },
-    examples: [{ label: { en: 'Meta description', he: 'Meta Description' }, input: 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.' }],
+    examples: [
+      { label: { en: 'Meta description', he: 'Meta Description' }, input: 'Convert JSON to CSV online for free. Fast browser-only conversion with copy, download, examples and bilingual Hebrew and English UI.' },
+      { label: { en: 'Product snippet', he: 'תיאור מוצר' }, input: 'Format CSV data in your browser, preview the output instantly, and copy clean rows into spreadsheets or internal tools.' }
+    ],
     faq: [faq.private, faq.free],
     related: ['meta-title-length-checker', 'word-counter', 'slug-generator']
   },

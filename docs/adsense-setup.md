@@ -35,9 +35,15 @@ The rendered ad slots should include `data-ad-real="true"` and the matching `dat
 ## Verification Commands
 
 ```bash
+npm run adsense:readiness
+npm run adsense:readiness:dist
 curl -i https://online-converter.evyatarhazan.com/ads.txt
 curl -i https://evyatarhazan.com/ads.txt
 curl -s https://online-converter.evyatarhazan.com/en/ | rg 'ca-pub-6696643120887220|data-ad-real'
 ```
+
+`npm run adsense:readiness` builds with the public AdSense client and slot IDs, then scans the generated `dist` output. It fails if public indexable pages are missing AdSense, if noindex pages include ads, if backlog routes are generated, if `ads.txt` is wrong, or if reviewed tool pages lose their minimum content, FAQ, examples or expected ad placement shape.
+
+Use `npm run adsense:readiness:dist` only when the current `dist` artifact was already built with the AdSense environment variables.
 
 If the AdSense dashboard still says the site is preparing immediately after these checks pass, wait for Google to recrawl. The dashboard can lag behind the live `ads.txt` state.

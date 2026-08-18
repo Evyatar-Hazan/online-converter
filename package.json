@@ -17,6 +17,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "seo:check": "node scripts/check-seo-build.mjs",
+    "adsense:readiness": "PUBLIC_GOOGLE_ADSENSE_CLIENT=ca-pub-6696643120887220 PUBLIC_GOOGLE_ADSENSE_SLOT_TOP=3116545087 PUBLIC_GOOGLE_ADSENSE_SLOT_INLINE=7318111602 PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=9458592152 PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=6038221894 npm run build && node scripts/check-adsense-readiness.mjs",
+    "adsense:readiness:dist": "node scripts/check-adsense-readiness.mjs",
     "perf:check": "node scripts/check-web-vitals.mjs",
     "smoke:prod": "node scripts/smoke-production.mjs"
   },

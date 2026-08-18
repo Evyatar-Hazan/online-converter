@@ -32,11 +32,17 @@ jobs:
       - name: SEO build check
         run: npm run seo:check
 
+      - name: AdSense readiness check
+        run: npm run adsense:readiness
+
       - name: Performance check
         run: npm run perf:check
 
       - name: Lint
         run: npm run lint
+
+      - name: Unit tests
+        run: npm test
 
       - name: End-to-end tests
         run: npm run test:e2e
