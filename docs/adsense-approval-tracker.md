@@ -10,6 +10,7 @@
 - לא הוצגו URL בעייתי, כלל פנימי מדויק או אבחנה מפורטת יותר.
 - לפי הממשק שנצפה, אי אפשר לבקש בדיקה נוספת לפני 24 באוגוסט 2026.
 - לכן אין לייחס את הדחייה לפער מסוים בלי ראיה. כל פער פרויקטואלי במסמך מסומן בנפרד מהסיבה הרשמית.
+- remediation commits `f9c16c7` ו־`512cd27` נמצאים ב־`origin/main`; GitHub Actions CI run `32170892848` עבר, ו־Cloudflare Pages production deployment `5bea41a7` פעיל על `512cd27`.
 
 ## מקרא סטטוסים
 
@@ -62,8 +63,8 @@
 - [x] רק 32 עמודי כלים ממומנטים.
 - [x] דפי ניווט, מידע, analytics ו־404 ללא מודעות.
 - [x] privacy/about/editorial/contact זמינים בשתי השפות ב־build.
-- [ ] הקוד הנוכחי נפרס ל־production ונבדק ישירות בכל הנתיבים החדשים.
-- [ ] Cloudflare production build ירוק על commit המדויק.
+- [x] הקוד הנוכחי נפרס ל־production ונבדק ישירות בכל הנתיבים החדשים.
+- [x] Cloudflare production deployment `5bea41a7` פעיל על `512cd27`, ו־CI run `32170892848` ירוק על אותו commit.
 - [ ] Policy Center נבדק ואין בו פריט פתוח נוסף.
 - [ ] Privacy & messaging/CMP נבדק בחשבון.
 - [ ] מקורות התנועה נבדקו ולא נמצאה תנועה לא תקינה או קנויה.
