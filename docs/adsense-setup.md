@@ -23,7 +23,7 @@ PUBLIC_GOOGLE_ADSENSE_SLOT_SIDEBAR=9458592152
 PUBLIC_GOOGLE_ADSENSE_SLOT_BOTTOM=6038221894
 ```
 
-The rendered ad slots should include `data-ad-real="true"` and the matching `data-ad-slot` values.
+Only the inline and bottom units are rendered by the current reviewed-tool layout. The top and sidebar IDs remain configured legacy units but must not be rendered on home or category navigation pages. Rendered units include `data-ad-real="true"` and the matching `data-ad-slot` values.
 
 ## Required In AdSense
 

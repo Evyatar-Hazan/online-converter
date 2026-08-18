@@ -175,6 +175,7 @@ test('tool pages emit privacy-safe analytics events', async ({ page }) => {
   await expect(page.locator('[data-ad-placement="inline"]')).toHaveAttribute('data-ad-real', /true|false/);
   await expect(page.locator('[data-ad-placement="bottom"]')).toHaveAttribute('data-ad-real', /true|false/);
   await expect(page.locator('[data-ad-placement="top"]')).toHaveCount(0);
+  await expect(page.locator('[data-ad-placement="sidebar"]')).toHaveCount(0);
 });
 
 test('home search and category filters emit analytics without raw query text', async ({ page }) => {

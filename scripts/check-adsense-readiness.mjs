@@ -237,6 +237,13 @@ const auditIndexablePage = (htmlFile) => {
     if (!document.querySelector('[data-editorial-review]')) {
       recordFailure(`${publicPath} is missing visible editorial review provenance`);
     }
+
+    const placements = [...document.querySelectorAll('[data-ad-real="true"]')]
+      .map((slot) => slot.getAttribute('data-ad-placement'))
+      .sort();
+    if (placements.join(',') !== 'bottom,inline') {
+      recordFailure(`${publicPath} must use only the separated inline and bottom placements; received ${placements.join(',')}`);
+    }
   }
 
   const locale = publicPath.split('/').filter(Boolean)[0];
